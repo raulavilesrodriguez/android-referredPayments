@@ -10,7 +10,7 @@ plugins {
 }
 
 android {
-    namespace = "com.avilesrodriguez.feature.auth"
+    namespace = "com.avilesrodriguez.feature.payments"
     compileSdk {
         version = release(36)
     }

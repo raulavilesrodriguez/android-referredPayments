@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cancel_crooper">Cancelar</string>
+    <string name="confirm_crooper">Recortar</string>
+    <string name="ok">OK</string>
+    <string name="generic_error">Algo malo pasó. Trata otra vez</string>
+    <string name="notification_permission_title">Notificación de permiso</string>
+    <string name="notification_permission_settings">La notificación de permiso es importante para esta app</string>
+    <string name="request_notification_permission">Solicitar permiso</string>
+    <string name="conversations_list_title">ChatApp</string>
+    <string name="conversations_tab_status_title">Estatus</string>
+    <string name="conversations_tab_chats_title">Chats</string>
+    <string name="conversations_tab_calls_title">Llamadas</string>
+    <string name="chat_title">Chat con %s</string>
+
+    <string name="search">Buscar</string>
+    <string name="contacts">Contactos</string>
+
+    <string name="welcome">Bienvenido</string>
+    <string name="welcome_name">Bienvenido %s</string>
+
+    <string name="yesterday">Ayer</string>
+</resources>

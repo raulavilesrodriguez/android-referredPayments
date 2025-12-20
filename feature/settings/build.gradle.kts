@@ -67,7 +67,6 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.ucrop)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.accompanist.permissions)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material.icons.core)
 

@@ -51,6 +51,8 @@ dependencies {
     implementation(project(":core:presentation"))
     implementation(project(":feature:settings"))
     implementation(project(":feature:auth"))
+    implementation(project(":feature:referrals"))
+    implementation(project(":feature:payments"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
