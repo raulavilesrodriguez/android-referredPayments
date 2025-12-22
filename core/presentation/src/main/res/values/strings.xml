@@ -1,23 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="cancel_crooper">Cancelar</string>
-    <string name="confirm_crooper">Recortar</string>
+    <string name="made_by">Raúl Avilés Rodríguez Tec</string>
+    <!-- Photo -->
+    <string name="cancel_crooper">Cancel</string>
+    <string name="confirm_crooper">Crop</string>
     <string name="ok">OK</string>
-    <string name="generic_error">Algo malo pasó. Trata otra vez</string>
-    <string name="notification_permission_title">Notificación de permiso</string>
-    <string name="notification_permission_settings">La notificación de permiso es importante para esta app</string>
-    <string name="request_notification_permission">Solicitar permiso</string>
-    <string name="conversations_list_title">ChatApp</string>
-    <string name="conversations_tab_status_title">Estatus</string>
-    <string name="conversations_tab_chats_title">Chats</string>
-    <string name="conversations_tab_calls_title">Llamadas</string>
-    <string name="chat_title">Chat con %s</string>
+    <string name="generic_error">Something went wrong. Please try again</string>
+    <string name="notification_permission_title">Notification permission</string>
+    <string name="notification_permission_settings">Notification permission is important for this app</string>
+    <string name="request_notification_permission">Request permission</string>
+    <string name="conversations_list_title">WinApp</string>
+    <string name="conversations_tab_status_title">Status</string>
+    <!-- Search -->
+    <string name="search">Search</string>
+    <string name="contacts">Contacts</string>
+    <!-- Splash -->
+    <string name="welcome">Welcome</string>
+    <string name="welcome_name">Welcome %s</string>
 
-    <string name="search">Buscar</string>
-    <string name="contacts">Contactos</string>
+    <string name="sign_up">Sign up</string>
+    <string name="sign_in">Sign in</string>
+    <string name="label_name">Your name</string>
+    <string name="placeholder_name">Write your name here</string>
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="repeat_password">Repeat password</string>
+    <string name="email_error">Please enter a valid email</string>
+    <string name="empty_password_error">Password cannot be empty</string>
+    <string name="forgot_password">Forgot your password? Click here to recover it via email.</string>
+    <string name="recovery_email_sent">Recovery email sent. Check your email</string>
+    <string name="password_error">Your password should be at least 6 characters long and include 1 digit,
+        1 lowercase letter, and 1 uppercase letter.</string>
+    <string name="password_match_error">Password do not match</string>
 
-    <string name="welcome">Bienvenido</string>
-    <string name="welcome_name">Bienvenido %s</string>
 
-    <string name="yesterday">Ayer</string>
+    <string name="yesterday">Yesterday</string>
 </resources>

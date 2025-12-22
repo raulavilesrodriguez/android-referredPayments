@@ -80,9 +80,22 @@ class StoreDataSource @Inject constructor(
         firebaseAuth.currentUser?.delete()?.await()
     }
 
+    suspend fun isAuthorizedProvider(email: String): Boolean {
+        return try {
+            val doc = firestore.collection(AUTHORIZED_PROVIDERS_COLLECTION)
+                .document(email.lowercase()).get().await()
+            doc.exists()
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+
 
     companion object{
         private const val USERS_COLLECTION = "users"
         private const val IS_ACTIVE_FIELD = "isActive"
+        private const val AUTHORIZED_PROVIDERS_COLLECTION = "authorized_providers"
+
     }
 }

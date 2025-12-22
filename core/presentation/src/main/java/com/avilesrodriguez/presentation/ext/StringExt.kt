@@ -1,17 +1,36 @@
 package com.avilesrodriguez.presentation.ext
 
+import android.util.Patterns
 import java.text.Normalizer
 import java.util.regex.Pattern
 
-private const val MIN_PASS_LENGTH = 10
-private const val ECUADOR_MOBILE_PATTERN = "^09\\d{8}$"
+private const val MIN_PASS_LENGTH = 6
+private const val PASS_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{$MIN_PASS_LENGTH,}$"
 private const val ONLY_NUMBERS_PATTERN = "^\\d+$"
 
-fun String.isValidNumber(): Boolean {
-    return this.isNotBlank() &&
-            this.length == MIN_PASS_LENGTH &&
-            Pattern.compile(ECUADOR_MOBILE_PATTERN).matcher(this).matches()
+const val MAX_LENGTH_NAME = 30
+private const val  NAME_PATTERN = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$"
+
+fun String.isValidEmail(): Boolean {
+    return this.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
 }
+
+fun String.isValidPassword(): Boolean {
+    return this.isNotBlank() &&
+            this.length >= MIN_PASS_LENGTH &&
+            Pattern.compile(PASS_PATTERN).matcher(this).matches()
+}
+
+fun String.passwordMatches(repeated: String): Boolean {
+    return this == repeated
+}
+
+fun String.isValidName(): Boolean {
+    return this.isNotBlank()
+            && this.length <= MAX_LENGTH_NAME &&
+            Pattern.compile(NAME_PATTERN).matcher(this).matches()
+}
+
 
 fun String.isOnlyNumbers(): Boolean {
     return Pattern.compile(ONLY_NUMBERS_PATTERN).matcher(this).matches()

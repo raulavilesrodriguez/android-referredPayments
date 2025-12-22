@@ -37,6 +37,7 @@ sealed class UserData {
         val countNumber: String? = null, // cuenta para pagar
         val moneyPaid: String? = null,
         val moneyToPay: String? = null,
-        val referralsConversion: String? = null
+        val referralsConversion: String? = null,
+        val industry: String? = null
     ) : UserData()
 }

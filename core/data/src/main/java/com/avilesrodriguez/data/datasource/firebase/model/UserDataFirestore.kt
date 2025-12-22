@@ -43,7 +43,8 @@ sealed class UserDataFirestore {
         val countNumber: String? = null, // cuenta para pagar
         val moneyPaid: String? = null,
         val moneyToPay: String? = null,
-        val referralsConversion: String? = null
+        val referralsConversion: String? = null,
+        val industry: String? = null
     ) : UserDataFirestore()
 }
 
@@ -75,7 +76,8 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
             countNumber = countNumber,
             moneyPaid = moneyPaid,
             moneyToPay = moneyToPay,
-            referralsConversion = referralsConversion
+            referralsConversion = referralsConversion,
+            industry = industry
         )
     }
 }
@@ -107,7 +109,8 @@ fun UserDataFirestore.toDomain(): UserData? {
             countNumber = countNumber,
             moneyPaid = moneyPaid,
             moneyToPay = moneyToPay,
-            referralsConversion = referralsConversion
+            referralsConversion = referralsConversion,
+            industry = industry
         )
     }
 }

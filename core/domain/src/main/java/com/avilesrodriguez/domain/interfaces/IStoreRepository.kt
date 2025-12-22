@@ -8,4 +8,5 @@ interface IStoreRepository {
     suspend fun deactivateUser(uid: String)
     suspend fun reactivateUser(uid: String)
     suspend fun secureDeleteAccount(uid: String)
+    suspend fun isAuthorizedProvider(email: String): Boolean
 }

@@ -5,6 +5,8 @@ object NavRoutes {
 
     const val Login = "login"
 
+    const val SignUp = "sign_up"
+
     const val Settings = "settings"
 
     const val NewReferral = "new_referral"

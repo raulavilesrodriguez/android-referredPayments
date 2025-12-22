@@ -19,4 +19,8 @@ class StoreRepository @Inject constructor(
     override suspend fun reactivateUser(uid: String) = data.reactivateUser(uid)
 
     override suspend fun secureDeleteAccount(uid: String) = data.secureDeleteAccount(uid)
+
+    override suspend fun isAuthorizedProvider(email: String): Boolean {
+        return data.isAuthorizedProvider(email)
+    }
 }
