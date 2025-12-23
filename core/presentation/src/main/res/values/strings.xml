@@ -33,6 +33,9 @@
     <string name="password_error">Your password should be at least 6 characters long and include 1 digit,
         1 lowercase letter, and 1 uppercase letter.</string>
     <string name="password_match_error">Password do not match</string>
+    <string name="home_winapp">Home WinApp</string>
+    <string name="home_provider">Home Company %s:</string>
+    <string name="home_client">Home Client %s:</string>
 
 
     <string name="yesterday">Yesterday</string>

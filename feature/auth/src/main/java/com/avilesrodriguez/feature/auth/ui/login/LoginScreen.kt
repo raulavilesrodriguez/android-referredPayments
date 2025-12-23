@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.BasicBottomBar
+import com.avilesrodriguez.presentation.composables.BasicButton
 import com.avilesrodriguez.presentation.composables.BasicTextButton
 import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.EmailField
@@ -75,14 +76,9 @@ fun LoginScreenContent(
     ) {
         EmailField(uiState.email, onEmailChange, Modifier.fieldModifier())
         PasswordField(uiState.password, onPasswordChange, Modifier.fieldModifier())
-        Button(
-            onClick = onSignInClick,
-            modifier = Modifier.basicButton()
-        ) {
-            Text(text = stringResource(R.string.login))
-            BasicTextButton(R.string.forgot_password, Modifier.textButton()) {
-                onForgotPasswordClick()
-            }
+        BasicButton(R.string.login, Modifier.basicButton()) { onSignInClick() }
+        BasicTextButton(R.string.forgot_password, Modifier.textButton()) {
+            onForgotPasswordClick()
         }
     }
 }

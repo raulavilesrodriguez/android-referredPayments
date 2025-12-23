@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/core/presentation" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/auth" />
+            <option value="$PROJECT_DIR$/feature/home" />
             <option value="$PROJECT_DIR$/feature/payments" />
             <option value="$PROJECT_DIR$/feature/referrals" />
             <option value="$PROJECT_DIR$/feature/settings" />
