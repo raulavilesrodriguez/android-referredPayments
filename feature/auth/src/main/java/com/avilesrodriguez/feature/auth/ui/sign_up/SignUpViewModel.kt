@@ -5,6 +5,7 @@ import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.IsAuthorizedProvider
 import com.avilesrodriguez.domain.usecases.SaveUser
+import com.avilesrodriguez.domain.usecases.SetNotFirstTime
 import com.avilesrodriguez.domain.usecases.SignUp
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.ext.isValidEmail
@@ -23,7 +24,8 @@ class SignUpViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
     private val signUp: SignUp,
     private val isAuthorizedProvider: IsAuthorizedProvider,
-    private val saveUser: SaveUser
+    private val saveUser: SaveUser,
+    private val setNotFirstTime: SetNotFirstTime
 ): BaseViewModel() {
     private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState: StateFlow<SignUpUiState> = _uiState
@@ -85,6 +87,7 @@ class SignUpViewModel @Inject constructor(
                 )
             }
             saveUser(newUser)
+            setNotFirstTime()
             // navigation
             openAndPopUp(NavRoutes.Home, NavRoutes.SignUp)
         }

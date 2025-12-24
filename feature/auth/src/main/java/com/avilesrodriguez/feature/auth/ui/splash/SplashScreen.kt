@@ -29,7 +29,6 @@ fun SplashScreen(
 ){
     LaunchedEffect(Unit) {
         viewModel.alreadyLoggedIn(openAndPopUp)
-        viewModel.getUserData()
     }
 
     val userData by viewModel.userDataStore.collectAsState()
@@ -53,9 +52,9 @@ fun SplashScreenContent(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val textToShow = if(userData?.name != null)
-                stringResource(R.string.welcome_name, userData.name!!)
-            else stringResource(R.string.welcome)
+            val textToShow = userData?.name?.let {
+                stringResource(R.string.welcome_name, it)
+            } ?: stringResource(R.string.welcome)
             Text(
                 text = textToShow,
                 color = MaterialTheme.colorScheme.onBackground,

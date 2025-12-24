@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.messaging)
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.datastore)
 }
 
 tasks.withType<KotlinJvmCompile>().configureEach {

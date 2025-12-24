@@ -37,6 +37,5 @@
     <string name="home_provider">Home Company %s:</string>
     <string name="home_client">Home Client %s:</string>
 
-
     <string name="yesterday">Yesterday</string>
 </resources>
