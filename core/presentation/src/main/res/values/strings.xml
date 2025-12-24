@@ -15,7 +15,7 @@
     <string name="search">Search</string>
     <string name="contacts">Contacts</string>
     <!-- Splash -->
-    <string name="welcome">Welcome</string>
+    <string name="welcome">Welcome to WinApp</string>
     <string name="welcome_name">Welcome %s</string>
 
     <string name="sign_up">Sign up</string>

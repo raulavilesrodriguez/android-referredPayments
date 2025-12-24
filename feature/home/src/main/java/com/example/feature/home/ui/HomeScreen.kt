@@ -1,6 +1,8 @@
 package com.example.feature.home.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,6 +23,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.presentation.R
+
+@Composable
+fun HomeScreen3(
+    openScreen: (String) -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) { Text("holaaa")}
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

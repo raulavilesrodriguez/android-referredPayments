@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,16 +46,15 @@ fun NameField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = 
     ) {
         OutlinedTextField(
             value = value,
-            onValueChange = { onNewValue(it) },
+            onValueChange = {
+                if(it.length <= MAX_LENGTH_NAME)
+                onNewValue(it)
+                            },
             shape = RoundedCornerShape(16.dp),
             placeholder = {Text(text = stringResource(R.string.placeholder_name))},
             singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = "Email") }
         )
         Text(
             text = "${value.length}/$MAX_LENGTH_NAME",

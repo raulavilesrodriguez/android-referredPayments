@@ -15,7 +15,7 @@ fun Modifier.textButton(): Modifier {
 }
 
 fun Modifier.basicButton(): Modifier {
-    return this.fillMaxWidth().padding(16.dp, 8.dp)
+    return this.fillMaxWidth().padding(20.dp, 8.dp)
 }
 
 fun Modifier.card(): Modifier {
@@ -35,7 +35,7 @@ fun Modifier.dropdownSelector(): Modifier {
 }
 
 fun Modifier.fieldModifier(): Modifier {
-    return this.fillMaxWidth().padding(16.dp, 4.dp)
+    return this.fillMaxWidth().padding(20.dp, 4.dp)
 }
 
 fun Modifier.toolbarActions(): Modifier {

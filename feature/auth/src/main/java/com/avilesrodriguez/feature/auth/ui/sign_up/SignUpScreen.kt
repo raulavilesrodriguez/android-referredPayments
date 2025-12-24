@@ -17,8 +17,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.presentation.R
+import com.avilesrodriguez.presentation.composables.BasicBottomBar
 import com.avilesrodriguez.presentation.composables.BasicButton
 import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.EmailField
@@ -42,7 +44,7 @@ fun SignUpScreen(
             BasicToolbar(R.string.sign_up)
         },
         bottomBar = {
-            BasicToolbar(R.string.made_by)
+            BasicBottomBar(R.string.made_by)
         },
         content = { innerPadding ->
             SignUpScreenContent(
@@ -84,5 +86,20 @@ fun SignUpScreenContent(
         PasswordField(uiState.password, onPasswordChange, Modifier.fieldModifier())
         RepeatPasswordField(uiState.repeatPassword, onRepeatPasswordChange, Modifier.fieldModifier())
         BasicButton(R.string.sign_up, Modifier.basicButton()) { onSignUpClick() }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SignUpScreenPreview(){
+    MaterialTheme {
+        SignUpScreenContent(
+            uiState = SignUpUiState(),
+            onNameChange = {},
+            onEmailChange = {},
+            onPasswordChange = {},
+            onRepeatPasswordChange = {},
+            onSignUpClick = {}
+        )
     }
 }

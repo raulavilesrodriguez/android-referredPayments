@@ -37,8 +37,10 @@ class SignUpViewModel @Inject constructor(
 
     fun onNameChange(name: String){
         // Solo deja pasar letras y espacios, eliminando lo demás al instante
+        val allowedSymbols = setOf('.', '-', ',', '/')
+
         val filteredName = name
-            .filter { it.isLetter() || it.isWhitespace() }
+            .filter { it.isLetter() || it.isDigit() || it.isWhitespace() || allowedSymbols.contains(it) }
             .take(30)
         _uiState.value = _uiState.value.copy(name = filteredName)
     }

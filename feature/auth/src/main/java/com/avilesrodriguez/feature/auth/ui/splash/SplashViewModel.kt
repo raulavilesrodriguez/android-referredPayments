@@ -24,7 +24,7 @@ class SplashViewModel @Inject constructor(
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
 
-    private val delay = 2000L // 2 seconds
+    private val delay = 3000L // 2 seconds
 
     val currentUserId
         get() = currentUserIdUseCase()
