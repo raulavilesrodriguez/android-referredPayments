@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name_presentation">WinApp</string>
     <string name="made_by">Raúl Avilés Rodríguez Tec</string>
     <!-- Photo -->
     <string name="cancel_crooper">Cancel</string>
@@ -28,14 +29,64 @@
     <string name="repeat_password">Repeat password</string>
     <string name="email_error">Please enter a valid email</string>
     <string name="empty_password_error">Password cannot be empty</string>
-    <string name="forgot_password">Forgot your password? Click here to recover it via email.</string>
     <string name="recovery_email_sent">Recovery email sent. Check your email</string>
     <string name="password_error">Your password should be at least 6 characters long and include 1 digit,
         1 lowercase letter, and 1 uppercase letter.</string>
     <string name="password_match_error">Password do not match</string>
+    <string name="navigate_sign_in">You already have an account. Click here to log in</string>
+    <string name="forgot_password">1. Forgot your password? Click here to recover it via email.</string>
+    <string name="navigate_sign_up">2. Don\'t have an account? Click here to sign up</string>
     <string name="home_winapp">Home WinApp</string>
-    <string name="home_provider">Home Company %s:</string>
-    <string name="home_client">Home Client %s:</string>
 
+    <!-- Up bar Home Screen -->
+    <string name="usage_policies">Usage policies</string>
+    <string name="start">Start</string>
+    <string name="referrals">Referrals</string>
+    <string name="settings">Settings</string>
+    <string name="sign_out">Sign out</string>
     <string name="yesterday">Yesterday</string>
+
+    <!-- Policies Screen -->
+    <string name="policies">Policies</string>
+
+    <!-- General -->
+    <string name="policies_title">Use Policy and Referral Program</string>
+    <string name="policies_intro">
+        This application offers a referral program based exclusively on real and verifiable purchases of products or services provided by companies registered on the platform.
+    </string>
+
+    <!-- Section 1 -->
+    <string name="policies_section_1_title">1. How the referral program works</string>
+    <string name="policies_section_1_body">
+        Monetary rewards are generated only when a referred user effectively purchases a product or service available in the application. No payments are made for simply registering referrals or for the number of invited users. Registering referrals does not guarantee income.
+    </string>
+
+    <string name="policies_section_1_example">
+        Example: A user may have multiple registered referrals; however, if none of them purchase a product or service offered by an affiliated company, no payment will be generated.
+    </string>
+
+    <!-- Section 2 -->
+    <string name="policies_section_2_title">2. Not a pyramid scheme</string>
+    <string name="policies_section_2_body">
+        This application is not a pyramid, multi-level, or investment scheme. No guaranteed income is promised. Earnings depend exclusively on real commercial transactions and not on the growth of a user network. No payments or investments are required to participate.
+    </string>
+
+    <!-- Section 3 -->
+    <string name="policies_section_3_title">3. Verification and control</string>
+    <string name="policies_section_3_body">
+        All rewards are subject to verification and validation processes. The platform reserves the right to reject or cancel payments that do not meet the established conditions. Any fraudulent or abusive use of the referral system may result in account suspension or termination.
+    </string>
+
+    <!-- Section 4 -->
+    <string name="policies_section_4_title">4. Payment information</string>
+    <string name="policies_section_4_body">
+        To receive payments, the user must provide a valid bank account in their own name. The user is solely responsible for ensuring that the provided personal and banking information is accurate, complete, and up to date.
+    </string>
+
+    <!-- Section 5 -->
+    <string name="policies_section_5_title">5. User responsibility</string>
+    <string name="policies_section_5_body">
+        The platform is not responsible for failed payments, delays, or losses caused by incorrect or false information provided by the user. Using the application implies acceptance of these policies.
+    </string>
+
 </resources>

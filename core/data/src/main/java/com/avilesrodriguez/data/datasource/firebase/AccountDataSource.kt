@@ -1,5 +1,6 @@
 package com.avilesrodriguez.data.datasource.firebase
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -24,7 +25,12 @@ class AccountDataSource @Inject constructor(
     }
 
     suspend fun sendRecoveryEmail(email: String) {
-        firebaseAuth.sendPasswordResetEmail(email).await()
+        try {
+            firebaseAuth.sendPasswordResetEmail(email).await()
+        } catch (e: Exception) {
+            Log.e("AccountDataSource HOLAA", "Error al enviar el correo broo: ${e.message}")
+            throw e
+        }
     }
 
     fun signOut() {

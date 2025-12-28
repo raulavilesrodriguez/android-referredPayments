@@ -1,6 +1,7 @@
 package com.avilesrodriguez.feature.auth.ui.login
 
 import com.avilesrodriguez.domain.usecases.SendRecoveryEmail
+import com.avilesrodriguez.domain.usecases.SetNotFirstTime
 import com.avilesrodriguez.domain.usecases.SignIn
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.ext.isValidEmail
@@ -15,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val signIn: SignIn,
-    private val sendRecoveryEmail: SendRecoveryEmail
+    private val sendRecoveryEmail: SendRecoveryEmail,
+    private val setNotFirstTime: SetNotFirstTime
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -45,6 +47,7 @@ class LoginViewModel @Inject constructor(
 
         launchCatching {
             signIn(email, password)
+            setNotFirstTime()
             openAndPopUp(NavRoutes.Home, NavRoutes.Login)
         }
     }
@@ -58,6 +61,10 @@ class LoginViewModel @Inject constructor(
             sendRecoveryEmail(email)
             SnackbarManager.showMessage(R.string.recovery_email_sent)
         }
+    }
+
+    fun onNavigateToSignUp(openAndPopUp: (String, String) -> Unit){
+        openAndPopUp(NavRoutes.SignUp, NavRoutes.Login)
     }
 
 }

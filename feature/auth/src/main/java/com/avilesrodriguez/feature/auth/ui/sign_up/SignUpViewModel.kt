@@ -94,4 +94,8 @@ class SignUpViewModel @Inject constructor(
             openAndPopUp(NavRoutes.Home, NavRoutes.SignUp)
         }
     }
+
+    fun onNavigateToSignIn(openAndPopUp: (String, String) -> Unit){
+        openAndPopUp(NavRoutes.Login, NavRoutes.SignUp)
+    }
 }

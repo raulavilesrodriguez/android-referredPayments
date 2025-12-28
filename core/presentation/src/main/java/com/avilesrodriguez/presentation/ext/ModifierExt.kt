@@ -14,6 +14,10 @@ fun Modifier.textButton(): Modifier {
     return this.fillMaxWidth().padding(16.dp, 8.dp, 16.dp, 0.dp)
 }
 
+fun Modifier.textButton2(): Modifier {
+    return this.padding(16.dp, 0.dp, 16.dp, 0.dp)
+}
+
 fun Modifier.basicButton(): Modifier {
     return this.fillMaxWidth().padding(20.dp, 8.dp)
 }

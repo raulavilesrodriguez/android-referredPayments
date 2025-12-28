@@ -9,6 +9,8 @@ object NavRoutes {
 
     const val Settings = "settings"
 
+    const val Policies = "policies"
+
     const val NewReferral = "new_referral"
 
     const val Home = "home"

@@ -29,6 +29,7 @@ import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import com.avilesrodriguez.winapp.ui.theme.WinAppTheme
 import com.example.feature.home.ui.HomeScreen
+import com.example.feature.home.ui.PoliciesScreen
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -62,6 +63,7 @@ fun MainNavigation(){
                     addSignUp(appState)
                     addLogin(appState)
                     addHome(appState)
+                    addPolicies(appState)
                 }
             }
         }
@@ -114,7 +116,16 @@ private fun NavGraphBuilder.addLogin(appState: AppState){
 private fun NavGraphBuilder.addHome(appState: AppState){
     composable(NavRoutes.Home) {
         HomeScreen(
-            openScreen = {route -> appState.navigate(route)}
+            openScreen = {route -> appState.navigate(route)},
+            restartApp = {route -> appState.clearAndNavigate(route)}
+        )
+    }
+}
+
+private fun NavGraphBuilder.addPolicies(appState: AppState){
+    composable(NavRoutes.Policies) {
+        PoliciesScreen(
+            popUp = {appState.popUp()}
         )
     }
 }

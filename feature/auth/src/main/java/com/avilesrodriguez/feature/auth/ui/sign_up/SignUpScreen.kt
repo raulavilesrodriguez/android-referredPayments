@@ -22,6 +22,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.BasicBottomBar
 import com.avilesrodriguez.presentation.composables.BasicButton
+import com.avilesrodriguez.presentation.composables.BasicTextButton
 import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.EmailField
 import com.avilesrodriguez.presentation.composables.NameField
@@ -29,6 +30,7 @@ import com.avilesrodriguez.presentation.composables.PasswordField
 import com.avilesrodriguez.presentation.composables.RepeatPasswordField
 import com.avilesrodriguez.presentation.ext.basicButton
 import com.avilesrodriguez.presentation.ext.fieldModifier
+import com.avilesrodriguez.presentation.ext.textButton
 
 
 @Composable
@@ -54,6 +56,7 @@ fun SignUpScreen(
                 onPasswordChange = viewModel::onPasswordChange,
                 onRepeatPasswordChange = viewModel::onRepeatPasswordChange,
                 onSignUpClick = {viewModel.onSignUpClick(openAndPopUp)},
+                onNavigateToSignIn = {viewModel.onNavigateToSignIn(openAndPopUp)},
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -69,6 +72,7 @@ fun SignUpScreenContent(
     onPasswordChange: (String) -> Unit,
     onRepeatPasswordChange: (String) -> Unit,
     onSignUpClick: () -> Unit,
+    onNavigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -86,6 +90,9 @@ fun SignUpScreenContent(
         PasswordField(uiState.password, onPasswordChange, Modifier.fieldModifier())
         RepeatPasswordField(uiState.repeatPassword, onRepeatPasswordChange, Modifier.fieldModifier())
         BasicButton(R.string.sign_up, Modifier.basicButton()) { onSignUpClick() }
+        BasicTextButton(R.string.navigate_sign_in, Modifier.textButton()) {
+            onNavigateToSignIn()
+        }
     }
 }
 
@@ -99,7 +106,8 @@ fun SignUpScreenPreview(){
             onEmailChange = {},
             onPasswordChange = {},
             onRepeatPasswordChange = {},
-            onSignUpClick = {}
+            onSignUpClick = {},
+            onNavigateToSignIn = {}
         )
     }
 }

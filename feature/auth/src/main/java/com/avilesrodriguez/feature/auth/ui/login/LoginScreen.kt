@@ -9,15 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.BasicBottomBar
@@ -29,6 +26,7 @@ import com.avilesrodriguez.presentation.composables.PasswordField
 import com.avilesrodriguez.presentation.ext.basicButton
 import com.avilesrodriguez.presentation.ext.fieldModifier
 import com.avilesrodriguez.presentation.ext.textButton
+import com.avilesrodriguez.presentation.ext.textButton2
 
 @Composable
 fun LoginScreen(
@@ -51,6 +49,7 @@ fun LoginScreen(
                 onPasswordChange = viewModel::onPasswordChange,
                 onSignInClick = { viewModel.onSignInClick(openAndPopUp) },
                 onForgotPasswordClick = { viewModel.onForgotPasswordClick() },
+                onNavigateToSignUp = { viewModel.onNavigateToSignUp(openAndPopUp) },
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -64,6 +63,7 @@ fun LoginScreenContent(
     onPasswordChange: (String) -> Unit,
     onSignInClick: () -> Unit,
     onForgotPasswordClick:() -> Unit,
+    onNavigateToSignUp: () -> Unit,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -72,13 +72,16 @@ fun LoginScreenContent(
             .fillMaxHeight()
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start
     ) {
         EmailField(uiState.email, onEmailChange, Modifier.fieldModifier())
         PasswordField(uiState.password, onPasswordChange, Modifier.fieldModifier())
         BasicButton(R.string.login, Modifier.basicButton()) { onSignInClick() }
         BasicTextButton(R.string.forgot_password, Modifier.textButton()) {
             onForgotPasswordClick()
+        }
+        BasicTextButton(R.string.navigate_sign_up, Modifier.textButton2()) {
+            onNavigateToSignUp()
         }
     }
 }
