@@ -2,10 +2,18 @@
 <resources>
     <string name="app_name_presentation">WinApp</string>
     <string name="made_by">Raúl Avilés Rodríguez Tec</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="save">Save</string>
+    <string name="settings">Settings</string>
+    <string name="edit_profile">Edit profile</string>
     <!-- Photo -->
     <string name="cancel_crooper">Cancel</string>
     <string name="confirm_crooper">Crop</string>
-    <string name="ok">OK</string>
+    <string name="error_cropping">Error cropping image</string>
+    <string name="error_saving">Error saving image: %s</string>
     <string name="generic_error">Something went wrong. Please try again</string>
     <string name="notification_permission_title">Notification permission</string>
     <string name="notification_permission_settings">Notification permission is important for this app</string>
@@ -21,6 +29,9 @@
 
     <string name="sign_up">Sign up</string>
     <string name="sign_in">Sign in</string>
+    <string name="sign_out">Sign out</string>
+    <string name="delete_account">Delete account</string>
+    <string name="warning_delete_account">Are you sure you want to delete your account?</string>
     <string name="label_name">Your name</string>
     <string name="placeholder_name">Write your name here</string>
     <string name="login">Login</string>
@@ -44,7 +55,18 @@
     <string name="referrals">Referrals</string>
     <string name="settings">Settings</string>
     <string name="sign_out">Sign out</string>
-    <string name="yesterday">Yesterday</string>
+
+    <!-- Settings Screen -->
+    <string name="profile">Profile</string>
+    <string name="settings_edit_photo">Edit photo</string>
+    <string name="settings_name">Name</string>
+    <string name="settings_industry">Industry</string>
+    <string name="settings_identity_card_client">Identity card</string>
+    <string name="settings_identity_card_provider">Identity card or RUC</string>
+    <string name="settings_count_number_bank_client">Count number bank to receive payments</string>
+    <string name="settings_count_number_bank_provider">Count number bank to pay"</string>
+    <string name="no_information">There is no information</string>
+    <string name="delete_account">Delete account"></string>
 
     <!-- Policies Screen -->
     <string name="policies">Policies</string>

@@ -53,7 +53,8 @@ fun HomeScreen(
         onActionClick = { action ->
             viewModel.onActionClick(openScreen, restartApp, action)
         },
-        openScreen = openScreen
+        openScreen = openScreen,
+        restartApp = restartApp
     )
 }
 
@@ -64,6 +65,7 @@ fun HomeScreenContent(
     options: List<Int>,
     onActionClick: (Int) -> Unit,
     openScreen: (String) -> Unit,
+    restartApp: (String) -> Unit,
 ){
     val tabs = generateTabs()
     val pagerState = rememberPagerState(1){tabs.size}
@@ -122,6 +124,7 @@ fun HomeScreenContent(
                     2 -> {
                         SettingsScreen(
                             openScreen = openScreen,
+                            restartApp = restartApp,
                             modifier = Modifier.padding(innerPadding)
                         )
                     }

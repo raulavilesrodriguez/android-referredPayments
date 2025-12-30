@@ -21,5 +21,4 @@ object NavRoutes {
     }
 
     const val EditUser = "edit_user"
-    const val EditName = "edit_name"
 }
