@@ -8,6 +8,8 @@ object NavRoutes {
     const val SignUp = "sign_up"
 
     const val Settings = "settings"
+    const val EditUser = "edit_user"
+    const val SettingsGraph = "settings_graph"
 
     const val Policies = "policies"
 
@@ -20,5 +22,4 @@ object NavRoutes {
         const val uId = "uId"
     }
 
-    const val EditUser = "edit_user"
 }

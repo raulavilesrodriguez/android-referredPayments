@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 @Composable
 fun ReferralsScreen(
     openScreen: (String) -> Unit,
-    modifier: Modifier = Modifier
 ){
     Column(
         modifier = Modifier

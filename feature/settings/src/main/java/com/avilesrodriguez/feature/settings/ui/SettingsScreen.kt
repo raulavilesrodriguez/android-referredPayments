@@ -6,13 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -21,10 +18,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -46,7 +40,6 @@ import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.avatar.DEFAULT_AVATAR_USER
-import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.profile.ItemEditProfile
 import com.avilesrodriguez.presentation.profile.ItemProfile
 
@@ -55,7 +48,6 @@ import com.avilesrodriguez.presentation.profile.ItemProfile
 fun SettingsScreen(
     openScreen: (String) -> Unit,
     restartApp: (String) -> Unit,
-    modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel()
 ){
     val userData by viewModel.uiState.collectAsState()
@@ -65,12 +57,12 @@ fun SettingsScreen(
         viewModel.reloadUserData()
     }
 
-    SettingsScreenContent(
-        userData = userData,
-        onDeleteAccountClick = { showDialogDeleteAccount = true },
-        onEditClick = { viewModel.editUser(openScreen) },
-        modifier = modifier
-    )
+    Box(modifier = Modifier.fillMaxSize()){
+        Profile(
+            userData = userData,
+            onDeleteAccountClick = { showDialogDeleteAccount = true }
+        )
+    }
 
     if(showDialogDeleteAccount){
         AlertDialog(
@@ -99,71 +91,42 @@ fun SettingsScreen(
 }
 
 @Composable
-fun SettingsScreenContent(
-    userData: UserData?,
-    onDeleteAccountClick: () -> Unit,
-    onEditClick: () -> Unit,
-    modifier: Modifier = Modifier
-){
-    Scaffold(
-        contentWindowInsets = WindowInsets.safeDrawing, // para que no se ponga encima de la parte superior del movil
-        topBar = { BasicToolbar(R.string.profile) },
-        floatingActionButton = {
-            FloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.primary,
-                onClick = onEditClick
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.edit),
-                    contentDescription = stringResource(R.string.edit)
-                )
-            }
-        },
-        content = { innerPadding ->
-            Profile(
-                userData = userData,
-                onDeleteAccountClick = onDeleteAccountClick,
-                modifier = modifier
-                    .padding(innerPadding)
-                    .navigationBarsPadding()
-            )
-        }
-    )
-}
-
-@Composable
 fun Profile(
     userData: UserData?,
-    onDeleteAccountClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onDeleteAccountClick: () -> Unit
 ){
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(
+            text = stringResource(R.string.profile),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(16.dp)
+        )
         Box(
             modifier = Modifier
-                .size(56.dp)
+                .size(64.dp)
                 .clip(CircleShape)
                 .background(Color.LightGray)
                 .clickable {},
             contentAlignment = Alignment.Center // Center the content
         ) {
             Avatar(
-                photoUri = userData?.photoUrl?: DEFAULT_AVATAR_USER,
-                size = 56.dp
+                photoUri = if(userData?.photoUrl.isNullOrBlank()) DEFAULT_AVATAR_USER else userData.photoUrl,
+                size = 64.dp
             )
         }
         Spacer(modifier = Modifier.width(16.dp))
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .fillMaxWidth(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ){
@@ -202,6 +165,11 @@ fun Profile(
                     }
                 }
             }
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+            )
             ItemEditProfile(icon = R.drawable.delete_user, title = R.string.delete_account, data = "") { onDeleteAccountClick() }
         }
     }

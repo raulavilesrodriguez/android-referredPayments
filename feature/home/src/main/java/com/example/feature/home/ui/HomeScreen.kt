@@ -1,7 +1,6 @@
 package com.example.feature.home.ui
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -11,6 +10,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
@@ -24,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.user.UserData
@@ -39,7 +41,7 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     openScreen: (String) -> Unit,
     restartApp: (String) -> Unit,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
 ){
     LaunchedEffect(Unit) {
         viewModel.getUserData()
@@ -54,7 +56,8 @@ fun HomeScreen(
             viewModel.onActionClick(openScreen, restartApp, action)
         },
         openScreen = openScreen,
-        restartApp = restartApp
+        restartApp = restartApp,
+        onEditClick = { viewModel.editUser(openScreen) }
     )
 }
 
@@ -66,6 +69,7 @@ fun HomeScreenContent(
     onActionClick: (Int) -> Unit,
     openScreen: (String) -> Unit,
     restartApp: (String) -> Unit,
+    onEditClick: () -> Unit
 ){
     val tabs = generateTabs()
     val pagerState = rememberPagerState(1){tabs.size}
@@ -105,27 +109,38 @@ fun HomeScreenContent(
                 }
             }
         },
+        floatingActionButton = {
+            if (pagerState.currentPage == 2) {
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    onClick = onEditClick
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.edit),
+                        contentDescription = stringResource(R.string.edit)
+                    )
+                }
+            }
+        },
         content = { innerPadding ->
             HorizontalPager(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(innerPadding),
                 state = pagerState,
                 userScrollEnabled = true
             ) { index ->
                 when(index){
                     0 -> {
                         ReferralsScreen(
-                            openScreen = openScreen,
-                            modifier = Modifier.padding(innerPadding)
+                            openScreen = openScreen
                         )
                     }
                     1 -> {
-                        HomeMainContent(user, innerPadding)
+                        HomeMainContent(user)
                     }
                     2 -> {
                         SettingsScreen(
                             openScreen = openScreen,
-                            restartApp = restartApp,
-                            modifier = Modifier.padding(innerPadding)
+                            restartApp = restartApp
                         )
                     }
                 }
@@ -135,11 +150,11 @@ fun HomeScreenContent(
 }
 
 @Composable
-fun HomeMainContent(user: UserData?, padding: PaddingValues) {
+fun HomeMainContent(user: UserData?) {
     if (user != null) {
         when (user.type) {
-            UserType.CLIENT -> HomeScreenClient(user = user, modifier = Modifier.padding(padding))
-            UserType.PROVIDER -> HomeScreenProvider(user = user, modifier = Modifier.padding(padding))
+            UserType.CLIENT -> HomeScreenClient(user = user)
+            UserType.PROVIDER -> HomeScreenProvider(user = user)
         }
     } else {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

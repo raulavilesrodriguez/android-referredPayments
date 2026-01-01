@@ -1,5 +1,6 @@
 package com.avilesrodriguez.presentation.composables
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -58,6 +59,48 @@ fun NameField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = 
         )
         Text(
             text = "${value.length}/$MAX_LENGTH_NAME",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp, end = 8.dp),
+            textAlign = TextAlign.End
+        )
+    }
+}
+
+@Composable
+fun TextFieldProfile(
+    value: String,
+    onNewValue: (String) -> Unit,
+    maxLength: Int,
+    @DrawableRes icon: Int,
+    @StringRes title: Int,
+    modifier: Modifier = Modifier){
+    Column(
+        modifier = modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.End
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {
+                if(it.length <= maxLength)
+                    onNewValue(it)
+            },
+            label = {Text(text = stringResource(title))},
+            shape = RoundedCornerShape(16.dp),
+            placeholder = {Text(text = stringResource(title))},
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = { Icon(painter = painterResource(icon), contentDescription = "Email") },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        )
+        Text(
+            text = "${value.length}/$maxLength",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp, end = 8.dp),

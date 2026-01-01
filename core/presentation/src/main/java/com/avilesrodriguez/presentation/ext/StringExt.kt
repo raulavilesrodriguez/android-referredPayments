@@ -4,11 +4,16 @@ import android.util.Patterns
 import java.text.Normalizer
 import java.util.regex.Pattern
 
+const val MAX_LENGTH_NAME = 30
+const val MAX_LENGTH_INDUSTRY = 20
+const val MAX_LENGTH_IDENTITY_CARD = 10
+const val MAX_LENGTH_RUC = 13
+const val MAX_LENGTH_COUNT_NUMBER_BANK = 20
+
 private const val MIN_PASS_LENGTH = 6
 private const val PASS_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{$MIN_PASS_LENGTH,}$"
 private const val ONLY_NUMBERS_PATTERN = "^\\d+$"
 
-const val MAX_LENGTH_NAME = 30
 private const val  NAME_PATTERN = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$"
 
 fun String.isValidEmail(): Boolean {

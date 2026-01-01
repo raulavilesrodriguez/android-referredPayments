@@ -16,11 +16,10 @@ import com.avilesrodriguez.domain.model.user.UserData
 @Composable
 fun HomeScreenProvider(
     user: UserData,
-    modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ){
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
             .verticalScroll(rememberScrollState()),

@@ -9,6 +9,11 @@ import com.avilesrodriguez.domain.usecases.SaveUser
 import com.avilesrodriguez.domain.usecases.SecureDeleteAccount
 import com.avilesrodriguez.domain.usecases.UploadPhoto
 import com.avilesrodriguez.presentation.avatar.DEFAULT_AVATAR_USER
+import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COUNT_NUMBER_BANK
+import com.avilesrodriguez.presentation.ext.MAX_LENGTH_IDENTITY_CARD
+import com.avilesrodriguez.presentation.ext.MAX_LENGTH_INDUSTRY
+import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
+import com.avilesrodriguez.presentation.ext.MAX_LENGTH_RUC
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,11 +64,17 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun updateName(newName: String){
+        // Solo deja pasar letras y espacios, eliminando lo demás al instante
+        val allowedSymbols = setOf('.', '-', ',', '/')
+
+        val filteredName = newName
+            .filter { it.isLetter() || it.isDigit() || it.isWhitespace() || allowedSymbols.contains(it) }
+            .take(MAX_LENGTH_NAME)
         val currentState = _uiState.value
         if(currentState != null){
             _uiState.value = when(currentState){
-                is UserData.Client -> currentState.copy(name = newName)
-                is UserData.Provider -> currentState.copy(name = newName)
+                is UserData.Client -> currentState.copy(name = filteredName)
+                is UserData.Provider -> currentState.copy(name = filteredName)
             }
         }
     }
@@ -79,9 +90,13 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun updateIndustry(industry: String){
+        val allowedSymbols = setOf('.', '-', ',', '/')
+        val filteredNameIndustry = industry
+            .filter { it.isLetter() || it.isDigit() || it.isWhitespace() || allowedSymbols.contains(it) }
+            .take(MAX_LENGTH_INDUSTRY)
         val currentState = _uiState.value
         if(currentState is UserData.Provider){
-            _uiState.value = currentState.copy(industry = industry)
+            _uiState.value = currentState.copy(industry = filteredNameIndustry)
         }
     }
 
@@ -89,23 +104,30 @@ class SettingsViewModel @Inject constructor(
         val currentState = _uiState.value
         if(currentState != null){
             _uiState.value = when(currentState){
-                is UserData.Client -> currentState.copy(identityCard = identityCard)
-                is UserData.Provider -> currentState.copy(ciOrRuc = identityCard)
+                is UserData.Client -> {
+                    val filteredIdentityCard = identityCard.filter { it.isDigit() }.take(MAX_LENGTH_IDENTITY_CARD)
+                    currentState.copy(identityCard = filteredIdentityCard)
+                }
+                is UserData.Provider -> {
+                    val filteredIdentityCardRuc = identityCard.filter { it.isDigit() }.take(MAX_LENGTH_RUC)
+                    currentState.copy(ciOrRuc = filteredIdentityCardRuc)
+                }
             }
         }
     }
 
     fun updateCountNumberBank(countNumberBank: String){
         val currentState = _uiState.value
+        val filteredCountNumberBank = countNumberBank.filter { it.isDigit() }.take(MAX_LENGTH_COUNT_NUMBER_BANK)
         if(currentState != null){
             _uiState.value = when(currentState){
-                is UserData.Client -> currentState.copy(countNumberPay = countNumberBank)
-                is UserData.Provider -> currentState.copy(countNumber = countNumberBank)
+                is UserData.Client -> currentState.copy(countNumberPay = filteredCountNumberBank)
+                is UserData.Provider -> currentState.copy(countNumber = filteredCountNumberBank)
             }
         }
     }
 
-    fun onSaveClick(openScreen: (String) -> Unit){
+    fun onSaveClick(popUp: () -> Unit) {
         launchCatching {
             _isSaving.value = true
             val remotePath = "profile_images/${currentUserId}.jpg"
@@ -124,18 +146,16 @@ class SettingsViewModel @Inject constructor(
                     is UserData.Provider -> currentState.copy(photoUrl = finalPhotoUrl)
                 }
             }
-            _uiState.value?.let{
+            _uiState.value?.let {
                 saveUser(it)
             }
             // navigate to settings screen
-            openScreen(NavRoutes.Settings)
+            popUp()
         }.invokeOnCompletion { _isSaving.value = false }
     }
 
-    fun editUser(openScreen: (String) -> Unit){
-        launchCatching {
-            openScreen(NavRoutes.EditUser)
-        }
+    fun cancelEditUser(popUp: () -> Unit){
+        popUp()
     }
 
 }

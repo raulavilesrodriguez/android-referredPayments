@@ -42,4 +42,8 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+    fun editUser(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.EditUser)
+    }
 }

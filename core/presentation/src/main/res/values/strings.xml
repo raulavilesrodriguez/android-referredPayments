@@ -53,8 +53,6 @@
     <string name="usage_policies">Usage policies</string>
     <string name="start">Start</string>
     <string name="referrals">Referrals</string>
-    <string name="settings">Settings</string>
-    <string name="sign_out">Sign out</string>
 
     <!-- Settings Screen -->
     <string name="profile">Profile</string>
@@ -66,7 +64,9 @@
     <string name="settings_count_number_bank_client">Count number bank to receive payments</string>
     <string name="settings_count_number_bank_provider">Count number bank to pay"</string>
     <string name="no_information">There is no information</string>
-    <string name="delete_account">Delete account"></string>
+
+    <!-- Time -->
+    <string name="yesterday">Yesterday</string>
 
     <!-- Policies Screen -->
     <string name="policies">Policies</string>

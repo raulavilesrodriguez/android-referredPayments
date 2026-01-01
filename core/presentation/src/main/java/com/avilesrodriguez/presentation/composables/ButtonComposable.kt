@@ -1,12 +1,23 @@
 package com.avilesrodriguez.presentation.composables
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
@@ -21,6 +32,42 @@ fun BasicButton(@StringRes text: Int, modifier: Modifier, action: () -> Unit) {
         modifier = modifier,
     ) {
         Text(text = stringResource(text), fontSize = 16.sp)
+    }
+}
+
+@Composable
+fun FormButtons(
+    @StringRes confirmText: Int,
+    @StringRes cancelText: Int,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+    isSaving: Boolean = false
+){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Button(
+            onClick = onConfirm,
+        ) {
+            if(isSaving){
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            }else{
+                Text(text = stringResource(confirmText))
+            }
+        }
+        OutlinedButton(
+            onClick = onCancel,
+        ) {
+            Text(text = stringResource(cancelText))
+        }
     }
 }
 

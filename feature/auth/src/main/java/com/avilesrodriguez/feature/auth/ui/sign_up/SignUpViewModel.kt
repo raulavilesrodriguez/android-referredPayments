@@ -8,6 +8,7 @@ import com.avilesrodriguez.domain.usecases.SaveUser
 import com.avilesrodriguez.domain.usecases.SetNotFirstTime
 import com.avilesrodriguez.domain.usecases.SignUp
 import com.avilesrodriguez.presentation.R
+import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.isValidEmail
 import com.avilesrodriguez.presentation.ext.isValidPassword
 import com.avilesrodriguez.presentation.ext.passwordMatches
@@ -41,7 +42,7 @@ class SignUpViewModel @Inject constructor(
 
         val filteredName = name
             .filter { it.isLetter() || it.isDigit() || it.isWhitespace() || allowedSymbols.contains(it) }
-            .take(30)
+            .take(MAX_LENGTH_NAME)
         _uiState.value = _uiState.value.copy(name = filteredName)
     }
 

@@ -16,14 +16,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import com.avilesrodriguez.feature.auth.ui.login.LoginScreen
 import com.avilesrodriguez.feature.auth.ui.sign_up.SignUpScreen
 import com.avilesrodriguez.feature.auth.ui.splash.SplashScreen
+import com.avilesrodriguez.feature.settings.ui.EditScreen
+import com.avilesrodriguez.feature.settings.ui.SettingsScreen
+import com.avilesrodriguez.feature.settings.ui.SettingsViewModel
 import com.avilesrodriguez.presentation.navigation.AppState
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.snackbar.SnackbarManager
@@ -64,6 +69,7 @@ fun MainNavigation(){
                     addLogin(appState)
                     addHome(appState)
                     addPolicies(appState)
+                    addEditUser(appState)
                 }
             }
         }
@@ -126,6 +132,14 @@ private fun NavGraphBuilder.addPolicies(appState: AppState){
     composable(NavRoutes.Policies) {
         PoliciesScreen(
             popUp = {appState.popUp()}
+        )
+    }
+}
+
+private fun NavGraphBuilder.addEditUser(appState: AppState) {
+    composable(NavRoutes.EditUser) {
+        EditScreen(
+            popUp = { appState.popUp() }
         )
     }
 }
