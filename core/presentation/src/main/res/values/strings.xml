@@ -95,9 +95,6 @@
 
     <!-- Section 3 -->
     <string name="policies_section_3_title">3. Verification and control</string>
-    <string name="policies_section_3_body">
-        All rewards are subject to verification and validation processes. The platform reserves the right to reject or cancel payments that do not meet the established conditions. Any fraudulent or abusive use of the referral system may result in account suspension or termination.
-    </string>
 
     <!-- Section 4 -->
     <string name="policies_section_4_title">4. Payment information</string>
