@@ -48,14 +48,17 @@
     <string name="referrals">Referidos</string>
     <string name="profile">Perfil</string>
     <string name="settings_edit_photo">Editar foto</string>
-    <string name="settings_name">Nombre</string>
+    <string name="settings_name">Nombre*</string>
     <string name="settings_industry">Industria</string>
     <string name="settings_identity_card_client">Cédula de identidad</string>
     <string name="settings_identity_card_provider">Cédula de identidad o RUC</string>
     <string name="settings_count_number_bank_client">Número de cuenta bancaria para recibir pagos</string>
     <string name="settings_count_number_bank_provider">Número de cuenta bancaria para realizar pagos</string>
     <string name="no_information">No hay información</string>
+    <string name="required_field">Campos obligatorios no pueden estar vacíos</string>
     <string name="yesterday">Ayer</string>
+    <string name="financial">Financiero</string>
+    <string name="other">Otros</string>
     <string name="policies">Políticas</string>
     <string name="policies_title">Política de uso y programa de referidos</string>
     <string name="policies_intro">Esta aplicación ofrece un programa de referidos basado exclusivamente         en compras reales y verificables de productos o servicios proporcionados         por empresas registradas en la plataforma.</string>
@@ -65,8 +68,17 @@
     <string name="policies_section_2_title">2. No es un esquema piramidal</string>
     <string name="policies_section_2_body">Esta aplicación no es un esquema piramidal, multinivel ni de inversión.         No se prometen ingresos garantizados. Las ganancias dependen exclusivamente         de transacciones comerciales reales y no del crecimiento de una red de usuarios.         No se requieren pagos ni inversiones para participar.</string>
     <string name="policies_section_3_title">3. Verificación y control</string>
+    <string name="policies_section_3_body">Todas las recompensas están sujetas a procesos de verificación y validación.     La plataforma se reserva el derecho de rechazar o cancelar pagos que no cumplan     con las condiciones establecidas. Cualquier uso fraudulento o abusivo del sistema     de referidos podrá resultar en la suspensión o cancelación de la cuenta.</string>
     <string name="policies_section_4_title">4. Información de pagos</string>
     <string name="policies_section_4_body">Para recibir pagos, el usuario debe proporcionar una cuenta bancaria válida         a su nombre. El usuario es el único responsable de garantizar que la información         personal y bancaria proporcionada sea correcta, completa y esté actualizada.</string>
     <string name="policies_section_5_title">5. Responsabilidad del usuario</string>
     <string name="policies_section_5_body">La plataforma no se hace responsable por pagos fallidos, retrasos o pérdidas         causadas por información incorrecta o falsa proporcionada por el usuario.         El uso de la aplicación implica la aceptación de estas políticas.</string>
+    <string name="insurance">Seguros</string>
+    <string name="real_estate">Bienes Raíces</string>
+    <string name="optics">Ópticas</string>
+    <string name="fitness">Fitness</string>
+    <string name="health">Salud</string>
+    <string name="beauty">Belleza</string>
+    <string name="travel">Viajes</string>
+    <string name="retail">Retail</string>
 </resources>

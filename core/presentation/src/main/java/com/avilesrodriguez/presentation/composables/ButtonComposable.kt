@@ -41,7 +41,8 @@ fun FormButtons(
     @StringRes cancelText: Int,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
-    isSaving: Boolean = false
+    isSaving: Boolean = false,
+    enabled: Boolean = true
 ){
     Row(
         modifier = Modifier
@@ -52,6 +53,7 @@ fun FormButtons(
     ) {
         Button(
             onClick = onConfirm,
+            enabled = enabled
         ) {
             if(isSaving){
                 CircularProgressIndicator(

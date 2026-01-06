@@ -1,5 +1,7 @@
 package com.avilesrodriguez.domain.model.user
 
+import com.avilesrodriguez.domain.model.industries.IndustriesType
+
 sealed class UserData {
     abstract val uid: String
     abstract val isActive: Boolean
@@ -38,6 +40,6 @@ sealed class UserData {
         val moneyPaid: String? = null,
         val moneyToPay: String? = null,
         val referralsConversion: String? = null,
-        val industry: String? = null
+        val industry: IndustriesType = IndustriesType.OTHER
     ) : UserData()
 }

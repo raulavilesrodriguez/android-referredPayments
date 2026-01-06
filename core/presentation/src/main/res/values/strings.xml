@@ -57,16 +57,29 @@
     <!-- Settings Screen -->
     <string name="profile">Profile</string>
     <string name="settings_edit_photo">Edit photo</string>
-    <string name="settings_name">Name</string>
+    <string name="settings_name">Name*</string>
     <string name="settings_industry">Industry</string>
     <string name="settings_identity_card_client">Identity card</string>
     <string name="settings_identity_card_provider">Identity card or RUC</string>
     <string name="settings_count_number_bank_client">Count number bank to receive payments</string>
     <string name="settings_count_number_bank_provider">Count number bank to pay"</string>
     <string name="no_information">There is no information</string>
+    <string name="required_field">Required fields cannot be empty</string>
 
     <!-- Time -->
     <string name="yesterday">Yesterday</string>
+
+    <!-- Industries -->
+    <string name="insurance">Insurance</string>
+    <string name="real_estate">Real estate</string>
+    <string name="optics">Optics</string>
+    <string name="fitness">Fitness</string>
+    <string name="health">Health</string>
+    <string name="beauty">Beauty</string>
+    <string name="travel">Travel</string>
+    <string name="retail">Retail</string>
+    <string name="financial">Financial</string>
+    <string name="other">Other</string>
 
     <!-- Policies Screen -->
     <string name="policies">Policies</string>
@@ -95,6 +108,10 @@
 
     <!-- Section 3 -->
     <string name="policies_section_3_title">3. Verification and control</string>
+    <string name="policies_section_3_body"> All rewards are subject to verification and
+        validation processes. The platform reserves the right to reject or cancel payments
+        that do not meet the established conditions. Any fraudulent or abusive use of the
+        referral system may result in account suspension or termination. </string>
 
     <!-- Section 4 -->
     <string name="policies_section_4_title">4. Payment information</string>

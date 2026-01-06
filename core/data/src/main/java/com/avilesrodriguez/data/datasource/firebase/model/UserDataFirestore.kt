@@ -1,5 +1,6 @@
 package com.avilesrodriguez.data.datasource.firebase.model
 
+import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
 import com.google.firebase.firestore.PropertyName
@@ -77,7 +78,7 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
             moneyPaid = moneyPaid,
             moneyToPay = moneyToPay,
             referralsConversion = referralsConversion,
-            industry = industry
+            industry = industry.name
         )
     }
 }
@@ -97,7 +98,20 @@ fun UserDataFirestore.toDomain(): UserData? {
             moneyEarned = moneyEarned,
             moneyReceived = moneyReceived
         )
-        is UserDataFirestore.Provider -> UserData.Provider(
+        is UserDataFirestore.Provider -> {
+            val domainIndustriesType = when (industry?.uppercase()){
+                IndustriesType.INSURANCE.name -> IndustriesType.INSURANCE
+                IndustriesType.REAL_ESTATE.name -> IndustriesType.REAL_ESTATE
+                IndustriesType.OPTICS.name -> IndustriesType.OPTICS
+                IndustriesType.FITNESS.name -> IndustriesType.FITNESS
+                IndustriesType.HEALTH.name -> IndustriesType.HEALTH
+                IndustriesType.BEAUTY.name -> IndustriesType.BEAUTY
+                IndustriesType.TRAVEL.name -> IndustriesType.TRAVEL
+                IndustriesType.RETAIL.name -> IndustriesType.RETAIL
+                IndustriesType.FINANCIAL.name -> IndustriesType.FINANCIAL
+                else -> IndustriesType.OTHER
+            }
+            UserData.Provider(
             uid = uid ?: "",
             name = name,
             email = email ?: "",
@@ -110,8 +124,8 @@ fun UserDataFirestore.toDomain(): UserData? {
             moneyPaid = moneyPaid,
             moneyToPay = moneyToPay,
             referralsConversion = referralsConversion,
-            industry = industry
-        )
+            industry = domainIndustriesType
+        )}
     }
 }
 

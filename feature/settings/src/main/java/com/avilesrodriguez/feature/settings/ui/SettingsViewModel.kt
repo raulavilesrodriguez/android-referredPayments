@@ -1,5 +1,6 @@
 package com.avilesrodriguez.feature.settings.ui
 
+import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.DownloadUrlPhoto
@@ -8,12 +9,11 @@ import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SaveUser
 import com.avilesrodriguez.domain.usecases.SecureDeleteAccount
 import com.avilesrodriguez.domain.usecases.UploadPhoto
-import com.avilesrodriguez.presentation.avatar.DEFAULT_AVATAR_USER
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COUNT_NUMBER_BANK
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_IDENTITY_CARD
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_INDUSTRY
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_RUC
+import com.avilesrodriguez.presentation.industries.getById
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,6 +36,10 @@ class SettingsViewModel @Inject constructor(
     val uiState: StateFlow<UserData?> = _uiState
     private val _isSaving = MutableStateFlow(false)
     val isSaving: StateFlow<Boolean> = _isSaving.asStateFlow()
+    private val _isEntryValid = MutableStateFlow(true)
+    val isEntryValid: StateFlow<Boolean> = _isEntryValid.asStateFlow()
+
+    private var localPhotoUri: String? = null
 
     val currentUserId
         get() = currentUserIdUseCase()
@@ -44,6 +48,21 @@ class SettingsViewModel @Inject constructor(
         launchCatching {
             if (hasUser()){
                 _uiState.value = getUser(currentUserId)
+                _isEntryValid.value = validateInput(_uiState.value)
+            }
+        }
+    }
+
+    private fun validateInput(uiState: UserData?): Boolean {
+        return with(uiState) {
+            when (this) {
+                is UserData.Client -> {
+                    name?.isNotBlank() == true
+                }
+                is UserData.Provider -> {
+                    name?.isNotBlank() == true
+                }
+                else -> false
             }
         }
     }
@@ -77,9 +96,11 @@ class SettingsViewModel @Inject constructor(
                 is UserData.Provider -> currentState.copy(name = filteredName)
             }
         }
+        _isEntryValid.value = validateInput(_uiState.value)
     }
 
     fun updatePhoto(newPhotoUri: String){
+        localPhotoUri = newPhotoUri
         val currentState = _uiState.value
         if(currentState != null){
             _uiState.value = when(currentState){
@@ -89,11 +110,8 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun updateIndustry(industry: String){
-        val allowedSymbols = setOf('.', '-', ',', '/')
-        val filteredNameIndustry = industry
-            .filter { it.isLetter() || it.isDigit() || it.isWhitespace() || allowedSymbols.contains(it) }
-            .take(MAX_LENGTH_INDUSTRY)
+    fun updateIndustry(industry: Int){
+        val filteredNameIndustry = IndustriesType.getById(industry)
         val currentState = _uiState.value
         if(currentState is UserData.Provider){
             _uiState.value = currentState.copy(industry = filteredNameIndustry)
@@ -128,23 +146,28 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onSaveClick(popUp: () -> Unit) {
+        val currentState = _uiState.value ?: return
+        if(!validateInput(currentState)){
+            _isEntryValid.value = false
+            return
+        }
         launchCatching {
             _isSaving.value = true
-            val remotePath = "profile_images/${currentUserId}.jpg"
+            var finalPhotoUrl = currentState.photoUrl
+            if(localPhotoUri != null) {
+                val remotePath = "profile_images/${currentUserId}.jpg"
+                val newPhotoUri = _uiState.value?.photoUrl ?: ""
 
-            val newPhotoUri = _uiState.value?.photoUrl ?: DEFAULT_AVATAR_USER
+                // Upload photo to Firebase Storage
+                uploadPhoto(newPhotoUri, remotePath)
 
-            // Upload photo to Firebase Storage
-            uploadPhoto(newPhotoUri, remotePath)
-
-            // Download URL of the uploaded photo
-            val finalPhotoUrl = downloadPhoto(remotePath)
-            val currentState = _uiState.value
-            if (currentState != null) {
-                _uiState.value = when (currentState) {
-                    is UserData.Client -> currentState.copy(photoUrl = finalPhotoUrl)
-                    is UserData.Provider -> currentState.copy(photoUrl = finalPhotoUrl)
-                }
+                // Download URL of the uploaded photo
+                finalPhotoUrl = downloadPhoto(remotePath)
+                localPhotoUri = null
+            }
+            _uiState.value = when (currentState) {
+                is UserData.Client -> currentState.copy(photoUrl = finalPhotoUrl)
+                is UserData.Provider -> currentState.copy(photoUrl = finalPhotoUrl)
             }
             _uiState.value?.let {
                 saveUser(it)

@@ -21,6 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,11 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
@@ -43,10 +44,12 @@ import com.avilesrodriguez.presentation.composables.ProfileToolBar
 import com.avilesrodriguez.presentation.composables.TextFieldProfile
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COUNT_NUMBER_BANK
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_IDENTITY_CARD
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_INDUSTRY
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_RUC
 import com.avilesrodriguez.presentation.ext.fieldModifier
+import com.avilesrodriguez.presentation.industries.options
+import com.avilesrodriguez.presentation.industries.MenuDropdownBox
+import com.avilesrodriguez.presentation.industries.label
 import com.avilesrodriguez.presentation.photo.pickImageLauncher
 
 @Composable
@@ -56,6 +59,9 @@ fun EditScreen(
 ){
     val isSaving by viewModel.isSaving.collectAsState()
     val userData by viewModel.uiState.collectAsState()
+    val isEntryValid by viewModel.isEntryValid.collectAsState()
+    val industryOptions = IndustriesType.options()
+
 
     val imagePicker = pickImageLauncher(
         context = LocalContext.current,
@@ -80,6 +86,7 @@ fun EditScreen(
                 userData = userData,
                 isSaving = isSaving,
                 onNameChange = viewModel::updateName,
+                industryOptions = industryOptions,
                 onIndustryChange = viewModel::updateIndustry,
                 onIdentityCardChange = viewModel::updateIdentityCard,
                 onCountNumberBankChange = viewModel::updateCountNumberBank,
@@ -90,6 +97,7 @@ fun EditScreen(
                 },
                 onSaveClick = { viewModel.onSaveClick(popUp) },
                 onCancel = { viewModel.cancelEditUser(popUp) },
+                isEntryValid = isEntryValid,
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -101,12 +109,14 @@ fun EditScreenContent(
     userData: UserData?,
     isSaving: Boolean,
     onNameChange: (String) -> Unit,
-    onIndustryChange: (String) -> Unit,
+    industryOptions: List<Int>,
+    onIndustryChange: (Int) -> Unit,
     onIdentityCardChange: (String) -> Unit,
     onCountNumberBankChange: (String) -> Unit,
     onPickImageClick: () -> Unit,
     onSaveClick: () -> Unit,
     onCancel:() -> Unit,
+    isEntryValid: Boolean,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -188,12 +198,11 @@ fun EditScreenContent(
                     title = R.string.settings_count_number_bank_provider,
                     modifier = Modifier.fieldModifier()
                 )
-                TextFieldProfile(
-                    value = userData.industry?: "",
-                    onNewValue = onIndustryChange,
-                    maxLength = MAX_LENGTH_INDUSTRY,
-                    icon = R.drawable.industry,
+                MenuDropdownBox(
+                    options = industryOptions,
+                    selectedOption = userData.industry.label(),
                     title = R.string.settings_industry,
+                    onClick = onIndustryChange,
                     modifier = Modifier.fieldModifier()
                 )
             }
@@ -203,7 +212,14 @@ fun EditScreenContent(
                 }
             }
         }
-        FormButtons(R.string.save, R.string.cancel, onSaveClick, onCancel, isSaving)
+        FormButtons(R.string.save, R.string.cancel, onSaveClick, onCancel, isSaving, isEntryValid)
+        if(!isEntryValid){
+            Text(
+                text = stringResource(R.string.required_field),
+                modifier = Modifier.padding(16.dp),
+                color = MaterialTheme.colorScheme.error
+            )
+        }
 
     }
 }
@@ -220,12 +236,14 @@ fun EditScreenContenPreview(){
             ),
             isSaving = false,
             onNameChange = {},
+            industryOptions = IndustriesType.options(),
             onIndustryChange = {},
             onIdentityCardChange = {},
             onCountNumberBankChange = {},
             onPickImageClick = {},
             onSaveClick = {},
-            onCancel = {}
+            onCancel = {},
+            isEntryValid = true,
         )
     }
 }

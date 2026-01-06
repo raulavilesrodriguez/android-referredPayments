@@ -131,6 +131,7 @@ fun Profile(
             horizontalAlignment = Alignment.Start
         ){
             ItemProfile(icon = R.drawable.name, title = R.string.settings_name, data = userData?.name?:stringResource(R.string.no_information))
+            ItemProfile(icon = R.drawable.mail, title = R.string.email, data = userData?.email?:stringResource(R.string.no_information))
             when(userData){
                 is UserData.Client -> {
                     ItemProfile(
@@ -156,7 +157,7 @@ fun Profile(
                     ItemProfile(
                         icon = R.drawable.industry,
                         title = R.string.settings_industry,
-                        data = userData.industry?:stringResource(R.string.no_information)
+                        data = userData.industry.name
                     )
                 }
                 else -> {
