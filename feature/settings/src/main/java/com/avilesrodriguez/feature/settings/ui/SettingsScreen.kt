@@ -111,7 +111,7 @@ fun Profile(
         )
         Box(
             modifier = Modifier
-                .size(64.dp)
+                .size(80.dp)
                 .clip(CircleShape)
                 .background(Color.LightGray)
                 .clickable {},
@@ -119,7 +119,7 @@ fun Profile(
         ) {
             Avatar(
                 photoUri = if(userData?.photoUrl.isNullOrBlank()) DEFAULT_AVATAR_USER else userData.photoUrl,
-                size = 64.dp
+                size = 80.dp
             )
         }
         Spacer(modifier = Modifier.width(16.dp))

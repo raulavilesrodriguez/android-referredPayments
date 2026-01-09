@@ -1,5 +1,6 @@
 package com.avilesrodriguez.feature.auth.ui.sign_up
 
+import android.util.Log
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.domain.usecases.CurrentUserId
@@ -74,6 +75,7 @@ class SignUpViewModel @Inject constructor(
 
         launchCatching {
             val isProvider = isAuthorizedProvider(email)
+            Log.d("SignUpViewModel", "isProvider: $isProvider")
             signUp(email, password)
             val userType = if(isProvider) UserType.PROVIDER else UserType.CLIENT
 

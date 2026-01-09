@@ -130,14 +130,14 @@ fun EditScreenContent(
     ){
         Box(
             modifier = Modifier
-                .size(72.dp)
+                .size(80.dp)
                 .clip(CircleShape)
                 .background(Color.LightGray)
                 .clickable { onPickImageClick() }
         ){
             Avatar(
                 photoUri = if(userData?.photoUrl.isNullOrBlank()) DEFAULT_AVATAR_USER else userData.photoUrl,
-                size = 72.dp,
+                size = 80.dp,
                 modifier = Modifier.align(Alignment.Center)
             )
             Icon(
@@ -146,7 +146,7 @@ fun EditScreenContent(
                 tint = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
                     .padding(8.dp)
-                    .size(21.dp)
+                    .size(24.dp)
                     .align(Alignment.BottomEnd)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))

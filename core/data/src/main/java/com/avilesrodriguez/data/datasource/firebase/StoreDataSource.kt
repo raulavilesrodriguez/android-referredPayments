@@ -81,11 +81,14 @@ class StoreDataSource @Inject constructor(
     }
 
     suspend fun isAuthorizedProvider(email: String): Boolean {
+        val cleanEmail = email.lowercase().trim()
         return try {
             val doc = firestore.collection(AUTHORIZED_PROVIDERS_COLLECTION)
-                .document(email.lowercase()).get().await()
+                .document(cleanEmail).get().await()
+            android.util.Log.d("StoreDataSource", "Buscando documento con ID: '$cleanEmail'")
             doc.exists()
         } catch (e: Exception) {
+            android.util.Log.e("StoreDataSource", "Error al consultar Firestore: ${e.message}")
             false
         }
     }
