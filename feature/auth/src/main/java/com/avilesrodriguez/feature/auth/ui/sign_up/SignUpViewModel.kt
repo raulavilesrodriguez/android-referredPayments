@@ -11,6 +11,7 @@ import com.avilesrodriguez.domain.usecases.SignUp
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.isValidEmail
+import com.avilesrodriguez.presentation.ext.isValidName
 import com.avilesrodriguez.presentation.ext.isValidPassword
 import com.avilesrodriguez.presentation.ext.passwordMatches
 import com.avilesrodriguez.presentation.navigation.NavRoutes
@@ -36,6 +37,9 @@ class SignUpViewModel @Inject constructor(
         get() = _uiState.value.email
     private val password
         get() = _uiState.value.password
+
+    private val name
+        get() = _uiState.value.name
 
     fun onNameChange(name: String){
         // Solo deja pasar letras y espacios, eliminando lo demás al instante

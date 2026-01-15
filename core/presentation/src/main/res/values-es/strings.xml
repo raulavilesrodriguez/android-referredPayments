@@ -56,9 +56,12 @@
     <string name="settings_count_number_bank_provider">Número de cuenta bancaria para realizar pagos</string>
     <string name="no_information">No hay información</string>
     <string name="required_field">Campos obligatorios no pueden estar vacíos</string>
+    <string name="invalid_phone_number">Inválido número telefónico</string>
+    <string name="invalid_name">Inválido nombre</string>
     <string name="yesterday">Ayer</string>
     <string name="financial">Financiero</string>
     <string name="other">Otros</string>
+    <string name="count_number_pay">Número de cuenta:</string>
     <string name="policies">Políticas</string>
     <string name="policies_title">Política de uso y programa de referidos</string>
     <string name="policies_intro">Esta aplicación ofrece un programa de referidos basado exclusivamente         en compras reales y verificables de productos o servicios proporcionados         por empresas registradas en la plataforma.</string>
@@ -81,4 +84,8 @@
     <string name="beauty">Belleza</string>
     <string name="travel">Viajes</string>
     <string name="retail">Retail</string>
+    <string name="beneficiary">Beneficiario:</string>
+    <string name="identity_card">Cédula de identidad:</string>
+    <string name="bank_name">Nombre del banco:</string>
+    <string name="account_type">Tipo de cuenta</string>
 </resources>

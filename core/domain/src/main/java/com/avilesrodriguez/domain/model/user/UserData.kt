@@ -22,8 +22,12 @@ sealed class UserData {
         val nameLowercase: String? = null,
         val identityCard: String? = null, // identity
         val countNumberPay: String? = null, // cuenta para recibir pagos
+        val bankName: String? = null,
+        val accountType: String? = null, // Ahorros y corriente
         val moneyEarned: String? = null,
-        val moneyReceived: String? = null
+        val moneyReceived: String? = null,
+        val totalReferrals: Int = 0,
+        val pendingPayments: Int = 0
     ) : UserData()
 
     data class Provider(
@@ -40,6 +44,10 @@ sealed class UserData {
         val moneyPaid: String? = null,
         val moneyToPay: String? = null,
         val referralsConversion: String? = null,
-        val industry: IndustriesType = IndustriesType.OTHER
+        val industry: IndustriesType = IndustriesType.OTHER,
+        val companyDescription: String? = null,
+        val paymentRating: Double = 0.0,
+        val totalPayouts: Int = 0, // Cuantas veces ha pagado con exito
+        val website:String? = null,
     ) : UserData()
 }

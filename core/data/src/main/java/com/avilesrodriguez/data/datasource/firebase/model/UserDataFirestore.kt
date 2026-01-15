@@ -1,5 +1,6 @@
 package com.avilesrodriguez.data.datasource.firebase.model
 
+import android.util.Log
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
@@ -26,8 +27,12 @@ sealed class UserDataFirestore {
         val nameLowercase: String? = null,
         val identityCard: String? = null, // identity
         val countNumberPay: String? = null, // cuenta para recibir pagos
+        val bankName: String? = null,
+        val accountType: String? = null, // Ahorros y corriente
         val moneyEarned: String? = null,
-        val moneyReceived: String? = null
+        val moneyReceived: String? = null,
+        val totalReferrals: Int = 0,
+        val pendingPayments: Int = 0
     ) : UserDataFirestore()
 
     data class Provider(
@@ -45,7 +50,11 @@ sealed class UserDataFirestore {
         val moneyPaid: String? = null,
         val moneyToPay: String? = null,
         val referralsConversion: String? = null,
-        val industry: String? = null
+        val industry: String? = null,
+        val companyDescription: String? = null,
+        val paymentRating: Double = 0.0,
+        val totalPayouts: Int = 0,
+        val website: String? = null
     ) : UserDataFirestore()
 }
 
@@ -61,8 +70,12 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
             type = type.name,
             identityCard = identityCard,
             countNumberPay = countNumberPay,
+            bankName = bankName,
+            accountType = accountType,
             moneyEarned = moneyEarned,
-            moneyReceived = moneyReceived
+            moneyReceived = moneyReceived,
+            totalReferrals = totalReferrals,
+            pendingPayments = pendingPayments
         )
         is UserData.Provider -> UserDataFirestore.Provider(
             uid = uid,
@@ -78,7 +91,11 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
             moneyPaid = moneyPaid,
             moneyToPay = moneyToPay,
             referralsConversion = referralsConversion,
-            industry = industry.name
+            industry = industry.name,
+            companyDescription = companyDescription,
+            paymentRating = paymentRating,
+            totalPayouts = totalPayouts,
+            website = website
         )
     }
 }
@@ -95,37 +112,39 @@ fun UserDataFirestore.toDomain(): UserData? {
             nameLowercase = nameLowercase,
             identityCard = identityCard,
             countNumberPay = countNumberPay,
+            bankName = bankName,
+            accountType = accountType,
             moneyEarned = moneyEarned,
-            moneyReceived = moneyReceived
+            moneyReceived = moneyReceived,
+            totalReferrals = totalReferrals,
+            pendingPayments = pendingPayments
         )
         is UserDataFirestore.Provider -> {
-            val domainIndustriesType = when (industry?.uppercase()){
-                IndustriesType.INSURANCE.name -> IndustriesType.INSURANCE
-                IndustriesType.REAL_ESTATE.name -> IndustriesType.REAL_ESTATE
-                IndustriesType.OPTICS.name -> IndustriesType.OPTICS
-                IndustriesType.FITNESS.name -> IndustriesType.FITNESS
-                IndustriesType.HEALTH.name -> IndustriesType.HEALTH
-                IndustriesType.BEAUTY.name -> IndustriesType.BEAUTY
-                IndustriesType.TRAVEL.name -> IndustriesType.TRAVEL
-                IndustriesType.RETAIL.name -> IndustriesType.RETAIL
-                IndustriesType.FINANCIAL.name -> IndustriesType.FINANCIAL
-                else -> IndustriesType.OTHER
+            val domainIndustriesType = try {
+                IndustriesType.valueOf(industry?.uppercase() ?: "OTHER")
+            } catch (e: Exception) {
+                Log.e("UserDataFirestore", "Error al convertir el tipo de industria: ${e.message}")
+                IndustriesType.OTHER
             }
             UserData.Provider(
-            uid = uid ?: "",
-            name = name,
-            email = email ?: "",
-            photoUrl = photoUrl ?: "",
-            fcmToken = fcmToken,
-            type = UserType.PROVIDER,
-            nameLowercase = nameLowercase,
-            ciOrRuc = ciOrRuc,
-            countNumber = countNumber,
-            moneyPaid = moneyPaid,
-            moneyToPay = moneyToPay,
-            referralsConversion = referralsConversion,
-            industry = domainIndustriesType
-        )}
+                uid = uid ?: "",
+                name = name,
+                email = email ?: "",
+                photoUrl = photoUrl ?: "",
+                fcmToken = fcmToken,
+                type = UserType.PROVIDER,
+                nameLowercase = nameLowercase,
+                ciOrRuc = ciOrRuc,
+                countNumber = countNumber,
+                moneyPaid = moneyPaid,
+                moneyToPay = moneyToPay,
+                referralsConversion = referralsConversion,
+                industry = domainIndustriesType,
+                companyDescription = companyDescription,
+                paymentRating = paymentRating,
+                totalPayouts = totalPayouts,
+                website = website
+            )}
     }
 }
 

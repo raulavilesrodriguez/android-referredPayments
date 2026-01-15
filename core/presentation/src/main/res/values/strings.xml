@@ -66,6 +66,10 @@
     <string name="no_information">There is no information</string>
     <string name="required_field">Required fields cannot be empty</string>
 
+    <!-- Referral Screen -->
+    <string name="invalid_phone_number">Invalid phone number</string>
+    <string name="invalid_name">Invalid name</string>
+
     <!-- Time -->
     <string name="yesterday">Yesterday</string>
 
@@ -80,6 +84,13 @@
     <string name="retail">Retail</string>
     <string name="financial">Financial</string>
     <string name="other">Other</string>
+
+    <!-- Banks -->
+    <string name="beneficiary">Beneficiary: </string>
+    <string name="identity_card">Identity card: </string>
+    <string name="bank_name">Bank name: </string>
+    <string name="account_type">Account type: </string>
+    <string name="count_number_pay">Count number: </string>
 
     <!-- Policies Screen -->
     <string name="policies">Policies</string>

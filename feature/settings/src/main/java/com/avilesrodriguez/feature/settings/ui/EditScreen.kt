@@ -48,7 +48,7 @@ import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_RUC
 import com.avilesrodriguez.presentation.ext.fieldModifier
 import com.avilesrodriguez.presentation.industries.options
-import com.avilesrodriguez.presentation.industries.MenuDropdownBox
+import com.avilesrodriguez.presentation.composables.MenuDropdownBox
 import com.avilesrodriguez.presentation.industries.label
 import com.avilesrodriguez.presentation.photo.pickImageLauncher
 

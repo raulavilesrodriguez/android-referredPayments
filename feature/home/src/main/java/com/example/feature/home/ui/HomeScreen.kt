@@ -79,7 +79,17 @@ fun HomeScreenContent(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(stringResource(R.string.app_name_presentation))
+                    when (pagerState.currentPage) {
+                        0 -> {
+                            Text(stringResource(R.string.referrals))
+                        }
+                        1 -> {
+                            Text(stringResource(R.string.app_name_presentation))
+                        }
+                        2 -> {
+                            Text(stringResource(R.string.profile))
+                        }
+                    }
                 },
                 actions = {
                     DropdownContextMenu(
@@ -131,6 +141,7 @@ fun HomeScreenContent(
                 when(index){
                     0 -> {
                         ReferralsScreen(
+                            user = user,
                             openScreen = openScreen
                         )
                     }

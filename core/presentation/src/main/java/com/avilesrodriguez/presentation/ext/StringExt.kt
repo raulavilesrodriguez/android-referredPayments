@@ -16,6 +16,9 @@ private const val ONLY_NUMBERS_PATTERN = "^\\d+$"
 
 private const val  NAME_PATTERN = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$"
 
+const val MIN_PASS_LENGTH_PHONE_ECUADOR = 10
+private const val ECUADOR_MOBILE_PATTERN = "^09\\d{8}$"
+
 fun String.isValidEmail(): Boolean {
     return this.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
 }
@@ -28,6 +31,12 @@ fun String.isValidPassword(): Boolean {
 
 fun String.passwordMatches(repeated: String): Boolean {
     return this == repeated
+}
+
+fun String.isValidNumber(): Boolean {
+    return this.isNotBlank() &&
+            this.length == MIN_PASS_LENGTH_PHONE_ECUADOR &&
+            Pattern.compile(ECUADOR_MOBILE_PATTERN).matcher(this).matches()
 }
 
 fun String.isValidName(): Boolean {

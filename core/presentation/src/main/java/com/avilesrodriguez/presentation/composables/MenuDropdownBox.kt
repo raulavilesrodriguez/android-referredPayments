@@ -1,4 +1,4 @@
-package com.avilesrodriguez.presentation.industries
+package com.avilesrodriguez.presentation.composables
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
