@@ -44,6 +44,15 @@ class ReferralDataSource @Inject constructor(
         return createReferralFlow(query)
     }
 
+    suspend fun getReferralById(referralId: String): Referral? {
+        val documentSnapshot = firestore.collection(REFERRALS_COLLECTION)
+            .document(referralId)
+            .get()
+            .await()
+
+        return documentSnapshot.toObject(ReferralFirestore::class.java)?.toDomain()
+    }
+
     suspend fun updateReferralStatus(referralId: String, status: String, voucherUrl: String?) {
         val updates = mutableMapOf<String, Any>(
             STATUS_FIELD to status

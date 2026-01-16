@@ -10,10 +10,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.avilesrodriguez.domain.model.referral.Referral
 
 @Composable
-fun ReferralsScreenClient(
-
+fun ReferralScreenClient(
+    popUp: () -> Unit,
+    viewModel: ReferralViewModel = hiltViewModel()
 ){
     Column(
         modifier = Modifier
@@ -23,6 +26,6 @@ fun ReferralsScreenClient(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Referidos holaa jiji")
+         Text("hola referral client")
     }
 }

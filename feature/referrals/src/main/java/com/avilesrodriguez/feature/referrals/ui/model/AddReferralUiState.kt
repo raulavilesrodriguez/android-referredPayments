@@ -1,4 +1,4 @@
-package com.avilesrodriguez.feature.referrals.ui.addReferral.model
+package com.avilesrodriguez.feature.referrals.ui.model
 
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
@@ -28,5 +28,15 @@ fun AddReferralUiState.toReferral(
         status = ReferralStatus.PENDING,
         createdAt = createdAt,
         voucherUrl = voucherUrl
+    )
+}
+
+fun Referral.toAddReferralUiState(): AddReferralUiState{
+    return AddReferralUiState(
+        name = name,
+        email = email,
+        numberPhone = numberPhone,
+        isSaving = false,
+        isEntryValid = true
     )
 }

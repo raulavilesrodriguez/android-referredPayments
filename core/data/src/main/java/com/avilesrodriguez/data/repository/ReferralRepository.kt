@@ -20,6 +20,10 @@ class ReferralRepository @Inject constructor(
         return data.getReferralsByProvider(providerId)
     }
 
+    override suspend fun getReferralById(referralId: String): Referral? {
+        return data.getReferralById(referralId)
+    }
+
     override suspend fun updateReferralStatus(
         referralId: String,
         status: String,

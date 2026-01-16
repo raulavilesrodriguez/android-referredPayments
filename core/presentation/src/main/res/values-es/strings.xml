@@ -58,6 +58,8 @@
     <string name="required_field">Campos obligatorios no pueden estar vacíos</string>
     <string name="invalid_phone_number">Inválido número telefónico</string>
     <string name="invalid_name">Inválido nombre</string>
+    <string name="select_referred">Seleccionar Referido</string>
+    <string name="no_have_referreds">No tienes referidos</string>
     <string name="yesterday">Ayer</string>
     <string name="financial">Financiero</string>
     <string name="other">Otros</string>
