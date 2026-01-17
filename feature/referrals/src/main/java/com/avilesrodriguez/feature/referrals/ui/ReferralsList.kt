@@ -18,6 +18,8 @@ fun ReferralsList(
     onReferralClick: (Referral) -> Unit,
     referrals: List<Referral>,
     user: UserData?,
+    clientWhoReferred: UserData?,
+    providerThatReceived: UserData?,
     modifier: Modifier = Modifier
 ){
     LazyColumn(

@@ -71,6 +71,8 @@
     <string name="invalid_name">Invalid name</string>
     <string name="select_referred">Select Referred</string>
     <string name="no_have_referreds">You don't have referreds</string>
+    <string name="referring_to">Referring to %s</string>
+    <string name="referred_from">Referred from %s</string>
 
     <!-- Time -->
     <string name="yesterday">Yesterday</string>

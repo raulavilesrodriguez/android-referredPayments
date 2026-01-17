@@ -19,9 +19,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
+import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.SearchField
 import com.avilesrodriguez.presentation.composables.SearchToolBarNoBack
@@ -35,6 +37,8 @@ fun ReferralsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val clientWhoReferred = viewModel.clientWhoReferred
+    val providerThatReceived = viewModel.providerThatReceived
 
     ReferralsScreenContent(
         searchText = searchText,
@@ -43,7 +47,9 @@ fun ReferralsScreen(
             viewModel.onReferralClick(referral, openScreen) },
         referrals = uiState,
         user = user,
-        isLoading = isLoading
+        isLoading = isLoading,
+        clientWhoReferred = clientWhoReferred,
+        providerThatReceived = providerThatReceived
     )
 }
 
@@ -54,7 +60,9 @@ private fun ReferralsScreenContent(
     onReferralClick: (Referral) -> Unit,
     referrals: List<Referral>,
     user: UserData?,
-    isLoading: Boolean
+    isLoading: Boolean,
+    clientWhoReferred: UserData?,
+    providerThatReceived: UserData?
 ){
     var showSearchField by remember { mutableStateOf(false) }
     var showToolBar by remember { mutableStateOf(true) }
@@ -99,6 +107,8 @@ private fun ReferralsScreenContent(
                     onReferralClick = onReferralClick,
                     referrals = referrals,
                     user = user,
+                    clientWhoReferred = clientWhoReferred,
+                    providerThatReceived = providerThatReceived,
                     modifier = Modifier
                         .padding(8.dp)
                         .align(Alignment.Center)
@@ -118,7 +128,16 @@ private fun ReferralsScreenContent(
 @Composable
 fun ReferralsScreenPreview(){
     MaterialTheme {
-
+        ReferralsScreenContent(
+            searchText = "",
+            onValueChange = {},
+            onReferralClick = {},
+            referrals = generateFakeReferrals(),
+            user = userClient,
+            isLoading = false,
+            clientWhoReferred = userClient,
+            providerThatReceived = userProvider
+        )
     }
 }
 
@@ -159,4 +178,41 @@ private fun generateFakeReferrals(): List<Referral> = listOf(
         createdAt = System.currentTimeMillis(),
         voucherUrl = ""
     )
+)
+
+private val userClient = UserData.Client(
+    uid = "1",
+    isActive = true,
+    name = "Brayan Muelas",
+    email = "byron@gmail.com",
+    photoUrl = "https://i.pravatar.cc/150?u=2",
+    type = UserType.CLIENT,
+    nameLowercase = "brayan muelas",
+    identityCard = "1098765432",
+    countNumberPay = "12223440455",
+    bankName = "Produbanco",
+    accountType = "Ahorros",
+    moneyEarned = "1000",
+    moneyReceived = "950",
+    totalReferrals = 10,
+    pendingPayments = 1
+)
+
+private val userProvider = UserData.Provider(
+    uid = "2",
+    isActive = true,
+    name = "Seguros Atlantida",
+    email = "support@evicertia.com",
+    photoUrl = "https://i.pravatar.cc/150?u=40",
+    type = UserType.PROVIDER,
+    nameLowercase = "seguros atlantida",
+    ciOrRuc = "1234567890123",
+    moneyPaid = "15000",
+    moneyToPay = "1000",
+    referralsConversion = "0.80",
+    industry = IndustriesType.INSURANCE,
+    companyDescription = "Seguros Atlantida, a insurance company",
+    paymentRating = 4.5,
+    totalPayouts = 50,
+    website = "https://www.segurosatlantida.ec/personas"
 )

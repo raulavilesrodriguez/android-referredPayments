@@ -60,6 +60,7 @@
     <string name="invalid_name">Inválido nombre</string>
     <string name="select_referred">Seleccionar Referido</string>
     <string name="no_have_referreds">No tienes referidos</string>
+    <string name="referred_from">Referido desde %s</string>
     <string name="yesterday">Ayer</string>
     <string name="financial">Financiero</string>
     <string name="other">Otros</string>
@@ -90,4 +91,5 @@
     <string name="identity_card">Cédula de identidad:</string>
     <string name="bank_name">Nombre del banco:</string>
     <string name="account_type">Tipo de cuenta</string>
+    <string name="referring_to">Refiriendo a %s</string>
 </resources>
