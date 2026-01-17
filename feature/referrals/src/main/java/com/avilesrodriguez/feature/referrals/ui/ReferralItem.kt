@@ -54,3 +54,22 @@ fun ReferralItemClient(
         Column() { }
     }
 }
+
+@Composable
+fun ReferralItemProvider(
+    referral: Referral,
+    clientWhoReferred: UserData?
+){
+    val nameClient = clientWhoReferred?.name?.truncate(15)?:""
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ){
+
+    }
+
+}
