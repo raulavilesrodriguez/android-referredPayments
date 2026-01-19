@@ -19,17 +19,21 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.avilesrodriguez.feature.auth.ui.login.LoginScreen
 import com.avilesrodriguez.feature.auth.ui.sign_up.SignUpScreen
 import com.avilesrodriguez.feature.auth.ui.splash.SplashScreen
+import com.avilesrodriguez.feature.referrals.ui.ReferralDetailScreen
+import com.avilesrodriguez.feature.referrals.ui.ReferralViewModel
 import com.avilesrodriguez.feature.settings.ui.EditScreen
-import com.avilesrodriguez.feature.settings.ui.SettingsScreen
-import com.avilesrodriguez.feature.settings.ui.SettingsViewModel
 import com.avilesrodriguez.presentation.navigation.AppState
+import com.avilesrodriguez.presentation.navigation.DeepLinks
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import com.avilesrodriguez.winapp.ui.theme.WinAppTheme
@@ -141,5 +145,36 @@ private fun NavGraphBuilder.addEditUser(appState: AppState) {
         EditScreen(
             popUp = { appState.popUp() }
         )
+    }
+}
+
+private fun NavGraphBuilder.referralGraph(appState: AppState){
+    navigation(
+        startDestination = NavRoutes.REFERRAL_DETAIL,
+        route = NavRoutes.REFERRAL_GRAPH
+    ){
+        composable(
+            route = NavRoutes.REFERRAL_DETAIL,
+            arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID) { type = NavType.StringType }),
+            deepLinks = listOf(navDeepLink { uriPattern = DeepLinks.REFERRAL_ROUTE })
+        ) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                //Le pedimos explícitamente al NavController que nos dé el NavBackStackEntry que
+                // corresponde a la ruta de nuestro grafo anidado
+                appState.navController.getBackStackEntry(NavRoutes.REFERRAL_GRAPH)
+            }
+            //Le pasamos esa entrada del grafo padre a hiltViewModel. Esto le dice a Hilt:
+            // "El ciclo de vida de este ViewModel no está atado a la pantalla actual,
+            // sino al grafo de navegación padre"
+            val viewModel: ReferralViewModel = hiltViewModel(parentEntry)
+            val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
+            ReferralDetailScreen(
+                referralId = referralId,
+                onBackClick = { appState.popUp() },
+                openScreen = { route -> appState.navigate(route) },
+                viewModel = viewModel
+            )
+
+        }
     }
 }

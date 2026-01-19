@@ -1,5 +1,5 @@
 package com.avilesrodriguez.presentation.navigation
 
 object DeepLinks {
-    const val userRoute = "app://winapp/{uId}"
+    const val REFERRAL_ROUTE = "app://winapp/{id}"
 }

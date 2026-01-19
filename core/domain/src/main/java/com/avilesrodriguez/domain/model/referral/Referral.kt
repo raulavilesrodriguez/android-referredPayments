@@ -1,5 +1,7 @@
 package com.avilesrodriguez.domain.model.referral
 
+import androidx.compose.ui.graphics.Color
+
 data class Referral(
     val id: String = "",
     val clientId: String = "",      // Quién lo refirió

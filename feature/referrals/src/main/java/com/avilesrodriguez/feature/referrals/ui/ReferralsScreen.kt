@@ -1,7 +1,9 @@
 package com.avilesrodriguez.feature.referrals.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -31,12 +33,12 @@ import com.avilesrodriguez.presentation.composables.SearchToolBarNoBack
 @Composable
 fun ReferralsScreen(
     openScreen: (String) -> Unit,
-    user: UserData?,
     viewModel: ReferralViewModel = hiltViewModel()
 ){
     val uiState by viewModel.uiState.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val user by viewModel.userDataStore.collectAsState()
     val clientWhoReferred = viewModel.clientWhoReferred
     val providerThatReceived = viewModel.providerThatReceived
 
@@ -67,7 +69,7 @@ private fun ReferralsScreenContent(
     var showSearchField by remember { mutableStateOf(false) }
     var showToolBar by remember { mutableStateOf(true) }
 
-    Box(modifier = Modifier.fillMaxSize()){
+    Column(modifier = Modifier.fillMaxSize()){
         when{
             showSearchField -> {
                 SearchField(
@@ -78,8 +80,7 @@ private fun ReferralsScreenContent(
                     onLeadingIconClick = {
                         showSearchField = false
                         showToolBar = true
-                    },
-                    modifier = Modifier.align(Alignment.TopCenter)
+                    }
                 )
             }
             showToolBar -> {
@@ -89,36 +90,35 @@ private fun ReferralsScreenContent(
                     iconSearchClick = {
                         showSearchField = true
                         showToolBar = false
-                    },
-                    modifier = Modifier.align(Alignment.TopCenter)
+                    }
                 )
             }
         }
         HorizontalDivider(
             modifier = Modifier
-                .padding(vertical = 8.dp)
-                .align(Alignment.TopCenter),
+                .padding(vertical = 8.dp),
             thickness = 1.dp,
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
         )
-        if(!isLoading){
-            if(referrals.isNotEmpty()){
-                ReferralsList(
-                    onReferralClick = onReferralClick,
-                    referrals = referrals,
-                    user = user,
-                    clientWhoReferred = clientWhoReferred,
-                    providerThatReceived = providerThatReceived,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .align(Alignment.Center)
-                )
+        Box(modifier = Modifier.weight(1f).fillMaxWidth()){
+            if(!isLoading){
+                if(referrals.isNotEmpty()){
+                    ReferralsList(
+                        onReferralClick = onReferralClick,
+                        referrals = referrals,
+                        user = user,
+                        clientWhoReferred = clientWhoReferred,
+                        providerThatReceived = providerThatReceived,
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp, vertical = 16.dp)
+                    )
+                } else {
+                    Text(text = stringResource(R.string.no_have_referreds))
+                }
             } else {
-                Text(text = stringResource(R.string.no_have_referreds))
-            }
-        } else {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
             }
         }
     }
@@ -160,7 +160,7 @@ private fun generateFakeReferrals(): List<Referral> = listOf(
         providerId = "2",
         name = "Juana Liceo",
         nameLowercase = "juana liceo",
-        email = "juana.liceo@examplepetstore.com",
+        email = "juana.liceo@petstore.com",
         numberPhone = "0999654321",
         status = ReferralStatus.PAID,
         createdAt = System.currentTimeMillis(),

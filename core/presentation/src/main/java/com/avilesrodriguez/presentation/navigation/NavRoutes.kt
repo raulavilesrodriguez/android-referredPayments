@@ -11,15 +11,15 @@ object NavRoutes {
 
     const val Policies = "policies"
 
-    const val NewReferral = "new_referral"
-    const val ReferralScreenClient = "referral_screen_client"
-    const val ReferralScreenProvider = "referral_screen_provider"
-
     const val Home = "home"
 
-    const val User = "user/{uId}"
-    object UserArgs {
-        const val uId = "uId"
+    const val NEW_REFERRAL = "new_referral"
+
+    const val REFERRAL_DETAIL = "referral/{id}"
+    object ReferralArgs {
+        const val ID = "id"
     }
+
+    const val REFERRAL_GRAPH = "referral_graph"
 
 }

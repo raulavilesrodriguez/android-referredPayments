@@ -1,5 +1,8 @@
 package com.avilesrodriguez.feature.referrals.ui
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
@@ -61,10 +64,11 @@ class ReferralViewModel @Inject constructor(
     private val _referralState = MutableStateFlow(Referral())
     val referralState: StateFlow<Referral> = _referralState.asStateFlow()
 
+    private val _userDataStore = MutableStateFlow<UserData?>(null)
+    val userDataStore: StateFlow<UserData?> = _userDataStore
 
-    private var userData: UserData? = null
-    var clientWhoReferred: UserData? = null
-    var providerThatReceived: UserData? = null
+    var clientWhoReferred by mutableStateOf<UserData?>(null)
+    var providerThatReceived by mutableStateOf<UserData?>(null)
 
     private var searchJob: Job? = null
 
@@ -80,7 +84,7 @@ class ReferralViewModel @Inject constructor(
     init {
         launchCatching {
             if(hasUser()){
-                userData = getUser(currentUserId)
+                _userDataStore.value = getUser(currentUserId)
             }
             _searchText
                 .debounce(300)
@@ -103,6 +107,7 @@ class ReferralViewModel @Inject constructor(
     private fun fetchAllReferrals(){
         _isLoading.value = true
         searchJob = launchCatching {
+            val userData = _userDataStore.value
             when(userData){
                 is UserData.Client -> {
                     getReferralsByClient(currentUserId)
@@ -127,6 +132,7 @@ class ReferralViewModel @Inject constructor(
     private fun performSearch(query: String){
         _isLoading.value = true
         searchJob = launchCatching {
+            val userData = _userDataStore.value
             when(userData){
                 is UserData.Client -> {
                     searchReferralsByClient(query, currentUserId)

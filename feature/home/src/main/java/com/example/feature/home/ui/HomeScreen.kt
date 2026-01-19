@@ -141,7 +141,6 @@ fun HomeScreenContent(
                 when(index){
                     0 -> {
                         ReferralsScreen(
-                            user = user,
                             openScreen = openScreen
                         )
                     }
