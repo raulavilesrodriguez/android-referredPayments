@@ -97,7 +97,7 @@ fun ReferralItem(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = status,
+                    text = stringResource(status),
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimary
                 )

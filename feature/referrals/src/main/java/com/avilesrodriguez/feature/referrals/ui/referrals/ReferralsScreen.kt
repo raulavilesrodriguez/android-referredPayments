@@ -174,7 +174,7 @@ private fun generateFakeReferrals(): List<Referral> = listOf(
         nameLowercase = "mariam pinilla",
         email = "mariam12@google.com",
         numberPhone = "0989678503",
-        status = ReferralStatus.COMPLETED,
+        status = ReferralStatus.PROCESSING,
         createdAt = System.currentTimeMillis(),
         voucherUrl = ""
     )
