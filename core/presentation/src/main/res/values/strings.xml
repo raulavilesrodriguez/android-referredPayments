@@ -74,6 +74,10 @@
     <string name="referring_to">Referring to: %s</string>
     <string name="referred_from">Referred from: %s</string>
     <string name="created">Created: %s</string>
+    <string name="referred">Referred: %s</string>
+    <string name="name_referred">Name Referred</string>
+    <string name="email_referred">Email Referred</string>
+    <string name="phone_number_referred">Phone Number Referred</string>
 
     <!-- Time -->
     <string name="yesterday">Yesterday</string>

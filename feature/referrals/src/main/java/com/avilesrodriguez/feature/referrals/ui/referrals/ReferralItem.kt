@@ -1,4 +1,4 @@
-package com.avilesrodriguez.feature.referrals.ui
+package com.avilesrodriguez.feature.referrals.ui.referrals
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,6 +27,8 @@ import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.presentation.R
+import com.avilesrodriguez.presentation.ext.toColor
+import com.avilesrodriguez.presentation.ext.toDisplayName
 import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.time.formatTimestamp
 
@@ -87,18 +88,8 @@ fun ReferralItem(
             horizontalAlignment = Alignment.End,
             modifier = Modifier.padding(start = 8.dp)
         ) {
-            val status = when(referral.status){
-                ReferralStatus.PENDING -> referral.status.name
-                ReferralStatus.COMPLETED -> referral.status.name
-                ReferralStatus.REJECTED -> referral.status.name
-                ReferralStatus.PAID -> referral.status.name
-            }
-            val colorBackground = when(referral.status){
-                ReferralStatus.PENDING -> Color(0xFFF5AD18)
-                ReferralStatus.COMPLETED -> Color(0xFF6594B1)
-                ReferralStatus.REJECTED -> Color(0XFFDC0E0E)
-                ReferralStatus.PAID -> Color(0xFF08CB00)
-            }
+            val status = referral.status.toDisplayName()
+            val colorBackground = referral.status.toColor()
             Box(
                 modifier = Modifier
                     .background(colorBackground, shape = RoundedCornerShape(50))

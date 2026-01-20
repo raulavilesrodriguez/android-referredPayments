@@ -30,7 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
-import com.avilesrodriguez.feature.referrals.ui.ReferralsScreen
+import com.avilesrodriguez.feature.referrals.ui.referrals.ReferralsScreen
 import com.avilesrodriguez.feature.settings.ui.SettingsScreen
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.DropdownContextMenu

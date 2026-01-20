@@ -62,6 +62,8 @@
     <string name="no_have_referreds">No tienes referidos</string>
     <string name="referred_from">Referido desde: %s</string>
     <string name="created">Creado: %s</string>
+    <string name="referred">Referrido:</string>
+    <string name="phone_number_referred">Número Telefónico Referido</string>
     <string name="yesterday">Ayer</string>
     <string name="financial">Financiero</string>
     <string name="other">Otros</string>
@@ -93,4 +95,6 @@
     <string name="bank_name">Nombre del banco:</string>
     <string name="account_type">Tipo de cuenta</string>
     <string name="referring_to">Refiriendo a: %s</string>
+    <string name="name_referred">Nombre referido</string>
+    <string name="email_referred">Correo electrónico Referido</string>
 </resources>

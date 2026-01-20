@@ -29,8 +29,8 @@ import androidx.navigation.navigation
 import com.avilesrodriguez.feature.auth.ui.login.LoginScreen
 import com.avilesrodriguez.feature.auth.ui.sign_up.SignUpScreen
 import com.avilesrodriguez.feature.auth.ui.splash.SplashScreen
-import com.avilesrodriguez.feature.referrals.ui.ReferralDetailScreen
-import com.avilesrodriguez.feature.referrals.ui.ReferralViewModel
+import com.avilesrodriguez.feature.referrals.ui.referral.ReferralScreen
+import com.avilesrodriguez.feature.referrals.ui.referral.ReferralViewModel
 import com.avilesrodriguez.feature.settings.ui.EditScreen
 import com.avilesrodriguez.presentation.navigation.AppState
 import com.avilesrodriguez.presentation.navigation.DeepLinks
@@ -156,7 +156,7 @@ private fun NavGraphBuilder.referralGraph(appState: AppState){
         composable(
             route = NavRoutes.REFERRAL_DETAIL,
             arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID) { type = NavType.StringType }),
-            deepLinks = listOf(navDeepLink { uriPattern = DeepLinks.REFERRAL_ROUTE })
+            deepLinks = listOf(navDeepLink { uriPattern = DeepLinks.REFERRAL_URL })
         ) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 //Le pedimos explícitamente al NavController que nos dé el NavBackStackEntry que
@@ -168,7 +168,7 @@ private fun NavGraphBuilder.referralGraph(appState: AppState){
             // sino al grafo de navegación padre"
             val viewModel: ReferralViewModel = hiltViewModel(parentEntry)
             val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
-            ReferralDetailScreen(
+            ReferralScreen(
                 referralId = referralId,
                 onBackClick = { appState.popUp() },
                 openScreen = { route -> appState.navigate(route) },

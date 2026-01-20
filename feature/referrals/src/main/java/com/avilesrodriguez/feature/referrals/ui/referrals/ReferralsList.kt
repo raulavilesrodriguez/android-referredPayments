@@ -1,4 +1,4 @@
-package com.avilesrodriguez.feature.referrals.ui
+package com.avilesrodriguez.feature.referrals.ui.referrals
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

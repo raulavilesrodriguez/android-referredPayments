@@ -15,11 +15,10 @@ object NavRoutes {
 
     const val NEW_REFERRAL = "new_referral"
 
-    const val REFERRAL_DETAIL = "referral/{id}"
+    const val REFERRAL_GRAPH = "referral_graph"
+    const val REFERRAL_DETAIL = "referral_detail/{id}"
     object ReferralArgs {
         const val ID = "id"
     }
-
-    const val REFERRAL_GRAPH = "referral_graph"
 
 }

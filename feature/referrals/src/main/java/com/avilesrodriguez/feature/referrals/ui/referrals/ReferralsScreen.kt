@@ -1,4 +1,4 @@
-package com.avilesrodriguez.feature.referrals.ui
+package com.avilesrodriguez.feature.referrals.ui.referrals
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,7 +33,7 @@ import com.avilesrodriguez.presentation.composables.SearchToolBarNoBack
 @Composable
 fun ReferralsScreen(
     openScreen: (String) -> Unit,
-    viewModel: ReferralViewModel = hiltViewModel()
+    viewModel: ReferralsViewModel = hiltViewModel()
 ){
     val uiState by viewModel.uiState.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
