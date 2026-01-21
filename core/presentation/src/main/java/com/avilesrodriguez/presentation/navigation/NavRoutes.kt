@@ -21,4 +21,9 @@ object NavRoutes {
         const val ID = "id"
     }
 
+    const val EDIT_NAME_REFERRAL = "edit_name_referral"
+    const val EDIT_EMAIL_REFERRAL = "edit_email_referral"
+    const val EDIT_PHONE_REFERRAL = "edit_phone_referral"
+    const val PAY_REFERRAL = "pay_referral"
+
 }

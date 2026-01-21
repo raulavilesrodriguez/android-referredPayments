@@ -44,6 +44,7 @@ import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.fakeData.referral
 import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.fakeData.userProvider
+import com.avilesrodriguez.presentation.profile.ItemEditProfile
 import com.avilesrodriguez.presentation.profile.ItemProfile
 
 @Composable
@@ -67,7 +68,10 @@ fun ReferralScreen(
         user = user,
         clientWhoReferred = clientWhoReferred,
         providerThatReceived = providerThatReceived,
-        onPayClick = {}
+        onNameClick = { viewModel.onNameReferral(openScreen)},
+        onEmailClick = { viewModel.onEmailReferral(openScreen)},
+        onPhoneClick = { viewModel.onPhoneReferral(openScreen)},
+        onPayClick = { viewModel.onPayReferral(openScreen)}
     )
 }
 
@@ -78,6 +82,9 @@ fun ReferralScreenContent(
     user: UserData?,
     clientWhoReferred: UserData?,
     providerThatReceived: UserData?,
+    onNameClick: () -> Unit,
+    onEmailClick: () -> Unit,
+    onPhoneClick: () -> Unit,
     onPayClick: () -> Unit
 ){
     Scaffold(
@@ -95,6 +102,9 @@ fun ReferralScreenContent(
                 user = user,
                 clientWhoReferred = clientWhoReferred,
                 providerThatReceived = providerThatReceived,
+                onNameClick = onNameClick,
+                onEmailClick = onEmailClick,
+                onPhoneClick = onPhoneClick,
                 onPayClick = onPayClick,
                 modifier = Modifier.padding(paddingValues)
             )
@@ -108,6 +118,9 @@ fun ProfileReferral(
     user: UserData?,
     clientWhoReferred: UserData?,
     providerThatReceived: UserData?,
+    onNameClick: () -> Unit,
+    onEmailClick: () -> Unit,
+    onPhoneClick: () -> Unit,
     onPayClick: () -> Unit,
     modifier: Modifier = Modifier
 ){
@@ -121,9 +134,9 @@ fun ProfileReferral(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ReferralStatus(status = referral.status)
-        ItemProfile(R.drawable.name, title = R.string.name_referred, data = referral.name)
-        ItemProfile(R.drawable.mail, title = R.string.email_referred, data = referral.email)
-        ItemProfile(R.drawable.phone, title = R.string.phone_number_referred, data = referral.numberPhone)
+        ItemEditProfile(R.drawable.name, title = R.string.name_referred, data = referral.name){onNameClick()}
+        ItemEditProfile(R.drawable.mail, title = R.string.email_referred, data = referral.email){onEmailClick()}
+        ItemEditProfile(R.drawable.phone, title = R.string.phone_number_referred, data = referral.numberPhone){onPhoneClick()}
         HorizontalDivider(
             modifier = Modifier.padding(vertical = 8.dp),
             thickness = 1.dp,
@@ -190,6 +203,9 @@ fun ProfileReferralPreview(){
             user = userClient,
             clientWhoReferred = userClient,
             providerThatReceived = userProvider,
+            onNameClick = {},
+            onEmailClick = {},
+            onPhoneClick = {},
             onPayClick = {}
         )
     }

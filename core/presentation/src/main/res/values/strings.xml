@@ -67,6 +67,7 @@
     <string name="required_field">Required fields cannot be empty</string>
 
     <!-- Referral Screen -->
+    <string name="add_new_referral">Add new Referral</string>
     <string name="information_referral">Referral Information</string>
     <string name="invalid_phone_number">Invalid phone number</string>
     <string name="invalid_name">Invalid name</string>

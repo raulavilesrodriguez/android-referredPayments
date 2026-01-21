@@ -56,6 +56,7 @@
     <string name="settings_count_number_bank_provider">Número de cuenta bancaria para realizar pagos</string>
     <string name="no_information">No hay información</string>
     <string name="required_field">Campos obligatorios no pueden estar vacíos</string>
+    <string name="add_new_referral">Agregar nuevo Referido</string>
     <string name="information_referral">Información de Referido</string>
     <string name="invalid_phone_number">Inválido número telefónico</string>
     <string name="invalid_name">Inválido nombre</string>

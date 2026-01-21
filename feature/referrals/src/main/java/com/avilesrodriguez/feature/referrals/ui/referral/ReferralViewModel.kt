@@ -10,6 +10,7 @@ import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetReferralById
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
+import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -52,6 +53,22 @@ class ReferralViewModel @Inject constructor(
         } catch (ie: Throwable){
             Log.e("ReferralViewModel", "Error loading referral information", ie)
         }
+    }
+
+    fun onNameReferral(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.EDIT_NAME_REFERRAL)
+    }
+
+    fun onEmailReferral(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.EDIT_EMAIL_REFERRAL)
+    }
+
+    fun onPhoneReferral(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.EDIT_PHONE_REFERRAL)
+    }
+
+    fun onPayReferral(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.PAY_REFERRAL)
     }
 
 }
