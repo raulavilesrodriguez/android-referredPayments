@@ -76,7 +76,7 @@ fun LoginScreenContent(
     ) {
         EmailField(uiState.email, onEmailChange, Modifier.fieldModifier())
         PasswordField(uiState.password, onPasswordChange, Modifier.fieldModifier())
-        BasicButton(R.string.login, Modifier.basicButton()) { onSignInClick() }
+        BasicButton(text = R.string.login, modifier = Modifier.basicButton()) { onSignInClick() }
         BasicTextButton(R.string.forgot_password, Modifier.textButton()) {
             onForgotPasswordClick()
         }

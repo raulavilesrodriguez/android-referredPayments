@@ -89,7 +89,7 @@ fun SignUpScreenContent(
         EmailField(uiState.email, onEmailChange, Modifier.fieldModifier())
         PasswordField(uiState.password, onPasswordChange, Modifier.fieldModifier())
         RepeatPasswordField(uiState.repeatPassword, onRepeatPasswordChange, Modifier.fieldModifier())
-        BasicButton(R.string.sign_up, Modifier.basicButton()) { onSignUpClick() }
+        BasicButton(text = R.string.sign_up, modifier = Modifier.basicButton()) { onSignUpClick() }
         BasicTextButton(R.string.navigate_sign_in, Modifier.textButton()) {
             onNavigateToSignIn()
         }

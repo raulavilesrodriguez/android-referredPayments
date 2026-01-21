@@ -67,12 +67,15 @@
     <string name="required_field">Required fields cannot be empty</string>
 
     <!-- Referral Screen -->
+    <string name="information_referral">Referral Information</string>
     <string name="invalid_phone_number">Invalid phone number</string>
     <string name="invalid_name">Invalid name</string>
     <string name="select_referred">Select Referred</string>
     <string name="no_have_referreds">You don\'t have referreds</string>
     <string name="referring_to">Referring to: %s</string>
     <string name="referred_from">Referred from: %s</string>
+    <string name="referring">Referring to</string>
+    <string name="referral">Referred from</string>
     <string name="created">Created: %s</string>
     <string name="referred">Referred: %s</string>
     <string name="name_referred">Name Referred</string>
@@ -82,6 +85,7 @@
     <string name="processing">Processing</string>
     <string name="rejected">Rejected</string>
     <string name="paid">Paid</string>
+    <string name="paid_to">Paid to: %s</string>
 
     <!-- Time -->
     <string name="yesterday">Yesterday</string>

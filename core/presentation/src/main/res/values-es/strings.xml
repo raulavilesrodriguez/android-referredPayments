@@ -56,15 +56,18 @@
     <string name="settings_count_number_bank_provider">Número de cuenta bancaria para realizar pagos</string>
     <string name="no_information">No hay información</string>
     <string name="required_field">Campos obligatorios no pueden estar vacíos</string>
+    <string name="information_referral">Información de Referido</string>
     <string name="invalid_phone_number">Inválido número telefónico</string>
     <string name="invalid_name">Inválido nombre</string>
     <string name="select_referred">Seleccionar Referido</string>
     <string name="no_have_referreds">No tienes referidos</string>
     <string name="referred_from">Referido desde: %s</string>
+    <string name="referral">Referrido de</string>
     <string name="created">Creado: %s</string>
     <string name="referred">Referrido:</string>
     <string name="phone_number_referred">Número Telefónico Referido</string>
     <string name="paid">Pagado</string>
+    <string name="paid_to">Pagar a: %s</string>
     <string name="yesterday">Ayer</string>
     <string name="financial">Financiero</string>
     <string name="other">Otros</string>
@@ -101,4 +104,5 @@
     <string name="pending">Pendiente</string>
     <string name="processing">Procesando</string>
     <string name="rejected">Rechazado</string>
+    <string name="referring">Refiriendo a</string>
 </resources>

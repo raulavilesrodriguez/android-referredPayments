@@ -21,3 +21,12 @@ fun ReferralStatus.toDisplayName(): Int {
         ReferralStatus.PAID -> R.string.paid
     }
 }
+
+fun ReferralStatus.toDisplayIcon(): Int {
+    return when (this) {
+        ReferralStatus.PENDING -> R.drawable.sentiment_pending
+        ReferralStatus.PROCESSING -> R.drawable.sentiment_processing
+        ReferralStatus.REJECTED -> R.drawable.sentiment_rejected
+        ReferralStatus.PAID -> R.drawable.sentiment_paid
+    }
+}
