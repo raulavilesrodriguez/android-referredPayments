@@ -85,7 +85,7 @@ fun SignUpScreenContent(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        NameField(uiState.name, onNameChange, Modifier.fieldModifier())
+        NameField(uiState.name, onNameChange, Modifier.fieldModifier(), R.string.placeholder_name)
         EmailField(uiState.email, onEmailChange, Modifier.fieldModifier())
         PasswordField(uiState.password, onPasswordChange, Modifier.fieldModifier())
         RepeatPasswordField(uiState.repeatPassword, onRepeatPasswordChange, Modifier.fieldModifier())

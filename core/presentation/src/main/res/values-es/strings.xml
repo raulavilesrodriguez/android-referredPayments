@@ -32,6 +32,7 @@
     <string name="placeholder_name">Escribe tu nombre aquí</string>
     <string name="login">Iniciar sesión</string>
     <string name="email">Correo electrónico</string>
+    <string name="mobile_number">Número Móvil</string>
     <string name="password">Contraseña</string>
     <string name="repeat_password">Repetir contraseña</string>
     <string name="email_error">Por favor ingresa un correo válido</string>

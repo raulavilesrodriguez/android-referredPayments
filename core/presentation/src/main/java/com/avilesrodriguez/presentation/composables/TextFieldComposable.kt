@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,9 +38,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
+import com.avilesrodriguez.presentation.ext.MIN_PASS_LENGTH_PHONE_ECUADOR
 
 @Composable
-fun NameField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
+fun NameField(
+    value: String,
+    onNewValue: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    @StringRes namePlaceholder: Int,) {
     Column(
         modifier = modifier
             .fillMaxWidth(),
@@ -52,7 +58,7 @@ fun NameField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = 
                 onNewValue(it)
                             },
             shape = RoundedCornerShape(16.dp),
-            placeholder = {Text(text = stringResource(R.string.placeholder_name))},
+            placeholder = {Text(text = stringResource(namePlaceholder))},
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = "Email") }
@@ -172,6 +178,32 @@ fun EmailField(value: String, onNewValue: (String) -> Unit, modifier: Modifier =
         leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Email") },
         shape = RoundedCornerShape(16.dp)
     )
+}
+
+@Composable
+fun PhoneField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.End
+    ) {
+        OutlinedTextField(
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            value = value,
+            onValueChange = { if(it.length <= MIN_PASS_LENGTH_PHONE_ECUADOR) onNewValue(it) },
+            placeholder = { Text(stringResource(R.string.mobile_number))},
+            leadingIcon = { Icon(imageVector = Icons.Default.PhoneAndroid, contentDescription = "Phone")},
+            shape = RoundedCornerShape(16.dp)
+        )
+        Text(
+            text = "${value.length}/$MIN_PASS_LENGTH_PHONE_ECUADOR",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp, end = 8.dp),
+            textAlign = TextAlign.End
+        )
+    }
 }
 
 @Composable

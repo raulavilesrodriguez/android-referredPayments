@@ -9,6 +9,7 @@ import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.MIN_PASS_LENGTH_PHONE_ECUADOR
 import com.avilesrodriguez.presentation.ext.isValidEmail
 import com.avilesrodriguez.presentation.ext.isValidNumber
+import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,7 +68,7 @@ class AddReferralViewModel @Inject constructor(
         _addReferralState.value = _addReferralState.value.copy(isEntryValid = validateInput(currentState.value))
     }
 
-    fun onSaveClick(providerId: String, popUp: () -> Unit){
+    fun onSaveClick(providerId: String, openAndPopUp: (String, String) -> Unit){
         if(!phoneNumber.isValidNumber()){
             SnackbarManager.showMessage(R.string.invalid_phone_number)
             return
@@ -90,8 +91,8 @@ class AddReferralViewModel @Inject constructor(
             )
             saveReferral(referral)
 
-            // navigate to referrals screen
-            popUp()
+            // navigate to home screen
+            openAndPopUp(NavRoutes.Home, NavRoutes.NEW_REFERRAL)
         }.invokeOnCompletion { _addReferralState.value = _addReferralState.value.copy(isSaving = false) }
     }
 }
