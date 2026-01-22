@@ -10,6 +10,7 @@ sealed class UserData {
     abstract val photoUrl: String
     abstract val fcmToken: String?
     abstract val type: UserType
+    abstract val nameLowercase: String?
 
     data class Client(
         override val uid: String = "",
@@ -19,7 +20,7 @@ sealed class UserData {
         override val photoUrl: String = "",
         override val fcmToken: String? = null,
         override val type: UserType = UserType.CLIENT,
-        val nameLowercase: String? = null,
+        override val nameLowercase: String? = null,
         val identityCard: String? = null, // identity
         val countNumberPay: String? = null, // cuenta para recibir pagos
         val bankName: String? = null,
@@ -38,7 +39,7 @@ sealed class UserData {
         override val photoUrl: String = "",
         override val fcmToken: String? = null,
         override val type: UserType = UserType.PROVIDER,
-        val nameLowercase: String? = null,
+        override val nameLowercase: String? = null,
         val ciOrRuc: String? = null, // Datos fiscales
         val countNumber: String? = null, // cuenta para pagar
         val moneyPaid: String? = null,

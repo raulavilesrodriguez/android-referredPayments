@@ -29,6 +29,7 @@ import androidx.navigation.navigation
 import com.avilesrodriguez.feature.auth.ui.login.LoginScreen
 import com.avilesrodriguez.feature.auth.ui.sign_up.SignUpScreen
 import com.avilesrodriguez.feature.auth.ui.splash.SplashScreen
+import com.avilesrodriguez.feature.referrals.ui.addReferral.AddReferralScreen
 import com.avilesrodriguez.feature.referrals.ui.referral.ReferralScreen
 import com.avilesrodriguez.feature.referrals.ui.referral.ReferralViewModel
 import com.avilesrodriguez.feature.settings.ui.EditScreen
@@ -74,6 +75,8 @@ fun MainNavigation(){
                     addHome(appState)
                     addPolicies(appState)
                     addEditUser(appState)
+                    referralGraph(appState)
+                    addNewReferral(appState)
                 }
             }
         }
@@ -176,5 +179,19 @@ private fun NavGraphBuilder.referralGraph(appState: AppState){
             )
 
         }
+    }
+}
+
+private fun NavGraphBuilder.addNewReferral(appState: AppState){
+    composable(
+        route = NavRoutes.NEW_REFERRAL,
+        arguments = listOf(navArgument(NavRoutes.UserArgs.ID){type = NavType.StringType})
+    ) { backStackEntry ->
+        val userId = backStackEntry.arguments?.getString(NavRoutes.UserArgs.ID)
+        AddReferralScreen(
+            providerId = userId,
+            openAndPopUp = {route, popUp -> appState.navigateAndPopUp(route, popUp)},
+            onBackClick = { appState.popUp() }
+        )
     }
 }

@@ -34,7 +34,7 @@ import com.avilesrodriguez.presentation.ext.fieldModifier
 
 @Composable
 fun AddReferralScreen(
-    providerId: String,
+    providerId: String?,
     openAndPopUp: (String, String) -> Unit,
     onBackClick: () -> Unit,
     viewModel: AddReferralViewModel = hiltViewModel()
