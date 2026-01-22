@@ -103,66 +103,6 @@ class StoreDataSource @Inject constructor(
         }
     }
 
-    fun getUsersClient(currentUserId: String): Flow<List<UserData>> = callbackFlow{
-        val query = firestore.collection(REFERRALS_COLLECTION)
-            .whereEqualTo(PROVIDER_ID_FIELD, currentUserId)
-
-        val listener: ListenerRegistration = query.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                close(error)
-                return@addSnapshotListener
-            }
-
-        val referrals = snapshot?.documents?.mapNotNull { document ->
-            document.toObject(ReferralFirestore::class.java)?.toDomain()
-        } ?: emptyList()
-
-        if(referrals.isEmpty()){
-            trySend(emptyList()).isSuccess
-            return@addSnapshotListener
-        }
-        launch {
-            try {
-                val uniqueClientIds = referrals.map { it.clientId }.distinct()
-
-                // Ejecutamos todas las peticiones en paralelo usando async
-                val deferredUsers = uniqueClientIds.map { clientId ->
-                    async {
-                        try {
-                            val userDoc = firestore.collection(USERS_COLLECTION)
-                                .document(clientId)
-                                .get()
-                                .await()
-
-                            if (userDoc.exists()) {
-                                // 3. Manejo correcto de polimorfismo (Client vs Provider)
-                                val type = userDoc.getString("type")
-                                val firestoreUser = when (type) {
-                                    "CLIENT" -> userDoc.toObject(UserDataFirestore.Client::class.java)
-                                    "PROVIDER" -> userDoc.toObject(UserDataFirestore.Provider::class.java)
-                                    else -> null
-                                }
-                                firestoreUser?.toDomain()
-                            } else null
-                        } catch (e: Exception) {
-                            Log.e("StoreDataSource", "Error al obtener cliente $clientId: ${e.message}")
-                            null
-                        }
-                    }
-                }
-
-                // Esperamos a que todas terminen y filtramos los nulos
-                val users = deferredUsers.awaitAll().filterNotNull()
-                trySend(users).isSuccess
-
-            } catch (e: Exception) {
-                Log.e("StoreDataSource", "Error en el flujo de usuarios: ${e.message}")
-            }
-        }
-    }
-    awaitClose { listener.remove() }
-}
-
     fun getUsersProvider(): Flow<List<UserData>>{
         val query = firestore.collection(USERS_COLLECTION)
             .whereEqualTo(TYPE_FIELD, TYPE_FIELD_PROVIDER)
@@ -186,6 +126,9 @@ class StoreDataSource @Inject constructor(
             .endAt(namePrefix + "\uf8ff")
         return createUsersFlow(query)
     }
+
+    fun getUsersClient(currentUserId: String): Flow<List<UserData>> =
+        searchUsersClient("", currentUserId = currentUserId)
 
     fun searchUsersClient(namePrefix: String, currentUserId: String): Flow<List<UserData>> = callbackFlow {
         val query = firestore.collection(REFERRALS_COLLECTION)

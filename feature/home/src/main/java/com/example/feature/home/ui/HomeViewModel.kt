@@ -3,7 +3,12 @@ package com.example.feature.home.ui
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetUser
+import com.avilesrodriguez.domain.usecases.GetUsersClient
+import com.avilesrodriguez.domain.usecases.GetUsersProvider
+import com.avilesrodriguez.domain.usecases.GetUsersProviderByIndustry
 import com.avilesrodriguez.domain.usecases.HasUser
+import com.avilesrodriguez.domain.usecases.SearchUsersClient
+import com.avilesrodriguez.domain.usecases.SearchUsersProvider
 import com.avilesrodriguez.domain.usecases.SignOut
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
@@ -18,7 +23,12 @@ class HomeViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
     private val hasUser: HasUser,
     private val getUser: GetUser,
-    private val signOut: SignOut
+    private val signOut: SignOut,
+    private val getUsersProvider: GetUsersProvider,
+    private val getUsersProviderByIndustry: GetUsersProviderByIndustry,
+    private val searchUsersProvider: SearchUsersProvider,
+    private val getUsersClient: GetUsersClient,
+    private val searchUsersClient: SearchUsersClient
 ) : BaseViewModel() {
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore

@@ -3,6 +3,7 @@ package com.avilesrodriguez.data.repository
 import com.avilesrodriguez.data.datasource.firebase.StoreDataSource
 import com.avilesrodriguez.domain.interfaces.IStoreRepository
 import com.avilesrodriguez.domain.model.user.UserData
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class StoreRepository @Inject constructor(
@@ -22,5 +23,31 @@ class StoreRepository @Inject constructor(
 
     override suspend fun isAuthorizedProvider(email: String): Boolean {
         return data.isAuthorizedProvider(email)
+    }
+
+    override suspend fun getUsersProvider(): Flow<List<UserData>> {
+        return data.getUsersProvider()
+    }
+
+    override suspend fun getUsersProviderByIndustry(industry: String): Flow<List<UserData>> {
+        return data.getUsersProviderByIndustry(industry)
+    }
+
+    override suspend fun searchUsersProvider(
+        namePrefix: String,
+        currentUserId: String
+    ): Flow<List<UserData>> {
+        return data.searchUsersProvider(namePrefix, currentUserId)
+    }
+
+    override suspend fun getUsersClient(currentUserId: String): Flow<List<UserData>> =
+        data.getUsersClient(currentUserId)
+
+
+    override suspend fun searchUsersClient(
+        namePrefix: String,
+        currentUserId: String
+    ): Flow<List<UserData>> {
+        return data.searchUsersClient(namePrefix, currentUserId)
     }
 }
