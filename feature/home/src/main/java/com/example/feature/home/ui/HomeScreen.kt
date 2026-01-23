@@ -19,7 +19,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -28,12 +27,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.feature.referrals.ui.referrals.ReferralsScreen
 import com.avilesrodriguez.feature.settings.ui.SettingsScreen
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.DropdownContextMenu
+import com.avilesrodriguez.presentation.industries.label
+import com.avilesrodriguez.presentation.industries.options
 import com.example.feature.home.models.StartListTab
 import kotlinx.coroutines.launch
 
@@ -43,11 +45,14 @@ fun HomeScreen(
     restartApp: (String) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ){
-    LaunchedEffect(Unit) {
-        viewModel.getUserData()
-    }
     val userData by viewModel.userDataStore.collectAsState()
+    val users by viewModel.users.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val searchText by viewModel.searchText.collectAsState()
+    val selectedIndustry by viewModel.selectedIndustry.collectAsState()
+
     val options = ActionOptionsHome.getOptions()
+    val industryOptions = IndustriesType.options()
 
     HomeScreenContent(
         user = userData,
@@ -57,7 +62,14 @@ fun HomeScreen(
         },
         openScreen = openScreen,
         restartApp = restartApp,
-        onEditClick = { viewModel.editUser(openScreen) }
+        onEditClick = { viewModel.editUser(openScreen) },
+        users = users,
+        isLoading = isLoading,
+        searchText = searchText,
+        updateSearchText = viewModel::updateSearchText,
+        selectedIndustry = selectedIndustry?.label(),
+        onIndustryChange = viewModel::onIndustryChange,
+        industryOptions = industryOptions
     )
 }
 
@@ -69,7 +81,14 @@ fun HomeScreenContent(
     onActionClick: (Int) -> Unit,
     openScreen: (String) -> Unit,
     restartApp: (String) -> Unit,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    users: List<UserData>,
+    isLoading: Boolean,
+    searchText: String,
+    updateSearchText: (String) -> Unit,
+    selectedIndustry: Int?,
+    onIndustryChange: (Int) -> Unit,
+    industryOptions: List<Int>
 ){
     val tabs = generateTabs()
     val pagerState = rememberPagerState(1){tabs.size}
@@ -145,7 +164,17 @@ fun HomeScreenContent(
                         )
                     }
                     1 -> {
-                        HomeMainContent(user)
+                        HomeMainContent(
+                            openScreen = openScreen,
+                            user = user,
+                            users = users,
+                            isLoading = isLoading,
+                            searchText = searchText,
+                            updateSearchText = updateSearchText,
+                            selectedIndustry = selectedIndustry,
+                            onIndustryChange = onIndustryChange,
+                            industryOptions = industryOptions
+                        )
                     }
                     2 -> {
                         SettingsScreen(
@@ -160,7 +189,17 @@ fun HomeScreenContent(
 }
 
 @Composable
-fun HomeMainContent(user: UserData?) {
+fun HomeMainContent(
+    openScreen: (String) -> Unit,
+    user: UserData?,
+    users: List<UserData>,
+    isLoading: Boolean,
+    searchText: String,
+    updateSearchText: (String) -> Unit,
+    selectedIndustry: Int?,
+    onIndustryChange: (Int) -> Unit,
+    industryOptions: List<Int>
+) {
     if (user != null) {
         when (user.type) {
             UserType.CLIENT -> HomeScreenClient(user = user)

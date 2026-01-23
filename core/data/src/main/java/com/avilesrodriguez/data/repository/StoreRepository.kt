@@ -35,9 +35,9 @@ class StoreRepository @Inject constructor(
 
     override suspend fun searchUsersProvider(
         namePrefix: String,
-        currentUserId: String
+        industry: String?
     ): Flow<List<UserData>> {
-        return data.searchUsersProvider(namePrefix, currentUserId)
+        return data.searchUsersProvider(namePrefix, industry)
     }
 
     override suspend fun getUsersClient(currentUserId: String): Flow<List<UserData>> =

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class SearchUsersProvider @Inject constructor(
     private val repository: IStoreRepository
 ) {
-    suspend operator fun invoke(namePrefix: String, currentUserId: String) : Flow<List<UserData>> {
-        return repository.searchUsersProvider(namePrefix, currentUserId)
+    suspend operator fun invoke(namePrefix: String, industry: String?) : Flow<List<UserData>> {
+        return repository.searchUsersProvider(namePrefix, industry)
     }
 }

@@ -118,12 +118,21 @@ class StoreDataSource @Inject constructor(
         return createUsersFlow(query)
     }
 
-    fun searchUsersProvider(namePrefix: String, currentUserId: String): Flow<List<UserData>> {
-        val query = firestore.collection(USERS_COLLECTION)
+    fun searchUsersProvider(namePrefix: String, industry: String? = null): Flow<List<UserData>> {
+        var query: Query = firestore.collection(USERS_COLLECTION)
             .whereEqualTo(TYPE_FIELD, TYPE_FIELD_PROVIDER)
-            .orderBy(ORDER_BY_FIELD_LOWER, Query.Direction.ASCENDING)
-            .startAt(namePrefix)
-            .endAt(namePrefix + "\uf8ff")
+
+        if (!industry.isNullOrBlank()) {
+            query = query.whereEqualTo(INDUSTRY_FIELD, industry)
+        }
+
+        query = query.orderBy(ORDER_BY_FIELD_LOWER, Query.Direction.ASCENDING)
+
+        if (namePrefix.isNotBlank()) {
+            query = query.startAt(namePrefix)
+                .endAt(namePrefix + "\uf8ff")
+        }
+
         return createUsersFlow(query)
     }
 
