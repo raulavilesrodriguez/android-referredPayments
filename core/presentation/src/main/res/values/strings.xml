@@ -50,10 +50,16 @@
     <string name="navigate_sign_up">2. Don\'t have an account? Click here to sign up</string>
     <string name="home_winapp">Home WinApp</string>
 
-    <!-- Up bar Home Screen -->
+    <!-- Home Screen -->
     <string name="usage_policies">Usage policies</string>
     <string name="start">Start</string>
     <string name="referrals">Referrals</string>
+    <string name="total_profits">Total Profits</string>
+    <string name="charged">Charged</string>
+    <string name="unnamed">Unnamed</string>
+    <string name="zero">0.00</string>
+    <string name="pending_payments">Pending Payments</string>
+    <string name="search_companies">Search Companies</string>
 
     <!-- Settings Screen -->
     <string name="profile">Profile</string>

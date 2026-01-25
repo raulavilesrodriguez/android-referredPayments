@@ -69,7 +69,8 @@ fun HomeScreen(
         updateSearchText = viewModel::updateSearchText,
         selectedIndustry = selectedIndustry?.label(),
         onIndustryChange = viewModel::onIndustryChange,
-        industryOptions = industryOptions
+        industryOptions = industryOptions,
+        onProviderClick = { providerId ->}
     )
 }
 
@@ -88,7 +89,8 @@ fun HomeScreenContent(
     updateSearchText: (String) -> Unit,
     selectedIndustry: Int?,
     onIndustryChange: (Int) -> Unit,
-    industryOptions: List<Int>
+    industryOptions: List<Int>,
+    onProviderClick: (String) -> Unit
 ){
     val tabs = generateTabs()
     val pagerState = rememberPagerState(1){tabs.size}
@@ -99,15 +101,9 @@ fun HomeScreenContent(
             TopAppBar(
                 title = {
                     when (pagerState.currentPage) {
-                        0 -> {
-                            Text(stringResource(R.string.referrals))
-                        }
-                        1 -> {
-                            Text(stringResource(R.string.app_name_presentation))
-                        }
-                        2 -> {
-                            Text(stringResource(R.string.profile))
-                        }
+                        0 -> { Text(stringResource(R.string.referrals)) }
+                        1 -> { Text(stringResource(R.string.app_name_presentation)) }
+                        2 -> { Text(stringResource(R.string.profile)) }
                     }
                 },
                 actions = {
@@ -165,7 +161,6 @@ fun HomeScreenContent(
                     }
                     1 -> {
                         HomeMainContent(
-                            openScreen = openScreen,
                             user = user,
                             users = users,
                             isLoading = isLoading,
@@ -173,7 +168,8 @@ fun HomeScreenContent(
                             updateSearchText = updateSearchText,
                             selectedIndustry = selectedIndustry,
                             onIndustryChange = onIndustryChange,
-                            industryOptions = industryOptions
+                            industryOptions = industryOptions,
+                            onProviderClick = onProviderClick
                         )
                     }
                     2 -> {
@@ -190,7 +186,6 @@ fun HomeScreenContent(
 
 @Composable
 fun HomeMainContent(
-    openScreen: (String) -> Unit,
     user: UserData?,
     users: List<UserData>,
     isLoading: Boolean,
@@ -198,12 +193,29 @@ fun HomeMainContent(
     updateSearchText: (String) -> Unit,
     selectedIndustry: Int?,
     onIndustryChange: (Int) -> Unit,
-    industryOptions: List<Int>
+    industryOptions: List<Int>,
+    onProviderClick: (String) -> Unit
 ) {
     if (user != null) {
         when (user.type) {
-            UserType.CLIENT -> HomeScreenClient(user = user)
-            UserType.PROVIDER -> HomeScreenProvider(user = user)
+            UserType.CLIENT -> HomeScreenClient(
+                user = user,
+                users = users,
+                isLoading = isLoading,
+                searchText = searchText,
+                updateSearchText = updateSearchText,
+                selectedIndustry = selectedIndustry,
+                onIndustryChange = onIndustryChange,
+                industryOptions = industryOptions,
+                onProviderClick = onProviderClick
+            )
+            UserType.PROVIDER -> HomeScreenProvider(
+                user = user,
+                users = users,
+                isLoading = isLoading,
+                searchText = searchText,
+                updateSearchText = updateSearchText
+            )
         }
     } else {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

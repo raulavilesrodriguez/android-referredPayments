@@ -47,6 +47,12 @@
     <string name="usage_policies">Políticas de uso</string>
     <string name="start">Inicio</string>
     <string name="referrals">Referidos</string>
+    <string name="total_profits">Ganancias Totales</string>
+    <string name="charged">Cobrado</string>
+    <string name="unnamed">Sin Nombre</string>
+    <string name="zero">0.00</string>
+    <string name="pending_payments">Pagos Pendientes</string>
+    <string name="search_companies">Buscar Empresas</string>
     <string name="profile">Perfil</string>
     <string name="settings_edit_photo">Editar foto</string>
     <string name="settings_name">Nombre*</string>

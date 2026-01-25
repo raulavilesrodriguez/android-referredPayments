@@ -94,3 +94,78 @@ val userProvider = UserData.Provider(
     totalPayouts = 50,
     website = "https://www.segurosatlantida.ec/personas"
 )
+
+val usersProviders = listOf(
+    UserData.Provider(
+        uid = "2",
+        isActive = true,
+        name = "Seguros Atlantida",
+        email = "support@evicertia.com",
+        photoUrl = "https://i.pravatar.cc/150?u=40",
+        type = UserType.PROVIDER,
+        nameLowercase = "seguros atlantida",
+        ciOrRuc = "1234567890123",
+        moneyPaid = "15000",
+        moneyToPay = "1000",
+        referralsConversion = "0.80",
+        industry = IndustriesType.INSURANCE,
+        companyDescription = "Seguros Atlantida, a insurance company",
+        paymentRating = 4.5,
+        totalPayouts = 50,
+        website = "https://www.segurosatlantida.ec/personas"
+    ),
+    UserData.Provider(
+        uid = "3",
+        isActive = true,
+        name = "Optica el Ojo",
+        email = "support@ojaso.com",
+        photoUrl = "https://i.pravatar.cc/150?u=45",
+        type = UserType.PROVIDER,
+        nameLowercase = "optica el ojo",
+        ciOrRuc = "1234567890199",
+        moneyPaid = "8000",
+        moneyToPay = "500",
+        referralsConversion = "0.85",
+        industry = IndustriesType.OPTICS,
+        companyDescription = "Optica el Ojo, a optics company",
+        paymentRating = 4.7,
+        totalPayouts = 30,
+        website = "https://www.opticalosandes.com.ec/?srsltid=AfmBOoo4EuNV7AfNRWUmWJx_tQFqf--YIamTm_7T-wwoOaff1pNVUbkr"
+    ),
+    UserData.Provider(
+        uid = "4",
+        isActive = true,
+        name = "Inversiones SP500",
+        email = "support@invest500.com",
+        photoUrl = "https://i.pravatar.cc/150?u=60",
+        type = UserType.PROVIDER,
+        nameLowercase = "inversiones sp500",
+        ciOrRuc = "1234566990199",
+        moneyPaid = "21000",
+        moneyToPay = "1200",
+        referralsConversion = "0.9",
+        industry = IndustriesType.FINANCIAL,
+        companyDescription = "Inversiones SP500, a financial company",
+        paymentRating = 4.7,
+        totalPayouts = 30,
+        website = "https://finance.yahoo.com/"
+    ),
+    UserData.Provider(
+        uid = "5",
+        isActive = true,
+        name = "Remax Agente",
+        email = "angelita.salazar@remax.com",
+        photoUrl = "https://i.pravatar.cc/150?u=66",
+        type = UserType.PROVIDER,
+        nameLowercase = "remax agente",
+        ciOrRuc = "1234566990003",
+        moneyPaid = "5000",
+        moneyToPay = "400",
+        referralsConversion = "0.75",
+        industry = IndustriesType.REAL_ESTATE,
+        companyDescription = "Remax Agente, a real estate company",
+        paymentRating = 4.2,
+        totalPayouts = 15,
+        website = "https://www.remax.com.ec/"
+    )
+)

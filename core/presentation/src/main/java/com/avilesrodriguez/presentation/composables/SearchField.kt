@@ -102,6 +102,43 @@ fun SearchToolBarNoBack(
 }
 
 @Composable
+fun SearchFieldBasic(
+    value: String,
+    onValueChange: (String) -> Unit,
+    @StringRes placeholder: Int,
+    @DrawableRes trailingIcon: Int,
+    modifier: Modifier = Modifier
+){
+    Box(modifier = modifier
+        .fillMaxWidth(),
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = { onValueChange(it) },
+            placeholder = { Text(text = stringResource(id = placeholder)) },
+            trailingIcon = {
+                Icon(
+                    painter = painterResource(id = trailingIcon),
+                    contentDescription = null
+                )
+            },
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.outline,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        )
+    }
+}
+
+@Composable
 fun SearchToolBar(
     @StringRes title: Int,
     @DrawableRes iconBack: Int,

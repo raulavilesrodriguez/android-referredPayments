@@ -8,6 +8,7 @@ import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SearchUsersClient
 import com.avilesrodriguez.domain.usecases.SearchUsersProvider
 import com.avilesrodriguez.domain.usecases.SignOut
+import com.avilesrodriguez.presentation.ext.normalizeName
 import com.avilesrodriguez.presentation.industries.getById
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
@@ -64,7 +65,7 @@ class HomeViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .collect { (query, industry) ->
                     searchJob?.cancel() // cancel previous search
-                    loadData(query, industry)
+                    loadData(query.normalizeName(), industry)
                 }
         }
     }

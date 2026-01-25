@@ -16,7 +16,10 @@ import com.avilesrodriguez.domain.model.user.UserData
 @Composable
 fun HomeScreenProvider(
     user: UserData,
-    viewModel: HomeViewModel = hiltViewModel()
+    users: List<UserData>,
+    isLoading: Boolean,
+    searchText: String,
+    updateSearchText: (String) -> Unit
 ){
     Column(
         modifier = Modifier
