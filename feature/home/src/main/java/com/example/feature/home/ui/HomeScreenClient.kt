@@ -45,11 +45,13 @@ import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
+import com.avilesrodriguez.presentation.composables.RatingBar
 import com.avilesrodriguez.presentation.composables.SearchFieldBasic
 import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.fakeData.usersProviders
 import com.avilesrodriguez.presentation.industries.label
 import com.avilesrodriguez.presentation.industries.options
+import java.util.Locale
 
 @Composable
 fun HomeScreenClient(
@@ -229,6 +231,14 @@ fun ProviderCard(provider: UserData.Provider, onProviderClick: (String) -> Unit)
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RatingBar(rating = provider.paymentRating)
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = String.format(Locale.US, "%.1f", provider.paymentRating),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
             }
         }
     }
