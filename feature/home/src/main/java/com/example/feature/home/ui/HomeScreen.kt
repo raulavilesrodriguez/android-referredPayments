@@ -70,7 +70,7 @@ fun HomeScreen(
         selectedIndustry = selectedIndustry?.label(),
         onIndustryChange = viewModel::onIndustryChange,
         industryOptions = industryOptions,
-        onProviderClick = { providerId ->}
+        onProviderClick = { providerId -> viewModel.navigationUserDetails(providerId, openScreen)}
     )
 }
 

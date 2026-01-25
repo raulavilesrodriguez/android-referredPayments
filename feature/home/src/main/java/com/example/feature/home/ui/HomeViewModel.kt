@@ -116,4 +116,8 @@ class HomeViewModel @Inject constructor(
     fun editUser(openScreen: (String) -> Unit){
         openScreen(NavRoutes.EditUser)
     }
+
+    fun navigationUserDetails(uid:String, openScreen: (String) -> Unit){
+        openScreen(NavRoutes.USER_DETAIL.replace("{id}", uid))
+    }
 }

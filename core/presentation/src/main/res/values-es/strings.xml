@@ -76,6 +76,7 @@
     <string name="phone_number_referred">Número Telefónico Referido</string>
     <string name="paid">Pagado</string>
     <string name="paid_to">Pagar a: %s</string>
+    <string name="refer_now">Refiere Ahora</string>
     <string name="yesterday">Ayer</string>
     <string name="financial">Financiero</string>
     <string name="other">Otros</string>

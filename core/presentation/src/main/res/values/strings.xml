@@ -94,6 +94,7 @@
     <string name="rejected">Rejected</string>
     <string name="paid">Paid</string>
     <string name="paid_to">Paid to: %s</string>
+    <string name="refer_now">Refer Now</string>
 
     <!-- Time -->
     <string name="yesterday">Yesterday</string>
