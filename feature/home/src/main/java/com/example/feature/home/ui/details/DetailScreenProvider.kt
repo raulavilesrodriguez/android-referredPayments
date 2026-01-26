@@ -1,5 +1,6 @@
 package com.example.feature.home.ui.details
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,12 +15,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Brightness2
 import androidx.compose.material.icons.filled.BrightnessHigh
+import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Payments
@@ -29,15 +33,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.avilesrodriguez.presentation.industries.label
@@ -46,36 +53,50 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
-import com.avilesrodriguez.presentation.composables.ProfileToolBar
 import com.avilesrodriguez.presentation.fakeData.userProvider
 import java.util.Locale
 
 @Composable
 fun DetailScreenProvider(
+    uId: String,
     popUp: () -> Unit,
+    openScreen: (String) -> Unit,
+    viewModel: DetailViewModel = hiltViewModel()
 ){
+    val userData by viewModel.userDataStore.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.loadUserInformation(uId)
+    }
+    DetailScreenProviderContent(
+        provider = userData as UserData.Provider,
+        onBackClick = popUp,
+        onAddReferClick = {uid -> viewModel.onAddReferClick(uid, openScreen)}
+    )
 }
 
 @Composable
 fun DetailScreenProviderContent(
     provider: UserData.Provider,
     onBackClick: () -> Unit,
-    onReferClick: (String) -> Unit,
+    onAddReferClick: (String) -> Unit,
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
-            ProfileToolBar(
-                iconBack = R.drawable.arrow_back,
+            ToolBarDetails(
                 title = R.string.information_provider,
-                backClick = { onBackClick() }
+                backClick = { onBackClick() },
+                modifier = Modifier.background(
+                    MaterialTheme.colorScheme.secondary
+                )
             )
         },
-        bottomBar = {ButtonToRefer(onReferClick = onReferClick, provider = provider)},
+        bottomBar = {ButtonToRefer(onReferClick = onAddReferClick, provider = provider)},
         content = { innerPadding ->
             ProfileProvider(
                 provider = provider,
@@ -83,6 +104,40 @@ fun DetailScreenProviderContent(
             )
         }
     )
+}
+
+@Composable
+private fun ToolBarDetails(
+    @StringRes title: Int,
+    backClick: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Absolute.Left
+    ){
+        IconButton(
+            onClick = { backClick()}
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                contentDescription = null
+            )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = stringResource(id = title),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier
+                .padding(start = 4.dp)
+                .fillMaxWidth(0.80f)
+        )
+    }
 }
 
 @Composable
@@ -125,30 +180,26 @@ private fun ProfileProvider(
             .verticalScroll(rememberScrollState())
     ){
         Box(modifier = Modifier
-            .height(280.dp)
-            .fillMaxWidth()){
-            Avatar(
-                photoUri = provider.photoUrl,
-                size = 80.dp
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .background(
+                MaterialTheme.colorScheme.secondary,
             )
+        ){
             // Capa de degradado para legibilidad
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                Color.Black.copy(alpha = 0.4f),
-                                Color.Transparent,
-                                Color.Black.copy(alpha = 0.6f)
-                            )
-                        )
+                        MaterialTheme.colorScheme.secondary
                     )
             )
             Column(
                 modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(16.dp)
+                    .align(Alignment.Center)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 Surface(
                     color = MaterialTheme.colorScheme.primary,
@@ -163,9 +214,14 @@ private fun ProfileProvider(
                 }
                 Text(
                     text = provider.name ?: stringResource(R.string.unnamed),
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.headlineLarge,
                     color = Color.White,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+                Avatar(
+                    photoUri = provider.photoUrl,
+                    size = 80.dp
                 )
             }
         }
@@ -177,26 +233,30 @@ private fun ProfileProvider(
                 DetailMetricItem(
                     icon = Icons.Default.Star,
                     value = String.format(Locale.US, "%.1f", provider.paymentRating),
-                    label = stringResource(R.string.rating)
+                    label = stringResource(R.string.rating),
+                    tint = Color(0xFFFFC107)
                 )
                 VerticalDivider(modifier = Modifier.height(40.dp))
                 DetailMetricItem(
                     icon = Icons.Default.Payments,
                     value = "${provider.totalPayouts}",
-                    label = stringResource(R.string.payouts)
+                    label = stringResource(R.string.payouts),
+                    tint = Color(0xFFFFC107)
                 )
                 VerticalDivider(modifier = Modifier.height(40.dp))
                 if(provider.isActive){
                     DetailMetricItem(
                         icon = Icons.Default.BrightnessHigh,
                         value ="",
-                        label = stringResource(R.string.active_user)
+                        label = stringResource(R.string.active_user),
+                        tint = Color(0xFFFFC107)
                     )
                 } else {
                     DetailMetricItem(
                         icon = Icons.Default.Brightness2,
                         value ="",
-                        label = stringResource(R.string.inactive_user)
+                        label = stringResource(R.string.inactive_user),
+                        tint = Color(0xFFC40C0C)
                     )
                 }
             }
@@ -210,6 +270,7 @@ private fun ProfileProvider(
                 text = provider.companyDescription ?: "",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 3,
                 modifier = Modifier.padding(top = 8.dp)
             )
 
@@ -227,15 +288,20 @@ private fun ProfileProvider(
                 title = stringResource(R.string.email),
                 value = provider.email
             )
+            InfoCard(
+                icon = Icons.Default.Business,
+                title = stringResource(R.string.settings_industry),
+                value = stringResource(provider.industry.label())
+            )
         }
     }
 }
 
 @Composable
-fun DetailMetricItem(icon: ImageVector, value: String, label: String) {
+fun DetailMetricItem(icon: ImageVector, value: String, label: String, tint: Color = Color.White) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, contentDescription = null, tint = Color(0xFFFFC107), modifier = Modifier.size(20.dp))
+            Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(4.dp))
             Text(text = value, fontWeight = FontWeight.Bold, fontSize = 18.sp)
         }
@@ -272,7 +338,7 @@ fun DetailScreenProviderPreview(){
         DetailScreenProviderContent(
             provider = userProvider,
             onBackClick = {},
-            onReferClick = {}
+            onAddReferClick = {}
         )
     }
 }

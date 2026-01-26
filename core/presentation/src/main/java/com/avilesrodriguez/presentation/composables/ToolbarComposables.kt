@@ -46,9 +46,10 @@ fun ProfileToolBar(
     @DrawableRes iconBack: Int,
     @StringRes title: Int,
     backClick: () -> Unit,
+    modifier: Modifier = Modifier
 ){
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
