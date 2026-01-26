@@ -1,8 +1,10 @@
 package com.example.feature.home.ui.details
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,33 +12,46 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Brightness2
+import androidx.compose.material.icons.filled.BrightnessHigh
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.avilesrodriguez.presentation.industries.label
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.composables.ProfileToolBar
 import com.avilesrodriguez.presentation.fakeData.userProvider
+import java.util.Locale
 
 @Composable
 fun DetailScreenProvider(
@@ -56,7 +71,7 @@ fun DetailScreenProviderContent(
         topBar = {
             ProfileToolBar(
                 iconBack = R.drawable.arrow_back,
-                title = R.string.information_referral,
+                title = R.string.information_provider,
                 backClick = { onBackClick() }
             )
         },
@@ -76,7 +91,7 @@ fun ButtonToRefer(
     provider: UserData.Provider,
 ){
     Surface(
-        tonalElevation = 8.dp,
+        //tonalElevation = 8.dp,
         shadowElevation = 8.dp,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -152,6 +167,99 @@ private fun ProfileProvider(
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
+            }
+        }
+        Column(modifier = Modifier.padding(16.dp)){
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ){
+                DetailMetricItem(
+                    icon = Icons.Default.Star,
+                    value = String.format(Locale.US, "%.1f", provider.paymentRating),
+                    label = stringResource(R.string.rating)
+                )
+                VerticalDivider(modifier = Modifier.height(40.dp))
+                DetailMetricItem(
+                    icon = Icons.Default.Payments,
+                    value = "${provider.totalPayouts}",
+                    label = stringResource(R.string.payouts)
+                )
+                VerticalDivider(modifier = Modifier.height(40.dp))
+                if(provider.isActive){
+                    DetailMetricItem(
+                        icon = Icons.Default.BrightnessHigh,
+                        value ="",
+                        label = stringResource(R.string.active_user)
+                    )
+                } else {
+                    DetailMetricItem(
+                        icon = Icons.Default.Brightness2,
+                        value ="",
+                        label = stringResource(R.string.inactive_user)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = stringResource(R.string.company_description),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = provider.companyDescription ?: "",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+            if (!provider.website.isNullOrBlank()) {
+                InfoCard(
+                    icon = Icons.Default.Language,
+                    title = stringResource(R.string.website),
+                    value = provider.website!!
+                )
+            }
+
+            InfoCard(
+                icon = Icons.Default.Email,
+                title = stringResource(R.string.email),
+                value = provider.email
+            )
+        }
+    }
+}
+
+@Composable
+fun DetailMetricItem(icon: ImageVector, value: String, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, contentDescription = null, tint = Color(0xFFFFC107), modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(4.dp))
+            Text(text = value, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        }
+        Text(text = label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+fun InfoCard(icon: ImageVector, title: String, value: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            Spacer(Modifier.width(16.dp))
+            Column {
+                Text(text = title, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
             }
         }
     }
