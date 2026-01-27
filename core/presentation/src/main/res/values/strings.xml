@@ -103,6 +103,7 @@
     <string name="pending">Pending</string>
     <string name="processing">Processing</string>
     <string name="rejected">Rejected</string>
+    <string name="all_status">All</string>
     <string name="paid">Paid</string>
     <string name="paid_to">Paid to: %s</string>
     <string name="refer_now">Refer Now</string>

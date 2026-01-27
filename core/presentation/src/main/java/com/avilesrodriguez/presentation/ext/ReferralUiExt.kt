@@ -30,3 +30,17 @@ fun ReferralStatus.toDisplayIcon(): Int {
         ReferralStatus.PAID -> R.drawable.sentiment_paid
     }
 }
+
+fun ReferralStatus.Companion.getById(id:Int): ReferralStatus?{
+    if (id == R.string.all_status) return null
+    return ReferralStatus.entries.find { option ->
+        option.toDisplayName() == id
+    } ?: ReferralStatus.PENDING
+}
+
+fun ReferralStatus.Companion.options(search: Boolean): List<Int>{
+    if(search){
+        return listOf(R.string.all_status) + ReferralStatus.entries.map { it.toDisplayName() }
+    }
+    return ReferralStatus.entries.map { it.toDisplayName() }
+}

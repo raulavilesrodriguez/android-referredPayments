@@ -80,6 +80,7 @@
     <string name="created">Creado: %s</string>
     <string name="referred">Referrido:</string>
     <string name="phone_number_referred">Número Telefónico Referido</string>
+    <string name="all_status">Todos</string>
     <string name="paid">Pagado</string>
     <string name="paid_to">Pagar a: %s</string>
     <string name="refer_now">Refiere Ahora</string>

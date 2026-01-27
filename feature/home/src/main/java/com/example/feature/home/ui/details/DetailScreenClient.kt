@@ -23,6 +23,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.avilesrodriguez.domain.model.referral.Referral
+import com.avilesrodriguez.domain.model.referral.ReferralMetrics
+import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
@@ -31,6 +34,11 @@ import com.avilesrodriguez.presentation.composables.ToolBarDetails
 @Composable
 fun DetailScreenClient(
     client: UserData.Client,
+    referrals: List<Referral>,
+    referralsMetrics: ReferralMetrics,
+    selectedStatus: ReferralStatus?,
+    filterReferralsByStatus: (Int) -> Unit,
+    statusOptions: List<Int>,
     onBackClick: () -> Unit,
     onReferClick: (String) -> Unit
 ){
@@ -48,7 +56,12 @@ fun DetailScreenClient(
         content = { innerPadding ->
             ProfileClient(
                 client = client,
+                referrals = referrals,
                 onReferClick = onReferClick,
+                referralsMetrics = referralsMetrics,
+                selectedStatus = selectedStatus,
+                filterReferralsByStatus = filterReferralsByStatus,
+                statusOptions = statusOptions,
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -58,7 +71,12 @@ fun DetailScreenClient(
 @Composable
 private fun ProfileClient(
     client: UserData.Client,
+    referrals: List<Referral>,
     onReferClick: (String) -> Unit,
+    referralsMetrics: ReferralMetrics,
+    selectedStatus: ReferralStatus?,
+    filterReferralsByStatus: (Int) -> Unit,
+    statusOptions: List<Int>,
     modifier: Modifier = Modifier
 ){
     Column(

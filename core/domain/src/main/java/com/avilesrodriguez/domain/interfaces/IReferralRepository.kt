@@ -12,4 +12,5 @@ interface IReferralRepository {
     suspend fun updateReferralStatus(referralId: String, status: String, voucherUrl: String?)
     suspend fun searchReferralsByClient(namePrefix: String, currentUserId: String): Flow<List<Referral>>
     suspend fun searchReferralsByProvider(namePrefix: String, currentUserId: String): Flow<List<Referral>>
+    suspend fun searchReferralsByClientAndProvider(namePrefix: String, clientId: String, providerId: String): Flow<List<Referral>>
 }

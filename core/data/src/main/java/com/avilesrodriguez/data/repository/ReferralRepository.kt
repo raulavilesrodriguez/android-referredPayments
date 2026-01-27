@@ -52,4 +52,12 @@ class ReferralRepository @Inject constructor(
     ): Flow<List<Referral>> {
         return data.searchReferralsByProvider(namePrefix, currentUserId)
     }
+
+    override suspend fun searchReferralsByClientAndProvider(
+        namePrefix: String,
+        clientId: String,
+        providerId: String
+    ): Flow<List<Referral>> {
+        return data.searchReferralsByClientAndProvider(namePrefix, clientId, providerId)
+    }
 }

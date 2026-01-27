@@ -48,7 +48,7 @@ class ReferralDataSource @Inject constructor(
         val query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(CLIENT_ID_FIELD, clientId)
             .whereEqualTo(PROVIDER_ID_FIELD, providerId)
-            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING)
+            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING) //los mas nuevos primero
 
         return createReferralFlow(query)
     }
@@ -86,6 +86,20 @@ class ReferralDataSource @Inject constructor(
     fun searchReferralsByProvider(namePrefix: String, currentUserId: String): Flow<List<Referral>> {
         val query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(PROVIDER_ID_FIELD, currentUserId)
+            .orderBy(ORDER_BY_FIELD_LOWER, Query.Direction.ASCENDING)
+            .startAt(namePrefix)
+            .endAt(namePrefix + "\uf8ff")
+        return createReferralFlow(query)
+    }
+
+    fun searchReferralsByClientAndProvider(
+        namePrefix: String,
+        clientId: String,
+        providerId: String
+    ): Flow<List<Referral>> {
+        val query = firestore.collection(REFERRALS_COLLECTION)
+            .whereEqualTo(CLIENT_ID_FIELD, clientId)
+            .whereEqualTo(PROVIDER_ID_FIELD, providerId)
             .orderBy(ORDER_BY_FIELD_LOWER, Query.Direction.ASCENDING)
             .startAt(namePrefix)
             .endAt(namePrefix + "\uf8ff")
