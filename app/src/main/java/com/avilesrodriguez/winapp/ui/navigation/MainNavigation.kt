@@ -40,6 +40,7 @@ import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import com.avilesrodriguez.winapp.ui.theme.WinAppTheme
 import com.example.feature.home.ui.HomeScreen
 import com.example.feature.home.ui.PoliciesScreen
+import com.example.feature.home.ui.details.DetailScreenUser
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -76,6 +77,7 @@ fun MainNavigation(){
                     addPolicies(appState)
                     addEditUser(appState)
                     referralGraph(appState)
+                    addDetailUser(appState)
                     addNewReferral(appState)
                 }
             }
@@ -179,6 +181,20 @@ private fun NavGraphBuilder.referralGraph(appState: AppState){
             )
 
         }
+    }
+}
+
+private fun NavGraphBuilder.addDetailUser(appState: AppState){
+    composable(
+        route = NavRoutes.USER_DETAIL,
+        arguments = listOf(navArgument(NavRoutes.UserArgs.ID){type = NavType.StringType})
+    ){ backStackEntry ->
+        val userId = backStackEntry.arguments?.getString(NavRoutes.UserArgs.ID)
+        DetailScreenUser(
+            uId = userId,
+            popUp = { appState.popUp() },
+            openScreen = { route -> appState.navigate(route) }
+        )
     }
 }
 

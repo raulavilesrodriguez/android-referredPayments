@@ -18,7 +18,8 @@ class DetailViewModel @Inject constructor(
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
 
-    fun loadUserInformation(uid: String){
+    fun loadUserInformation(uid: String?){
+        if(uid == null) return
         try {
             launchCatching {
                 _userDataStore.value = getUser(uid)
@@ -30,5 +31,9 @@ class DetailViewModel @Inject constructor(
 
     fun onAddReferClick(uid: String, openScreen: (String) -> Unit){
         openScreen(NavRoutes.NEW_REFERRAL.replace("{id}", uid))
+    }
+
+    fun onReferClick(id: String, openScreen: (String) -> Unit){
+        openScreen(NavRoutes.REFERRAL_DETAIL.replace("{id}", id))
     }
 }

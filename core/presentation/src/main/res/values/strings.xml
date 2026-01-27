@@ -80,6 +80,7 @@
     <string name="website">Website</string>
     <string name="company_description">About Company</string>
     <string name="information_provider">Company Information</string>
+    <string name="information_client">Referrer Information</string>
     <string name="active_user">Active</string>
     <string name="inactive_user">Inactive</string>
 

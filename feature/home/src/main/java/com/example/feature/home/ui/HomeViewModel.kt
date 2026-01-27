@@ -1,5 +1,6 @@
 package com.example.feature.home.ui
 
+import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
@@ -8,7 +9,6 @@ import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SearchUsersClient
 import com.avilesrodriguez.domain.usecases.SearchUsersProvider
 import com.avilesrodriguez.domain.usecases.SignOut
-import com.avilesrodriguez.presentation.ext.normalizeName
 import com.avilesrodriguez.presentation.industries.getById
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel

@@ -1,5 +1,6 @@
 package com.avilesrodriguez.feature.settings.ui
 
+import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
@@ -92,8 +93,8 @@ class SettingsViewModel @Inject constructor(
         val currentState = _uiState.value
         if(currentState != null){
             _uiState.value = when(currentState){
-                is UserData.Client -> currentState.copy(name = filteredName)
-                is UserData.Provider -> currentState.copy(name = filteredName)
+                is UserData.Client -> currentState.copy(name = filteredName, nameLowercase = filteredName.normalizeName())
+                is UserData.Provider -> currentState.copy(name = filteredName, nameLowercase = filteredName.normalizeName())
             }
         }
         _isEntryValid.value = validateInput(_uiState.value)

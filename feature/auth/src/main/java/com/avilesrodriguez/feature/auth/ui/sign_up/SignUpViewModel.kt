@@ -1,6 +1,7 @@
 package com.avilesrodriguez.feature.auth.ui.sign_up
 
 import android.util.Log
+import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.domain.usecases.CurrentUserId
@@ -11,7 +12,6 @@ import com.avilesrodriguez.domain.usecases.SignUp
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.isValidEmail
-import com.avilesrodriguez.presentation.ext.isValidName
 import com.avilesrodriguez.presentation.ext.isValidPassword
 import com.avilesrodriguez.presentation.ext.passwordMatches
 import com.avilesrodriguez.presentation.navigation.NavRoutes
@@ -87,11 +87,13 @@ class SignUpViewModel @Inject constructor(
                 UserType.CLIENT -> UserData.Client(
                     uid = currentUserIdUseCase(),
                     name = _uiState.value.name,
+                    nameLowercase = _uiState.value.name.normalizeName(),
                     email = email
                 )
                 UserType.PROVIDER -> UserData.Provider(
                     uid = currentUserIdUseCase(),
                     name = _uiState.value.name,
+                    nameLowercase = _uiState.value.name.normalizeName(),
                     email = email
                 )
             }

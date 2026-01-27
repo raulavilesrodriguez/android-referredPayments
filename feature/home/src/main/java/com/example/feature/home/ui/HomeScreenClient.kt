@@ -153,7 +153,7 @@ fun BalanceCard(balance: String, received: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
     ) {
         Column(
             modifier = Modifier
@@ -162,19 +162,18 @@ fun BalanceCard(balance: String, received: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = stringResource(R.string.total_profits), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = stringResource(R.string.total_profits),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
             Text(
                 text = "$$balance",
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text=stringResource(R.string.charged), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text("$$received", fontWeight = FontWeight.Bold)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column {
-                }
-            }
+            Text(text=stringResource(R.string.charged), color = MaterialTheme.colorScheme.onPrimary)
+            Text("$$received", fontWeight = FontWeight.Bold, color= MaterialTheme.colorScheme.onPrimary)
         }
     }
 }

@@ -66,6 +66,7 @@
     <string name="referrals_conversion">Conversión de Referidos</string>
     <string name="company_description">Acerca de la Empresa</string>
     <string name="information_provider">Información de la Compañía</string>
+    <string name="information_client">Información del Referidor</string>
     <string name="active_user">Activo</string>
     <string name="inactive_user">Inactivo</string>
     <string name="add_new_referral">Agregar nuevo Referido</string>

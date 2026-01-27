@@ -1,8 +1,8 @@
 package com.avilesrodriguez.feature.referrals.ui.model
 
+import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
-import com.avilesrodriguez.presentation.ext.normalizeName
 
 data class AddReferralUiState(
     val name: String = "",

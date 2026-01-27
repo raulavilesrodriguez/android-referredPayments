@@ -1,5 +1,6 @@
 package com.avilesrodriguez.domain.model.user
 
+import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 
 sealed class UserData {
@@ -20,7 +21,7 @@ sealed class UserData {
         override val photoUrl: String = "",
         override val fcmToken: String? = null,
         override val type: UserType = UserType.CLIENT,
-        override val nameLowercase: String? = null,
+        override val nameLowercase: String? = name?.normalizeName(),
         val identityCard: String? = null, // identity
         val countNumberPay: String? = null, // cuenta para recibir pagos
         val bankName: String? = null,
@@ -39,7 +40,7 @@ sealed class UserData {
         override val photoUrl: String = "",
         override val fcmToken: String? = null,
         override val type: UserType = UserType.PROVIDER,
-        override val nameLowercase: String? = null,
+        override val nameLowercase: String? = name?.normalizeName(),
         val ciOrRuc: String? = null, // Datos fiscales
         val countNumber: String? = null, // cuenta para pagar
         val moneyPaid: String? = null,

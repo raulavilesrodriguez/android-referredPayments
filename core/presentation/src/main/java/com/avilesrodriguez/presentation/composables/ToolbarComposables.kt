@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -67,6 +69,40 @@ fun ProfileToolBar(
         Text(
             text = stringResource(id = title),
             style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier
+                .padding(start = 4.dp)
+                .fillMaxWidth(0.80f)
+        )
+    }
+}
+
+@Composable
+fun ToolBarDetails(
+    @StringRes title: Int,
+    backClick: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Absolute.Left
+    ){
+        IconButton(
+            onClick = { backClick()}
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                contentDescription = null
+            )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = stringResource(id = title),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .padding(start = 4.dp)
                 .fillMaxWidth(0.80f)

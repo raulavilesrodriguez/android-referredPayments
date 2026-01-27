@@ -3,6 +3,7 @@ package com.avilesrodriguez.feature.referrals.ui.referrals
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
@@ -64,11 +65,12 @@ class ReferralsViewModel @Inject constructor(
                 .debounce(300)
                 .distinctUntilChanged()
                 .collect { query ->
+                    val queryNormalized = query.normalizeName()
                     searchJob?.cancel() // cancel previous search
-                    if (query.isEmpty()) {
+                    if (queryNormalized.isEmpty()) {
                         fetchAllReferrals()
                     } else {
-                        performSearch(query)
+                        performSearch(queryNormalized)
                     }
                 }
         }
