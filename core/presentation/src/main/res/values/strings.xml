@@ -121,6 +121,7 @@
     <string name="retail">Retail</string>
     <string name="financial">Financial</string>
     <string name="other">Other</string>
+    <string name="all_industries">All</string>
 
     <!-- Banks -->
     <string name="beneficiary">Beneficiary: </string>

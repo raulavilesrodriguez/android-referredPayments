@@ -124,7 +124,7 @@ fun HomeScreenClient(
                     )
                     MenuDropdownBox(
                         options = industryOptions,
-                        selectedOption = selectedIndustry?:R.string.settings_industry,
+                        selectedOption = selectedIndustry?:R.string.all_industries,
                         onClick = onIndustryChange,
                         modifier = Modifier.widthIn(max = 164.dp)
                     )
@@ -255,7 +255,7 @@ fun HomeScreenClientPreview() {
             updateSearchText = {},
             selectedIndustry = null,
             onIndustryChange = {},
-            industryOptions = IndustriesType.options(),
+            industryOptions = IndustriesType.options(true),
             onProviderClick = {}
         )
     }

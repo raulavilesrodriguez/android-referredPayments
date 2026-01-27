@@ -18,13 +18,16 @@ fun IndustriesType.label(): Int{
     }
 }
 
-fun IndustriesType.Companion.options(): List<Int>{
+fun IndustriesType.Companion.options(search: Boolean): List<Int>{
+    if(search){
+        return listOf(R.string.all_industries) + IndustriesType.entries.map { it.label() }
+    }
     return IndustriesType.entries.map { it.label() }
 }
 
-fun IndustriesType.Companion.getById(id: Int): IndustriesType {
-    IndustriesType.entries.forEach { option ->
-        if (option.label() == id) return option
-    }
-    return IndustriesType.OTHER
+fun IndustriesType.Companion.getById(id: Int): IndustriesType? {
+    if (id == R.string.all_industries) return null
+    return IndustriesType.entries.find { option ->
+        option.label() == id
+    } ?: IndustriesType.OTHER
 }

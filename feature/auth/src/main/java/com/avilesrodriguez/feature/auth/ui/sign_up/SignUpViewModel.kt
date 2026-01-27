@@ -1,7 +1,6 @@
 package com.avilesrodriguez.feature.auth.ui.sign_up
 
 import android.util.Log
-import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.domain.usecases.CurrentUserId
@@ -82,18 +81,17 @@ class SignUpViewModel @Inject constructor(
             Log.d("SignUpViewModel", "isProvider: $isProvider")
             signUp(email, password)
             val userType = if(isProvider) UserType.PROVIDER else UserType.CLIENT
+            val uid = currentUserIdUseCase()
 
             val newUser = when(userType){
                 UserType.CLIENT -> UserData.Client(
-                    uid = currentUserIdUseCase(),
-                    name = _uiState.value.name,
-                    nameLowercase = _uiState.value.name.normalizeName(),
+                    uid = uid,
+                    name = name,
                     email = email
                 )
                 UserType.PROVIDER -> UserData.Provider(
-                    uid = currentUserIdUseCase(),
-                    name = _uiState.value.name,
-                    nameLowercase = _uiState.value.name.normalizeName(),
+                    uid = uid,
+                    name = name,
                     email = email
                 )
             }

@@ -52,7 +52,7 @@ fun HomeScreen(
     val selectedIndustry by viewModel.selectedIndustry.collectAsState()
 
     val options = ActionOptionsHome.getOptions()
-    val industryOptions = IndustriesType.options()
+    val industryOptions = IndustriesType.options(true)
 
     HomeScreenContent(
         user = userData,

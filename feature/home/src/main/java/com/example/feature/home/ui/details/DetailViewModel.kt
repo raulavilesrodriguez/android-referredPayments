@@ -2,6 +2,8 @@ package com.example.feature.home.ui.details
 
 import android.util.Log
 import com.avilesrodriguez.domain.model.user.UserData
+import com.avilesrodriguez.domain.usecases.CurrentUserId
+import com.avilesrodriguez.domain.usecases.GetReferralsByClientByProvider
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.presentation.navigation.NavRoutes
@@ -13,10 +15,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
+    private val currentUserIdUseCase: CurrentUserId,
     private val getUser: GetUser,
+    private val getReferralsByClientByProvider: GetReferralsByClientByProvider
 ) : BaseViewModel() {
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
+
+    val currentUserId
+        get() = currentUserIdUseCase()
 
     fun loadUserInformation(uid: String?){
         if(uid == null) return

@@ -115,7 +115,7 @@ class SettingsViewModel @Inject constructor(
         val filteredNameIndustry = IndustriesType.getById(industry)
         val currentState = _uiState.value
         if(currentState is UserData.Provider){
-            _uiState.value = currentState.copy(industry = filteredNameIndustry)
+            _uiState.value = currentState.copy(industry = filteredNameIndustry?: IndustriesType.OTHER)
         }
     }
 

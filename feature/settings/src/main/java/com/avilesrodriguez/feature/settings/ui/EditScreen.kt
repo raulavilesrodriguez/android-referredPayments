@@ -60,7 +60,7 @@ fun EditScreen(
     val isSaving by viewModel.isSaving.collectAsState()
     val userData by viewModel.uiState.collectAsState()
     val isEntryValid by viewModel.isEntryValid.collectAsState()
-    val industryOptions = IndustriesType.options()
+    val industryOptions = IndustriesType.options(false)
 
 
     val imagePicker = pickImageLauncher(
@@ -236,7 +236,7 @@ fun EditScreenContenPreview(){
             ),
             isSaving = false,
             onNameChange = {},
-            industryOptions = IndustriesType.options(),
+            industryOptions = IndustriesType.options(false),
             onIndustryChange = {},
             onIdentityCardChange = {},
             onCountNumberBankChange = {},
