@@ -22,6 +22,7 @@
     <string name="conversations_tab_status_title">Status</string>
     <!-- Search -->
     <string name="search">Search</string>
+    <string name="filter_by_status">Filter by status</string>
     <string name="contacts">Contacts</string>
     <!-- Splash -->
     <string name="welcome">Welcome to WinApp</string>
@@ -97,16 +98,20 @@
     <string name="referral">Referred from</string>
     <string name="created">Created: %s</string>
     <string name="referred">Referred: %s</string>
+    <string name="referreds_by">Referreds by: %s</string>
     <string name="name_referred">Name Referred</string>
     <string name="email_referred">Email Referred</string>
     <string name="phone_number_referred">Phone Number Referred</string>
+    <string name="paid_to">Paid to: %s</string>
+    <string name="refer_now">Refer Now</string>
+    <!-- Referral Metrics -->
+    <string name="all_referrals">All Referrals</string>
     <string name="pending">Pending</string>
     <string name="processing">Processing</string>
     <string name="rejected">Rejected</string>
     <string name="all_status">All</string>
     <string name="paid">Paid</string>
-    <string name="paid_to">Paid to: %s</string>
-    <string name="refer_now">Refer Now</string>
+
 
     <!-- Time -->
     <string name="yesterday">Yesterday</string>

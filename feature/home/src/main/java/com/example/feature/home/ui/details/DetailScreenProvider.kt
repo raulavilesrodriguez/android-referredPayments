@@ -50,6 +50,7 @@ import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.composables.ToolBarDetails
+import com.avilesrodriguez.presentation.details.DetailMetricItem
 import com.avilesrodriguez.presentation.fakeData.userProvider
 import com.avilesrodriguez.presentation.industries.label
 import java.util.Locale
@@ -215,7 +216,6 @@ private fun ProfileProvider(
                     value = provider.website!!
                 )
             }
-
             InfoCard(
                 icon = Icons.Default.Email,
                 title = stringResource(R.string.email),
@@ -227,18 +227,6 @@ private fun ProfileProvider(
                 value = stringResource(provider.industry.label())
             )
         }
-    }
-}
-
-@Composable
-fun DetailMetricItem(icon: ImageVector, value: String, label: String, tint: Color = Color.White) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(4.dp))
-            Text(text = value, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-        }
-        Text(text = label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

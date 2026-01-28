@@ -8,6 +8,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.ext.options
+import com.avilesrodriguez.presentation.ext.toDisplayName
 
 @Composable
 fun DetailScreenUser(
@@ -39,7 +40,7 @@ fun DetailScreenUser(
                 client = userData as UserData.Client,
                 referrals = referrals,
                 referralsMetrics = referralsMetrics,
-                selectedStatus = selectedStatus,
+                selectedStatus = selectedStatus?.toDisplayName(),
                 filterReferralsByStatus = viewModel::filterReferralsByStatus,
                 statusOptions = statusOptions,
                 onBackClick = popUp,

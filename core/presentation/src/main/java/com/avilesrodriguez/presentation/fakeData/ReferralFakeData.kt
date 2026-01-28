@@ -42,6 +42,18 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         status = ReferralStatus.PROCESSING,
         createdAt = System.currentTimeMillis(),
         voucherUrl = ""
+    ),
+    Referral(
+        id = "4",
+        clientId = "1",
+        providerId = "3",
+        name = "Gina Cuero",
+        nameLowercase = "gina cuero",
+        email = "cuero.gina@google.com",
+        numberPhone = "0985478901",
+        status = ReferralStatus.REJECTED,
+        createdAt = System.currentTimeMillis(),
+        voucherUrl = ""
     )
 )
 
