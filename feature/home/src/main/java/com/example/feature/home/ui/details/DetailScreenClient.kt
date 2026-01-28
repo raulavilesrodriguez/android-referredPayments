@@ -1,6 +1,7 @@
 package com.example.feature.home.ui.details
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,8 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brightness2
 import androidx.compose.material.icons.filled.BrightnessHigh
@@ -27,11 +29,14 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
@@ -40,8 +45,12 @@ import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
 import com.avilesrodriguez.presentation.composables.ToolBarDetails
 import com.avilesrodriguez.presentation.details.DetailMetricItem
+import com.avilesrodriguez.presentation.ext.toColor
+import com.avilesrodriguez.presentation.ext.toDisplayName
+import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.fakeData.generateFakeReferrals
 import com.avilesrodriguez.presentation.fakeData.userClient
+import com.avilesrodriguez.presentation.time.formatTimestamp
 
 @Composable
 fun DetailScreenClient(
@@ -91,105 +100,166 @@ private fun ProfileClient(
     statusOptions: List<Int>,
     modifier: Modifier = Modifier
 ){
-    Column(
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
     ){
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .background(
-                MaterialTheme.colorScheme.secondary,
-            )
-        ){
-            Column(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = client.name ?: stringResource(R.string.unnamed),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1
+        item{
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .background(
+                    MaterialTheme.colorScheme.secondary,
                 )
-                Avatar(
-                    photoUri = client.photoUrl,
-                    size = 80.dp
-                )
-            }
-        }
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ){
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
             ){
-                DetailMetricItem(
-                    icon = Icons.Default.People,
-                    value = referralsMetrics.totalReferrals.toString(),
-                    label = stringResource(R.string.all_referrals),
-                    tint = Color(0xFFFFC107)
-                )
-                VerticalDivider(modifier = Modifier.height(40.dp))
-                DetailMetricItem(
-                    icon = Icons.Default.People,
-                    value = referralsMetrics.pendingReferrals.toString(),
-                    label = stringResource(R.string.pending),
-                    tint = Color(0xFFC40C0C)
-                )
-                VerticalDivider(modifier = Modifier.height(40.dp))
-                if(client.isActive){
-                    DetailMetricItem(
-                        icon = Icons.Default.BrightnessHigh,
-                        value = "",
-                        label = stringResource(R.string.active_user),
-                        tint = Color(0xFFFFC107)
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = client.name ?: stringResource(R.string.unnamed),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
                     )
-                }else{
-                    DetailMetricItem(
-                        icon = Icons.Default.Brightness2,
-                        value = "",
-                        label = stringResource(R.string.inactive_user),
-                        tint = Color(0xFFC40C0C)
+                    Avatar(
+                        photoUri = client.photoUrl,
+                        size = 80.dp
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(24.dp))
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-                thickness = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        }
+        item{
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ){
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ){
+                    DetailMetricItem(
+                        icon = Icons.Default.People,
+                        value = referralsMetrics.totalReferrals.toString(),
+                        label = stringResource(R.string.all_referrals),
+                        tint = Color(0xFFFFC107)
+                    )
+                    VerticalDivider(modifier = Modifier.height(40.dp))
+                    DetailMetricItem(
+                        icon = Icons.Default.People,
+                        value = referralsMetrics.pendingReferrals.toString(),
+                        label = stringResource(R.string.pending),
+                        tint = Color(0xFFC40C0C)
+                    )
+                    VerticalDivider(modifier = Modifier.height(40.dp))
+                    if(client.isActive){
+                        DetailMetricItem(
+                            icon = Icons.Default.BrightnessHigh,
+                            value = "",
+                            label = stringResource(R.string.active_user),
+                            tint = Color(0xFFFFC107)
+                        )
+                    }else{
+                        DetailMetricItem(
+                            icon = Icons.Default.Brightness2,
+                            value = "",
+                            label = stringResource(R.string.inactive_user),
+                            tint = Color(0xFFC40C0C)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )
+                Text(
+                    text = stringResource(R.string.referreds_by, client.name?:""),
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(
+                        text = stringResource(R.string.filter_by_status),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    MenuDropdownBox(
+                        options = statusOptions,
+                        selectedOption = selectedStatus?:R.string.all_status,
+                        onClick = filterReferralsByStatus,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                }
+            }
+        }
+        items(referrals){ referral ->
+            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)){
+                ItemReferralInDetail(referral = referral, onReferClick = onReferClick)
+            }
+        }
+        item { Spacer(modifier = Modifier.height(16.dp)) }
+    }
+}
+
+@Composable
+private fun ItemReferralInDetail(referral: Referral, onReferClick: (String) -> Unit){
+    val createdAt = formatTimestamp(referral.createdAt)
+    Row(
+        modifier = Modifier
+            .clickable { onReferClick(referral.id) }
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Column {
+            Text(
+                text = referral.name.truncate(20),
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 18.sp
             )
             Text(
-                text = stringResource(R.string.referreds_by, client.name?:""),
-                style = MaterialTheme.typography.titleMedium,
+                text = stringResource(R.string.created, createdAt),
                 maxLines = 1,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(vertical = 8.dp)
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ){
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Column(
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier.padding(start = 8.dp)
+        ) {
+            val status = referral.status.toDisplayName()
+            val colorBackground = referral.status.toColor()
+            Box(
+                modifier = Modifier
+                    .background(colorBackground, shape = RoundedCornerShape(100))
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
-                    text = stringResource(R.string.filter_by_status),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                MenuDropdownBox(
-                    options = statusOptions,
-                    selectedOption = selectedStatus?:R.string.all_status,
-                    onClick = filterReferralsByStatus,
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = "",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
