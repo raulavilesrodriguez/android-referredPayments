@@ -76,6 +76,9 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil)
+
+    implementation(libs.vico.compose)
+    implementation(libs.vico.compose.m3)
 }
 
 tasks.withType<KotlinJvmCompile>().configureEach {

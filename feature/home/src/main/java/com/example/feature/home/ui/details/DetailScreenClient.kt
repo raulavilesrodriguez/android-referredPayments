@@ -17,13 +17,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brightness2
 import androidx.compose.material.icons.filled.BrightnessHigh
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,6 +55,7 @@ import com.avilesrodriguez.presentation.ext.toDisplayName
 import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.fakeData.generateFakeReferrals
 import com.avilesrodriguez.presentation.fakeData.userClient
+import com.avilesrodriguez.presentation.graphs.ColumnStack
 import com.avilesrodriguez.presentation.time.formatTimestamp
 
 @Composable
@@ -178,6 +180,16 @@ private fun ProfileClient(
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
+                //Aqui Graph
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                    ),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    ColumnStack(metrics = referralsMetrics, modifier = Modifier.padding(8.dp))
+                }
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 8.dp),
                     thickness = 1.dp,

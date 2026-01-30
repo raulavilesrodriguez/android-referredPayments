@@ -66,6 +66,9 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material.icons.core)
+
+    implementation(libs.vico.compose)
+    implementation(libs.vico.compose.m3)
 }
 
 tasks.withType<KotlinJvmCompile>().configureEach {
