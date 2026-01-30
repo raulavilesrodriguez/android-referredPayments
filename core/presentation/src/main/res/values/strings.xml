@@ -128,6 +128,7 @@
     <string name="financial">Financial</string>
     <string name="other">Other</string>
     <string name="all_industries">All</string>
+    <string name="status">Status</string>
 
     <!-- Banks -->
     <string name="beneficiary">Beneficiary: </string>

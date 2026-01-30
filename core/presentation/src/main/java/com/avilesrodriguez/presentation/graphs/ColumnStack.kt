@@ -1,19 +1,23 @@
 package com.avilesrodriguez.presentation.graphs
 
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
+import com.avilesrodriguez.presentation.R
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.cartesian.layer.cartesianLayerPadding
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.stacked
+import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.marker.rememberToggleOnTap
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
@@ -42,34 +46,34 @@ fun ColumnStack(
     metrics: ReferralMetrics,
     modifier: Modifier = Modifier
 ){
-    val x = 1
     val y =
         mapOf(
-            "pendingReferrals" to metrics.pendingReferrals,
-            "processingReferrals" to metrics.processingReferrals,
-            "rejectedReferrals" to metrics.rejectedReferrals,
-            "paidReferrals" to metrics.paidReferrals
+            stringResource(R.string.pending) to metrics.pendingReferrals,
+            stringResource(R.string.processing) to metrics.processingReferrals,
+            stringResource(R.string.rejected) to metrics.rejectedReferrals,
+            stringResource(R.string.paid) to metrics.paidReferrals
         )
     val modelProducer = remember { CartesianChartModelProducer() }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(metrics) {
         modelProducer.runTransaction {
-            columnSeries { y.values.forEach { series(x, it) } }
+            columnSeries {
+                y.values.forEach { series(it) }
+            }
             extras { it[LegendLabelKey] = y.keys }
         }
     }
-    JetpackComposeDailyDigitalMediaUse(modelProducer, modifier)
+    ComposeColumnStack(modelProducer, modifier)
 
 
 }
 
 private val LegendLabelKey = ExtraStore.Key<Set<String>>()
-private val YDecimalFormat = DecimalFormat("#.## h")
-private val StartAxisValueFormatter = CartesianValueFormatter.decimal(YDecimalFormat)
-private val StartAxisItemPlacer = VerticalAxis.ItemPlacer.step({ 0.5 })
-private val MarkerValueFormatter = DefaultCartesianMarker.ValueFormatter.default(YDecimalFormat)
+private val CountFormat = DecimalFormat("#")
+private val StartAxisValueFormatter = CartesianValueFormatter.decimal(CountFormat)
+private val MarkerValueFormatter = DefaultCartesianMarker.ValueFormatter.default(CountFormat)
 
 @Composable
-private fun JetpackComposeDailyDigitalMediaUse(
+private fun ComposeColumnStack(
     modelProducer: CartesianChartModelProducer,
     modifier: Modifier = Modifier,
 ) {
@@ -80,6 +84,16 @@ private fun JetpackComposeDailyDigitalMediaUse(
         Color(0xFF08CB00)
     )
     val legendItemLabelComponent = rememberTextComponent(vicoTheme.textColor)
+
+    val marker = rememberDefaultCartesianMarker(
+        label = rememberTextComponent(
+            color = MaterialTheme.colorScheme.onSurface,
+            background = shapeComponent(fill(MaterialTheme.colorScheme.surface), CorneredShape.Pill),
+            padding = insets(8.dp, 4.dp),
+            margins = insets(bottom = 4.dp)
+        ),
+        valueFormatter = MarkerValueFormatter
+    )
     CartesianChartHost(
         chart =
             rememberCartesianChart(
@@ -87,7 +101,7 @@ private fun JetpackComposeDailyDigitalMediaUse(
                     columnProvider =
                         ColumnCartesianLayer.ColumnProvider.series(
                             columnColors.map { color ->
-                                rememberLineComponent(fill = fill(color), thickness = 16.dp)
+                                rememberLineComponent(fill = fill(color), thickness = 32.dp)
                             }
                         ),
                     columnCollectionSpacing = 32.dp,
@@ -96,11 +110,7 @@ private fun JetpackComposeDailyDigitalMediaUse(
                 startAxis =
                     VerticalAxis.rememberStart(
                         valueFormatter = StartAxisValueFormatter,
-                        itemPlacer = StartAxisItemPlacer,
-                    ),
-                bottomAxis =
-                    HorizontalAxis.rememberBottom(
-                        itemPlacer = remember { HorizontalAxis.ItemPlacer.segmented() }
+                        itemPlacer = VerticalAxis.ItemPlacer.step({1.0}),
                     ),
                 layerPadding = { cartesianLayerPadding(scalableStart = 16.dp, scalableEnd = 16.dp) },
                 legend =
@@ -121,6 +131,7 @@ private fun JetpackComposeDailyDigitalMediaUse(
                         },
                         padding = insets(top = 16.dp),
                     ),
+                marker = marker,
                 markerController = CartesianMarkerController.rememberToggleOnTap(),
             ),
         modelProducer = modelProducer,
