@@ -6,6 +6,7 @@ import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
+import com.avilesrodriguez.domain.usecases.GetReferralsByClientByProvider
 import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
@@ -15,8 +16,10 @@ import com.avilesrodriguez.domain.usecases.SignOut
 import com.avilesrodriguez.presentation.industries.getById
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
+import com.example.feature.home.models.UserAndReferralMetrics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +28,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -36,6 +42,7 @@ class HomeViewModel @Inject constructor(
     private val searchUsersProvider: SearchUsersProvider,
     private val searchUsersClient: SearchUsersClient,
     private val getReferralsByProvider: GetReferralsByProvider,
+    private val getReferralsByClientByProvider: GetReferralsByClientByProvider
 ) : BaseViewModel() {
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
@@ -53,8 +60,12 @@ class HomeViewModel @Inject constructor(
     val selectedIndustry: StateFlow<IndustriesType?> = _selectedIndustry.asStateFlow()
     private val _uiStateReferralsMetrics = MutableStateFlow(ReferralMetrics())
     val uiStateReferralsMetrics: StateFlow<ReferralMetrics> = _uiStateReferralsMetrics.asStateFlow()
+    private val _usersAndMetrics = MutableStateFlow<List<UserAndReferralMetrics>>(emptyList())
+    val usersAndMetrics: StateFlow<List<UserAndReferralMetrics>> = _usersAndMetrics.asStateFlow()
+
     private var searchJob: Job? = null
     private var referralsJob: Job? = null
+    private var userMetricsJob: Job? = null
 
     val currentUserId
         get() = currentUserIdUseCase()
@@ -66,6 +77,7 @@ class HomeViewModel @Inject constructor(
                 _userDataStore.value = user
                 if(user is UserData.Provider){
                     loadReferralsByProvider()
+                    observeUsersMetrics()
                 }
             }
             combine(_searchText, _selectedIndustry){ text, industry ->
@@ -148,4 +160,37 @@ class HomeViewModel @Inject constructor(
                 }
         }
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeUsersMetrics(){
+        _isLoading.value = true
+        userMetricsJob?.cancel()
+        userMetricsJob = launchCatching {
+            _users.flatMapLatest { userList ->
+                if (userList.isEmpty()) {
+                    flowOf(emptyList())
+                } else {
+                    val flows = userList.map { user ->
+                        getReferralsByClientByProvider(user.uid, currentUserId).map { referrals ->
+                            UserAndReferralMetrics(
+                                user = user,
+                                referralMetrics = ReferralMetrics(
+                                    totalReferrals = referrals.size,
+                                    pendingReferrals = referrals.count { it.status == ReferralStatus.PENDING },
+                                    processingReferrals = referrals.count { it.status == ReferralStatus.PROCESSING },
+                                    rejectedReferrals = referrals.count { it.status == ReferralStatus.REJECTED },
+                                    paidReferrals = referrals.count { it.status == ReferralStatus.PAID }
+                                )
+                            )
+                        }
+                    }
+                    combine(flows) { array -> array.toList() }
+                }
+            }.collect { combinedList ->
+                _usersAndMetrics.value = combinedList
+                _isLoading.value = false 
+            }
+        }
+    }
+
 }
