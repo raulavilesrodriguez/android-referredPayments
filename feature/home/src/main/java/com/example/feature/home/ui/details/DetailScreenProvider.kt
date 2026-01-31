@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
@@ -45,7 +44,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
@@ -183,7 +181,7 @@ private fun ProfileProvider(
                         icon = Icons.Default.BrightnessHigh,
                         value ="",
                         label = stringResource(R.string.active_user),
-                        tint = Color(0xFFFFC107)
+                        tint = Color(0xFF08CB00)
                     )
                 } else {
                     DetailMetricItem(

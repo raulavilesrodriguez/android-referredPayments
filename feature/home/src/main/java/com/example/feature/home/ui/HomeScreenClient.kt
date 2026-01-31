@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -25,21 +24,17 @@ import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
@@ -47,6 +42,7 @@ import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
 import com.avilesrodriguez.presentation.composables.RatingBar
 import com.avilesrodriguez.presentation.composables.SearchFieldBasic
+import com.avilesrodriguez.presentation.composables.StatItem
 import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.fakeData.usersProviders
 import com.avilesrodriguez.presentation.industries.label
@@ -63,7 +59,7 @@ fun HomeScreenClient(
     selectedIndustry: Int?,
     onIndustryChange: (Int) -> Unit,
     industryOptions: List<Int>,
-    onProviderClick: (String) -> Unit
+    onUserClick: (String) -> Unit
 ) {
     val client = user as? UserData.Client
 
@@ -142,7 +138,7 @@ fun HomeScreenClient(
             }
         } else {
             items(users) { provider ->
-                ProviderCard(provider = provider as UserData.Provider, onProviderClick = onProviderClick)
+                ProviderCard(provider = provider as UserData.Provider, onUserClick = onUserClick)
             }
         }
     }
@@ -178,33 +174,13 @@ fun BalanceCard(balance: String, received: String) {
     }
 }
 
-@Composable
-fun StatItem(modifier: Modifier, title: String, value: String, icon: ImageVector, color: Color) {
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = color)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Column {
-                Text(text = value, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Text(text = title, fontSize = 12.sp)
-            }
-        }
-    }
-}
 
 @Composable
-fun ProviderCard(provider: UserData.Provider, onProviderClick: (String) -> Unit) {
+fun ProviderCard(provider: UserData.Provider, onUserClick: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable{onProviderClick(provider.uid)},
+            .clickable{onUserClick(provider.uid)},
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -256,7 +232,7 @@ fun HomeScreenClientPreview() {
             selectedIndustry = null,
             onIndustryChange = {},
             industryOptions = IndustriesType.options(true),
-            onProviderClick = {}
+            onUserClick = {}
         )
     }
 }

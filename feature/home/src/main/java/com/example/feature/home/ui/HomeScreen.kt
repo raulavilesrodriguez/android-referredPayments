@@ -28,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.industries.IndustriesType
+import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.feature.referrals.ui.referrals.ReferralsScreen
@@ -50,6 +51,7 @@ fun HomeScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val selectedIndustry by viewModel.selectedIndustry.collectAsState()
+    val referralsMetricsProvider by viewModel.uiStateReferralsMetrics.collectAsState()
 
     val options = ActionOptionsHome.getOptions()
     val industryOptions = IndustriesType.options(true)
@@ -70,7 +72,8 @@ fun HomeScreen(
         selectedIndustry = selectedIndustry?.label(),
         onIndustryChange = viewModel::onIndustryChange,
         industryOptions = industryOptions,
-        onProviderClick = { providerId -> viewModel.navigationUserDetails(providerId, openScreen)}
+        onUserClick = { uId -> viewModel.navigationUserDetails(uId, openScreen)},
+        referralMetricsProvider = referralsMetricsProvider
     )
 }
 
@@ -90,7 +93,8 @@ fun HomeScreenContent(
     selectedIndustry: Int?,
     onIndustryChange: (Int) -> Unit,
     industryOptions: List<Int>,
-    onProviderClick: (String) -> Unit
+    onUserClick: (String) -> Unit,
+    referralMetricsProvider: ReferralMetrics
 ){
     val tabs = generateTabs()
     val pagerState = rememberPagerState(1){tabs.size}
@@ -169,7 +173,8 @@ fun HomeScreenContent(
                             selectedIndustry = selectedIndustry,
                             onIndustryChange = onIndustryChange,
                             industryOptions = industryOptions,
-                            onProviderClick = onProviderClick
+                            onUserClick = onUserClick,
+                            referralMetricsProvider = referralMetricsProvider
                         )
                     }
                     2 -> {
@@ -194,7 +199,8 @@ fun HomeMainContent(
     selectedIndustry: Int?,
     onIndustryChange: (Int) -> Unit,
     industryOptions: List<Int>,
-    onProviderClick: (String) -> Unit
+    onUserClick: (String) -> Unit,
+    referralMetricsProvider: ReferralMetrics
 ) {
     if (user != null) {
         when (user.type) {
@@ -207,14 +213,16 @@ fun HomeMainContent(
                 selectedIndustry = selectedIndustry,
                 onIndustryChange = onIndustryChange,
                 industryOptions = industryOptions,
-                onProviderClick = onProviderClick
+                onUserClick = onUserClick
             )
             UserType.PROVIDER -> HomeScreenProvider(
                 user = user,
                 users = users,
                 isLoading = isLoading,
                 searchText = searchText,
-                updateSearchText = updateSearchText
+                updateSearchText = updateSearchText,
+                referralMetricsProvider = referralMetricsProvider,
+                onUserClick = onUserClick
             )
         }
     } else {

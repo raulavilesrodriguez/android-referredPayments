@@ -61,6 +61,7 @@
     <string name="zero">0.00</string>
     <string name="pending_payments">Pending Payments</string>
     <string name="search_companies">Search Companies</string>
+    <string name="search_referrers">Search Referrers</string>
 
     <!-- Settings Screen -->
     <string name="profile">Profile</string>
@@ -84,6 +85,10 @@
     <string name="information_client">Referrer Information</string>
     <string name="active_user">Active</string>
     <string name="inactive_user">Inactive</string>
+    <string name="money_paid">Money Paid</string>
+    <string name="money_to_pay">Money to Pay</string>
+    <string name="payment_rating">Payment Rating</string>
+    <string name="total_payout">Total Payouts</string>
 
     <!-- Referral Screen -->
     <string name="add_new_referral">Add new Referral</string>
@@ -104,6 +109,7 @@
     <string name="phone_number_referred">Phone Number Referred</string>
     <string name="paid_to">Paid to: %s</string>
     <string name="refer_now">Refer Now</string>
+    <string name="total_referrals">Total Referrals</string>
     <!-- Referral Metrics -->
     <string name="all_referrals">All Referrals</string>
     <string name="pending">Pending</string>

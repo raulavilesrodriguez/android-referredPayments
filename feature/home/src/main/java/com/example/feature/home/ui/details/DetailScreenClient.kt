@@ -44,14 +44,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
+import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
 import com.avilesrodriguez.presentation.composables.ToolBarDetails
 import com.avilesrodriguez.presentation.details.DetailMetricItem
+import com.avilesrodriguez.presentation.ext.options
+import com.avilesrodriguez.presentation.ext.referralMetricsColors
 import com.avilesrodriguez.presentation.ext.toColor
 import com.avilesrodriguez.presentation.ext.toDisplayName
+import com.avilesrodriguez.presentation.ext.referralMetricsLabels
+import com.avilesrodriguez.presentation.ext.toList
 import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.fakeData.generateFakeReferrals
 import com.avilesrodriguez.presentation.fakeData.userClient
@@ -153,14 +158,14 @@ private fun ProfileClient(
                         icon = Icons.Default.People,
                         value = referralsMetrics.totalReferrals.toString(),
                         label = stringResource(R.string.all_referrals),
-                        tint = Color(0xFFFFC107)
+                        tint = Color(0xFF00CAFF)
                     )
                     VerticalDivider(modifier = Modifier.height(40.dp))
                     DetailMetricItem(
                         icon = Icons.Default.People,
                         value = referralsMetrics.pendingReferrals.toString(),
                         label = stringResource(R.string.pending),
-                        tint = Color(0xFFC40C0C)
+                        tint = Color(0xFFF5AD18)
                     )
                     VerticalDivider(modifier = Modifier.height(40.dp))
                     if(client.isActive){
@@ -168,7 +173,7 @@ private fun ProfileClient(
                             icon = Icons.Default.BrightnessHigh,
                             value = "",
                             label = stringResource(R.string.active_user),
-                            tint = Color(0xFFFFC107)
+                            tint = Color(0xFF08CB00)
                         )
                     }else{
                         DetailMetricItem(
@@ -188,7 +193,12 @@ private fun ProfileClient(
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    ColumnStack(metrics = referralsMetrics, modifier = Modifier.padding(8.dp))
+                    ColumnStack(
+                        y = referralsMetrics.toList(),
+                        labels = referralMetricsLabels(),
+                        columnColors = referralMetricsColors(),
+                        modifier = Modifier.padding(8.dp)
+                    )
                 }
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 8.dp),
@@ -298,7 +308,7 @@ fun DetailScreenClientPreview(){
             ),
             selectedStatus = null,
             filterReferralsByStatus = {},
-            statusOptions = emptyList(),
+            statusOptions = ReferralStatus.options(true),
             onBackClick = {},
             onReferClick = {}
         )

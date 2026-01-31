@@ -2,8 +2,11 @@ package com.example.feature.home.ui
 
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.industries.IndustriesType
+import com.avilesrodriguez.domain.model.referral.ReferralMetrics
+import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
+import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SearchUsersClient
@@ -31,7 +34,8 @@ class HomeViewModel @Inject constructor(
     private val getUser: GetUser,
     private val signOut: SignOut,
     private val searchUsersProvider: SearchUsersProvider,
-    private val searchUsersClient: SearchUsersClient
+    private val searchUsersClient: SearchUsersClient,
+    private val getReferralsByProvider: GetReferralsByProvider,
 ) : BaseViewModel() {
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
@@ -47,8 +51,10 @@ class HomeViewModel @Inject constructor(
 
     private val _selectedIndustry = MutableStateFlow<IndustriesType?>(null)
     val selectedIndustry: StateFlow<IndustriesType?> = _selectedIndustry.asStateFlow()
-
+    private val _uiStateReferralsMetrics = MutableStateFlow(ReferralMetrics())
+    val uiStateReferralsMetrics: StateFlow<ReferralMetrics> = _uiStateReferralsMetrics.asStateFlow()
     private var searchJob: Job? = null
+    private var referralsJob: Job? = null
 
     val currentUserId
         get() = currentUserIdUseCase()
@@ -56,7 +62,11 @@ class HomeViewModel @Inject constructor(
     init{
         launchCatching {
             if(hasUser()){
-                _userDataStore.value = getUser(currentUserId)
+                val user = getUser(currentUserId)
+                _userDataStore.value = user
+                if(user is UserData.Provider){
+                    loadReferralsByProvider()
+                }
             }
             combine(_searchText, _selectedIndustry){ text, industry ->
                 Pair(text, industry)
@@ -119,5 +129,23 @@ class HomeViewModel @Inject constructor(
 
     fun navigationUserDetails(uid:String, openScreen: (String) -> Unit){
         openScreen(NavRoutes.USER_DETAIL.replace("{id}", uid))
+    }
+
+    private fun loadReferralsByProvider(){
+        _isLoading.value = true
+        referralsJob?.cancel()
+        referralsJob = launchCatching {
+            getReferralsByProvider(currentUserId)
+                .collect { referrals ->
+                    _uiStateReferralsMetrics.value = ReferralMetrics(
+                        totalReferrals = referrals.size,
+                        pendingReferrals = referrals.count { it.status == ReferralStatus.PENDING },
+                        processingReferrals = referrals.count { it.status == ReferralStatus.PROCESSING },
+                        rejectedReferrals = referrals.count { it.status == ReferralStatus.REJECTED },
+                        paidReferrals = referrals.count { it.status == ReferralStatus.PAID }
+                    )
+                    _isLoading.value = false
+                }
+        }
     }
 }

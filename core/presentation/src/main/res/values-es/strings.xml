@@ -54,6 +54,7 @@
     <string name="zero">0.00</string>
     <string name="pending_payments">Pagos Pendientes</string>
     <string name="search_companies">Buscar Empresas</string>
+    <string name="search_referrers">Buscar Referidores</string>
     <string name="profile">Perfil</string>
     <string name="settings_edit_photo">Editar foto</string>
     <string name="settings_name">Nombre*</string>
@@ -70,6 +71,8 @@
     <string name="information_client">Información del Referidor</string>
     <string name="active_user">Activo</string>
     <string name="inactive_user">Inactivo</string>
+    <string name="money_to_pay">Dinero Por pagar</string>
+    <string name="total_payout">Pagos Totales</string>
     <string name="add_new_referral">Agregar nuevo Referido</string>
     <string name="information_referral">Información de Referido</string>
     <string name="invalid_phone_number">Inválido número telefónico</string>
@@ -121,6 +124,7 @@
     <string name="referreds_by">Referidos por: %s</string>
     <string name="name_referred">Nombre referido</string>
     <string name="email_referred">Correo electrónico Referido</string>
+    <string name="total_referrals">Total Referidos</string>
     <string name="all_referrals">Todos los Referidos</string>
     <string name="pending">Pendiente</string>
     <string name="processing">Procesando</string>
@@ -129,4 +133,6 @@
     <string name="rating">Rating</string>
     <string name="payouts">Número de Pagos</string>
     <string name="website">Sitio Web</string>
+    <string name="money_paid">Dinero Pagado</string>
+    <string name="payment_rating">Rating de Pagos</string>
 </resources>

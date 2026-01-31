@@ -7,12 +7,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.avilesrodriguez.domain.model.referral.ReferralMetrics
-import com.avilesrodriguez.presentation.R
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.cartesian.layer.cartesianLayerPadding
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
@@ -28,7 +24,6 @@ import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.compose.common.insets
 import com.patrykandpatrick.vico.compose.common.rememberHorizontalLegend
 import com.patrykandpatrick.vico.compose.common.vicoTheme
-import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
@@ -43,28 +38,21 @@ import java.text.DecimalFormat
 
 @Composable
 fun ColumnStack(
-    metrics: ReferralMetrics,
+    y: List<Int>,
+    labels: List<String>,
+    columnColors: List<Color>,
     modifier: Modifier = Modifier
 ){
-    val y =
-        mapOf(
-            stringResource(R.string.pending) to metrics.pendingReferrals,
-            stringResource(R.string.processing) to metrics.processingReferrals,
-            stringResource(R.string.rejected) to metrics.rejectedReferrals,
-            stringResource(R.string.paid) to metrics.paidReferrals
-        )
     val modelProducer = remember { CartesianChartModelProducer() }
-    LaunchedEffect(metrics) {
+    LaunchedEffect(y) {
         modelProducer.runTransaction {
             columnSeries {
-                y.values.forEach { series(it) }
+                y.forEach { series(it) }
             }
-            extras { it[LegendLabelKey] = y.keys }
+            extras { it[LegendLabelKey] = labels.toSet() }
         }
     }
-    ComposeColumnStack(modelProducer, modifier)
-
-
+    ComposeColumnStack(modelProducer, columnColors, modifier)
 }
 
 private val LegendLabelKey = ExtraStore.Key<Set<String>>()
@@ -75,14 +63,9 @@ private val MarkerValueFormatter = DefaultCartesianMarker.ValueFormatter.default
 @Composable
 private fun ComposeColumnStack(
     modelProducer: CartesianChartModelProducer,
+    columnColors: List<Color>,
     modifier: Modifier = Modifier,
 ) {
-    val columnColors = listOf(
-        Color(0xFFF5AD18),
-        Color(0xFF6594B1),
-        Color(0XFFDC0E0E),
-        Color(0xFF08CB00)
-    )
     val legendItemLabelComponent = rememberTextComponent(vicoTheme.textColor)
 
     val marker = rememberDefaultCartesianMarker(
