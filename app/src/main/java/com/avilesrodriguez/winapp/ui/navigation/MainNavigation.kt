@@ -30,7 +30,9 @@ import com.avilesrodriguez.feature.auth.ui.login.LoginScreen
 import com.avilesrodriguez.feature.auth.ui.sign_up.SignUpScreen
 import com.avilesrodriguez.feature.auth.ui.splash.SplashScreen
 import com.avilesrodriguez.feature.referrals.ui.addReferral.AddReferralScreen
+import com.avilesrodriguez.feature.referrals.ui.referral.EditEmailReferral
 import com.avilesrodriguez.feature.referrals.ui.referral.EditNameReferral
+import com.avilesrodriguez.feature.referrals.ui.referral.EditPhoneReferral
 import com.avilesrodriguez.feature.referrals.ui.referral.ReferralScreen
 import com.avilesrodriguez.feature.referrals.ui.referral.ReferralViewModel
 import com.avilesrodriguez.feature.settings.ui.EditScreen
@@ -189,6 +191,30 @@ private fun NavGraphBuilder.referralGraph(appState: AppState){
             }
             val viewModel: ReferralViewModel = hiltViewModel(parentEntry)
             EditNameReferral(
+                onBackClick = { appState.popUp() },
+                viewModel = viewModel
+            )
+        }
+        composable(
+            route = NavRoutes.EDIT_EMAIL_REFERRAL
+        ){ backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                appState.navController.getBackStackEntry(NavRoutes.REFERRAL_GRAPH)
+            }
+            val viewModel: ReferralViewModel = hiltViewModel(parentEntry)
+            EditEmailReferral(
+                onBackClick = { appState.popUp() },
+                viewModel = viewModel
+            )
+        }
+        composable(
+            route = NavRoutes.EDIT_PHONE_REFERRAL
+        ){ backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                appState.navController.getBackStackEntry(NavRoutes.REFERRAL_GRAPH)
+            }
+            val viewModel: ReferralViewModel = hiltViewModel(parentEntry)
+            EditPhoneReferral(
                 onBackClick = { appState.popUp() },
                 viewModel = viewModel
             )

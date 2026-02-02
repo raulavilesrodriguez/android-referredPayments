@@ -11,7 +11,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -77,13 +76,13 @@ fun FormButtons(
 @Composable
 fun SaveButton(
     onClick: () -> Unit,
-    isNameValid: Boolean,
+    isFieldValid: Boolean,
     @StringRes text: Int,
     modifier: Modifier = Modifier
 ){
     Button(
         onClick = onClick,
-        enabled = isNameValid,
+        enabled = isFieldValid,
         modifier = modifier,
         shape = RoundedCornerShape(50.dp),
     ) {

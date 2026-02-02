@@ -5,11 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -32,46 +30,44 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.presentation.R
-import com.avilesrodriguez.presentation.composables.NameTextFieldCursor
+import com.avilesrodriguez.presentation.composables.PhoneFieldCursor
 import com.avilesrodriguez.presentation.composables.SaveButton
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.fakeData.referral
 
 @Composable
-fun EditNameReferral(
+fun EditPhoneReferral(
     onBackClick: () -> Unit,
     viewModel: ReferralViewModel = hiltViewModel()
 ){
     val referral by viewModel.referralState.collectAsState()
-
-    EditNameReferralContent(
+    EditPhoneReferralContent(
         referral = referral,
         onBackClick = onBackClick,
-        updateName = viewModel::updateName,
-        onSaveClick = { viewModel.onSaveName { onBackClick() }}
+        updateNumberPhone = viewModel::updateNumberPhone,
+        onSaveClick = { viewModel.onSaveNumberPhone { onBackClick() }}
     )
 }
 
 @Composable
-private fun EditNameReferralContent(
+private fun EditPhoneReferralContent(
     referral: Referral,
     onBackClick: () -> Unit,
-    updateName: (String) -> Unit,
+    updateNumberPhone: (String) -> Unit,
     onSaveClick: () -> Unit
 ){
     Scaffold(
-        contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
             ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
-                title = R.string.name_referred,
+                title = R.string.phone_number_referred,
                 backClick = { onBackClick() }
             )
         },
         content = { innerPadding ->
-            NameContent(
+            PhoneContent(
                 referral = referral,
-                updateName = updateName,
+                updateNumberPhone = updateNumberPhone,
                 onSaveClick = onSaveClick,
                 modifier = Modifier.padding(innerPadding)
             )
@@ -80,9 +76,9 @@ private fun EditNameReferralContent(
 }
 
 @Composable
-private fun NameContent(
+private fun PhoneContent(
     referral: Referral,
-    updateName: (String) -> Unit,
+    updateNumberPhone: (String) -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
 ){
@@ -94,17 +90,17 @@ private fun NameContent(
         focusRequester.requestFocus()
     }
     if(isLandscape){
-        LandscapeNameContent(
+        LandscapePhoneContent(
             referral = referral,
-            updateName = updateName,
+            updateNumberPhone = updateNumberPhone,
             onSaveClick = onSaveClick,
             focusRequester = focusRequester,
             modifier = modifier
         )
-    }else{
-        PortraitNameContent(
+    } else {
+        PortraitPhoneContent(
             referral = referral,
-            updateName = updateName,
+            updateNumberPhone = updateNumberPhone,
             onSaveClick = onSaveClick,
             focusRequester = focusRequester,
             modifier = modifier
@@ -113,9 +109,9 @@ private fun NameContent(
 }
 
 @Composable
-private fun PortraitNameContent(
+private fun PortraitPhoneContent(
     referral: Referral,
-    updateName: (String) -> Unit,
+    updateNumberPhone: (String) -> Unit,
     onSaveClick: () -> Unit,
     focusRequester: FocusRequester,
     modifier: Modifier = Modifier
@@ -128,14 +124,14 @@ private fun PortraitNameContent(
             modifier = Modifier.align(Alignment.TopCenter),
             horizontalAlignment = Alignment.End
         ) {
-            NameTextFieldCursor(
-                value = referral.name,
-                onNewValue = updateName,
+            PhoneFieldCursor(
+                value = referral.numberPhone,
+                onNewValue = updateNumberPhone,
                 focusRequester = focusRequester,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.fillMaxWidth()
             )
             Text(
-                text = stringResource(R.string.comment_save_name_referred),
+                text = stringResource(R.string.comment_save_phone_number_referred),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
@@ -146,7 +142,7 @@ private fun PortraitNameContent(
         }
         SaveButton(
             onClick = onSaveClick,
-            isFieldValid = referral.name.isNotBlank(),
+            isFieldValid = referral.numberPhone.isNotBlank(),
             text = R.string.save,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -157,9 +153,9 @@ private fun PortraitNameContent(
 }
 
 @Composable
-private fun LandscapeNameContent(
+private fun LandscapePhoneContent(
     referral: Referral,
-    updateName: (String) -> Unit,
+    updateNumberPhone: (String) -> Unit,
     onSaveClick: () -> Unit,
     focusRequester: FocusRequester,
     modifier: Modifier = Modifier
@@ -177,24 +173,25 @@ private fun LandscapeNameContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ){
-            NameTextFieldCursor(
-                value = referral.name,
-                onNewValue = updateName,
+            PhoneFieldCursor(
+                value = referral.numberPhone,
+                onNewValue = updateNumberPhone,
                 focusRequester = focusRequester,
-                modifier = Modifier.weight(0.7f)
+                modifier = Modifier
+                    .weight(0.7f)
             )
             Spacer(modifier = Modifier.width(16.dp))
             SaveButton(
                 onClick = onSaveClick,
-                isFieldValid = referral.name.isNotBlank(),
+                isFieldValid = referral.numberPhone.isNotBlank(),
                 text = R.string.save,
                 modifier = Modifier
-                    .padding(bottom = 16.dp)
+                    .padding(top = 8.dp, bottom = 16.dp)
                     .weight(0.3f)
             )
         }
         Text(
-            text = stringResource(R.string.comment_save_name_referred),
+            text = stringResource(R.string.comment_save_phone_number_referred),
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier
@@ -207,12 +204,12 @@ private fun LandscapeNameContent(
 
 @Preview(showBackground = true)
 @Composable
-fun EditNameReferralPreview(){
+fun EditPhoneReferralPreview(){
     MaterialTheme {
-        EditNameReferralContent(
+        EditPhoneReferralContent(
             referral = referral,
             onBackClick = {},
-            updateName = {},
+            updateNumberPhone = {},
             onSaveClick = {}
         )
     }

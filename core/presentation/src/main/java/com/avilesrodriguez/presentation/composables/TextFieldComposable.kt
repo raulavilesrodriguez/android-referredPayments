@@ -181,6 +181,41 @@ fun EmailField(value: String, onNewValue: (String) -> Unit, modifier: Modifier =
 }
 
 @Composable
+fun EmailFieldCursor(
+    value: String,
+    onNewValue: (String) -> Unit,
+    focusRequester: FocusRequester,
+    modifier: Modifier = Modifier
+) {
+    var textFieldValue by remember(value) {
+        mutableStateOf(
+            TextFieldValue(
+                text = value,
+                selection = TextRange(value.length) //selection cursor
+            )
+        )
+    }
+
+    OutlinedTextField(
+        value = textFieldValue,
+        onValueChange = { newValue ->
+            textFieldValue = newValue
+            onNewValue(newValue.text)
+        },
+        label = { Text(text = stringResource(R.string.email)) },
+        placeholder = { Text(text = stringResource(R.string.email)) },
+        leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = null) },
+        singleLine = true,
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.focusRequester(focusRequester),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    )
+}
+
+@Composable
 fun PhoneField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
@@ -198,6 +233,61 @@ fun PhoneField(value: String, onNewValue: (String) -> Unit, modifier: Modifier =
         )
         Text(
             text = "${value.length}/$MIN_PASS_LENGTH_PHONE_ECUADOR",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp, end = 8.dp),
+            textAlign = TextAlign.End
+        )
+    }
+}
+
+@Composable
+fun PhoneFieldCursor(
+    value: String,
+    onNewValue: (String) -> Unit,
+    focusRequester: FocusRequester,
+    modifier: Modifier = Modifier
+) {
+    var textFieldValue by remember(value) {
+        mutableStateOf(
+            TextFieldValue(
+                text = value,
+                selection = TextRange(value.length)
+            )
+        )
+    }
+    Column(
+        modifier = modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.End
+    ) {
+        OutlinedTextField(
+            value = textFieldValue,
+            onValueChange = { newValue ->
+                val filteredText = newValue.text.filter { it.isDigit() }
+                if (filteredText.length <= MIN_PASS_LENGTH_PHONE_ECUADOR) {
+                    textFieldValue = newValue.copy(text = filteredText)
+                    onNewValue(filteredText)
+                }
+            },
+            label = { Text(text = stringResource(R.string.mobile_number)) },
+            shape = RoundedCornerShape(16.dp),
+            placeholder = { Text(text = stringResource(R.string.mobile_number)) },
+            leadingIcon = { Icon(imageVector = Icons.Default.PhoneAndroid, contentDescription = "Phone") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester)
+        )
+        Text(
+            text = "${textFieldValue.text.length}/$MIN_PASS_LENGTH_PHONE_ECUADOR",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp, end = 8.dp),
