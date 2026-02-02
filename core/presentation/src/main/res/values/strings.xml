@@ -110,6 +110,9 @@
     <string name="paid_to">Paid to: %s</string>
     <string name="refer_now">Refer Now</string>
     <string name="total_referrals">Total Referrals</string>
+    <string name="comment_save_name_referred">Please check that this name is correct</string>
+    <string name="comment_save_email_referred">Please check that this email is correct</string>
+    <string name="comment_save_phone_number_referred">Please check that this mobile phone number is correct</string>
     <!-- Referral Metrics -->
     <string name="all_referrals">All Referrals</string>
     <string name="pending">Pending</string>

@@ -12,6 +12,10 @@ class ReferralRepository @Inject constructor(
 
     override suspend fun saveReferral(referral: Referral)= data.saveReferral(referral)
 
+    override suspend fun updateReferralFields(referralId: String, updates: Map<String, Any>) {
+        data.updateReferralFields(referralId, updates)
+    }
+
     override suspend fun getReferralsByClient(clientId: String): Flow<List<Referral>> {
         return data.getReferralsByClient(clientId)
     }

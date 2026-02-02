@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.avilesrodriguez.presentation.R
-import com.avilesrodriguez.presentation.composables.ProfileToolBar
+import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 
 @Composable
 fun PoliciesScreen(
@@ -29,7 +29,7 @@ fun PoliciesScreen(
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
-            ProfileToolBar(
+            ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
                 title = R.string.policies,
                 backClick = popUp

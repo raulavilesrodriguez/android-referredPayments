@@ -35,7 +35,7 @@ import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.BasicButton
-import com.avilesrodriguez.presentation.composables.ProfileToolBar
+import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.ext.basicButton
 import com.avilesrodriguez.presentation.ext.toColor
 import com.avilesrodriguez.presentation.ext.toDisplayIcon
@@ -90,7 +90,7 @@ fun ReferralScreenContent(
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
-            ProfileToolBar(
+            ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
                 title = R.string.information_referral,
                 backClick = { onBackClick() }
@@ -134,20 +134,29 @@ fun ProfileReferral(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ReferralStatus(status = referral.status)
-        ItemEditProfile(R.drawable.name, title = R.string.name_referred, data = referral.name){onNameClick()}
-        ItemEditProfile(R.drawable.mail, title = R.string.email_referred, data = referral.email){onEmailClick()}
-        ItemEditProfile(R.drawable.phone, title = R.string.phone_number_referred, data = referral.numberPhone){onPhoneClick()}
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 8.dp),
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-        )
+
         when(user){
             is UserData.Client -> {
+                ItemEditProfile(R.drawable.name, title = R.string.name_referred, data = referral.name){onNameClick()}
+                ItemEditProfile(R.drawable.mail, title = R.string.email_referred, data = referral.email){onEmailClick()}
+                ItemEditProfile(R.drawable.phone, title = R.string.phone_number_referred, data = referral.numberPhone){onPhoneClick()}
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )
                 val nameProvider = providerThatReceived?.name?.truncate(30)?:""
                 ItemProfile(R.drawable.step, title = R.string.referring, data = nameProvider)
             }
             is UserData.Provider -> {
+                ItemProfile(icon = R.drawable.name, title = R.string.name_referred, data = referral.name)
+                ItemProfile(icon = R.drawable.mail, title = R.string.email_referred, data = referral.email)
+                ItemProfile(icon = R.drawable.phone, title = R.string.phone_number_referred, data = referral.numberPhone)
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )
                 val nameClient = clientWhoReferred?.name?.truncate(30)?:""
                 ItemProfile(R.drawable.step, title = R.string.referral, data = nameClient)
                 BasicButton(
@@ -200,7 +209,7 @@ fun ProfileReferralPreview(){
         ReferralScreenContent(
             onBackClick = {},
             referral = referral,
-            user = userClient,
+            user = userProvider,
             clientWhoReferred = userClient,
             providerThatReceived = userProvider,
             onNameClick = {},

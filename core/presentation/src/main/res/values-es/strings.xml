@@ -125,6 +125,8 @@
     <string name="name_referred">Nombre referido</string>
     <string name="email_referred">Correo electrónico Referido</string>
     <string name="total_referrals">Total Referidos</string>
+    <string name="comment_save_name_referred">Por favor, revisa que este nombre sea el correcto</string>
+    <string name="comment_save_phone_number_referred">Por favor verifica que este número de teléfono móvil sea correcto</string>
     <string name="all_referrals">Todos los Referidos</string>
     <string name="pending">Pendiente</string>
     <string name="processing">Procesando</string>
@@ -135,4 +137,5 @@
     <string name="website">Sitio Web</string>
     <string name="money_paid">Dinero Pagado</string>
     <string name="payment_rating">Rating de Pagos</string>
+    <string name="comment_save_email_referred">Por favor, comprueba que este correo electrónico sea correcto.</string>
 </resources>

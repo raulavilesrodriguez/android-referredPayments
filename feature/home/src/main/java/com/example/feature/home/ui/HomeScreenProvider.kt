@@ -119,7 +119,7 @@ fun HomeScreenProvider(
                 )
             }
         }
-        item(){
+        item{
             Column(modifier = Modifier.padding(vertical = 8.dp)) {
                 Text(
                     text = stringResource(R.string.search_referrers),
@@ -136,7 +136,7 @@ fun HomeScreenProvider(
             }
         }
         if (isLoading) {
-            item() {
+            item {
                 Box(Modifier
                     .fillMaxWidth()
                     .height(200.dp), contentAlignment = Alignment.Center) {
@@ -147,6 +147,7 @@ fun HomeScreenProvider(
             items(usersAndMetrics){ client ->
                 ClientRow(clientMetrics = client, onClientClick = onUserClick)
             }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
         }
     }
 }

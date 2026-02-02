@@ -29,7 +29,7 @@ import com.avilesrodriguez.presentation.composables.EmailField
 import com.avilesrodriguez.presentation.composables.FormButtons
 import com.avilesrodriguez.presentation.composables.NameField
 import com.avilesrodriguez.presentation.composables.PhoneField
-import com.avilesrodriguez.presentation.composables.ProfileToolBar
+import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.ext.fieldModifier
 
 @Composable
@@ -64,7 +64,7 @@ fun AddReferralScreenContent(
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
-            ProfileToolBar(
+            ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
                 title = R.string.add_new_referral,
                 backClick = { onBackClick() }

@@ -40,7 +40,7 @@ import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.avatar.DEFAULT_AVATAR_USER
 import com.avilesrodriguez.presentation.composables.FormButtons
-import com.avilesrodriguez.presentation.composables.ProfileToolBar
+import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.composables.TextFieldProfile
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COUNT_NUMBER_BANK
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_IDENTITY_CARD
@@ -75,7 +75,7 @@ fun EditScreen(
 
     Scaffold(
         topBar = {
-            ProfileToolBar(
+            ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
                 title = R.string.edit_profile,
                 backClick = popUp

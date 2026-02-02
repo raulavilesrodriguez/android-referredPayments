@@ -1,7 +1,6 @@
 package com.avilesrodriguez.presentation.ext
 
 import android.util.Patterns
-import java.text.Normalizer
 import java.util.regex.Pattern
 
 const val MAX_LENGTH_NAME = 30

@@ -3,10 +3,8 @@ package com.avilesrodriguez.presentation.composables
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -44,7 +42,7 @@ fun BasicToolbar(@StringRes title: Int) {
 }
 
 @Composable
-fun ProfileToolBar(
+fun ToolBarWithIcon(
     @DrawableRes iconBack: Int,
     @StringRes title: Int,
     backClick: () -> Unit,
@@ -53,7 +51,7 @@ fun ProfileToolBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 8.dp, vertical = 0.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Absolute.Left
     ){

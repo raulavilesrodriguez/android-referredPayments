@@ -28,6 +28,14 @@ class ReferralDataSource @Inject constructor(
         docRef.set(referralFirestore.copy(id = docRef.id), SetOptions.merge()).await()
     }
 
+    suspend fun updateReferralFields(referralId: String, updates: Map<String, Any>) {
+        if (referralId.isEmpty()) return
+        firestore.collection(REFERRALS_COLLECTION)
+            .document(referralId)
+            .update(updates)
+            .await()
+    }
+
     fun getReferralsByClient(clientId: String): Flow<List<Referral>> {
         val query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(CLIENT_ID_FIELD, clientId)

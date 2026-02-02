@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -70,6 +71,26 @@ fun FormButtons(
         ) {
             Text(text = stringResource(cancelText))
         }
+    }
+}
+
+@Composable
+fun SaveButton(
+    onClick: () -> Unit,
+    isNameValid: Boolean,
+    @StringRes text: Int,
+    modifier: Modifier = Modifier
+){
+    Button(
+        onClick = onClick,
+        enabled = isNameValid,
+        modifier = modifier,
+        shape = RoundedCornerShape(50.dp),
+    ) {
+        Text(
+            text = stringResource(text),
+            modifier = Modifier.padding(vertical = 8.dp),
+        )
     }
 }
 

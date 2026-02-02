@@ -4,13 +4,21 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetReferralById
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
+import com.avilesrodriguez.domain.usecases.UpdateReferralFields
+import com.avilesrodriguez.presentation.R
+import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
+import com.avilesrodriguez.presentation.ext.MIN_PASS_LENGTH_PHONE_ECUADOR
+import com.avilesrodriguez.presentation.ext.isValidEmail
+import com.avilesrodriguez.presentation.ext.isValidNumber
 import com.avilesrodriguez.presentation.navigation.NavRoutes
+import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -23,7 +31,8 @@ class ReferralViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
     private val hasUser: HasUser,
     private val getUser: GetUser,
-    private val getReferralById: GetReferralById
+    private val getReferralById: GetReferralById,
+    private val updateReferralFields: UpdateReferralFields
 ) : BaseViewModel() {
     private val _referralState = MutableStateFlow(Referral())
     val referralState: StateFlow<Referral> = _referralState.asStateFlow()
@@ -35,6 +44,13 @@ class ReferralViewModel @Inject constructor(
 
     val currentUserId
         get() = currentUserIdUseCase()
+
+    private val nameReferral
+        get() = _referralState.value.name
+    private val emailReferral
+        get() = _referralState.value.email
+    private val numberPhoneReferral
+        get() = _referralState.value.numberPhone
 
     init {
         launchCatching {
@@ -69,6 +85,71 @@ class ReferralViewModel @Inject constructor(
 
     fun onPayReferral(openScreen: (String) -> Unit){
         openScreen(NavRoutes.PAY_REFERRAL)
+    }
+
+    fun updateName(newName: String){
+        // Solo deja pasar letras y espacios, eliminando lo demás al instante
+        val allowedSymbols = setOf('.', '-', ',', '/')
+
+        val filteredName = newName
+            .filter { it.isLetter() || it.isDigit() || it.isWhitespace() || allowedSymbols.contains(it) }
+            .take(MAX_LENGTH_NAME)
+
+        _referralState.value = _referralState.value.copy(name = filteredName)
+    }
+
+    fun onSaveName(popUp: () -> Unit) {
+        if(nameReferral.isBlank()){
+            return
+        }
+        launchCatching {
+            val updates = mapOf(
+                "name" to nameReferral,
+                "nameLowercase" to nameReferral.normalizeName()
+            )
+            val referralId = _referralState.value.id
+            updateReferralFields(referralId, updates)
+            popUp()
+        }
+    }
+
+    fun updateEmail(newEmail: String){
+        _referralState.value = _referralState.value.copy(email = newEmail)
+    }
+
+    fun onSaveEmail(popUp: () -> Unit) {
+        if(!emailReferral.isValidEmail()){
+            SnackbarManager.showMessage(R.string.email_error)
+            return
+        }
+        launchCatching {
+            val updates = mapOf(
+                "email" to emailReferral
+            )
+            val referralId = _referralState.value.id
+            updateReferralFields(referralId, updates)
+            popUp()
+        }
+    }
+
+    fun updateNumberPhone(newNumberPhone: String){
+        val filtered = newNumberPhone.filter { it.isDigit() }.take(MIN_PASS_LENGTH_PHONE_ECUADOR)
+        _referralState.value = _referralState.value.copy(numberPhone = filtered)
+    }
+
+    fun onSaveNumberPhone(popUp: () -> Unit) {
+        if(!numberPhoneReferral.isValidNumber()){
+            SnackbarManager.showMessage(R.string.invalid_phone_number)
+            return
+        }
+        launchCatching {
+            val updates = mapOf(
+                "numberPhone" to numberPhoneReferral
+            )
+            val referralId = _referralState.value.id
+            updateReferralFields(referralId, updates)
+            popUp()
+        }
     }
 
 }
