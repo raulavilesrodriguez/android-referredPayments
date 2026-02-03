@@ -31,9 +31,7 @@ sealed class UserDataFirestore {
         val bankName: String? = null,
         val accountType: String? = null, // Ahorros y corriente
         val moneyEarned: String? = null,
-        val moneyReceived: String? = null,
-        val totalReferrals: Int = 0,
-        val pendingPayments: Int = 0
+        val moneyReceived: String? = null
     ) : UserDataFirestore()
 
     data class Provider(
@@ -65,6 +63,7 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
             uid = uid,
             isActive = isActive,
             name = name,
+            nameLowercase = nameLowercase,
             email = email,
             photoUrl = photoUrl,
             fcmToken = fcmToken,
@@ -74,9 +73,7 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
             bankName = bankName,
             accountType = accountType,
             moneyEarned = moneyEarned,
-            moneyReceived = moneyReceived,
-            totalReferrals = totalReferrals,
-            pendingPayments = pendingPayments
+            moneyReceived = moneyReceived
         )
         is UserData.Provider -> UserDataFirestore.Provider(
             uid = uid,
@@ -116,9 +113,7 @@ fun UserDataFirestore.toDomain(): UserData? {
             bankName = bankName,
             accountType = accountType,
             moneyEarned = moneyEarned,
-            moneyReceived = moneyReceived,
-            totalReferrals = totalReferrals,
-            pendingPayments = pendingPayments
+            moneyReceived = moneyReceived
         )
         is UserDataFirestore.Provider -> {
             val domainIndustriesType = try {

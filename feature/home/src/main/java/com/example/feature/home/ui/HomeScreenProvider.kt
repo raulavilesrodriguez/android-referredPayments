@@ -62,7 +62,7 @@ fun HomeScreenProvider(
     isLoading: Boolean,
     searchText: String,
     updateSearchText: (String) -> Unit,
-    referralMetricsProvider: ReferralMetrics,
+    referralsMetrics: ReferralMetrics,
     onUserClick: (String) -> Unit,
     usersAndMetrics: List<UserAndReferralMetrics>
 ){
@@ -73,13 +73,13 @@ fun HomeScreenProvider(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item() {
+        item {
             BalanceCardProvider(
-                totalReferrals = referralMetricsProvider.totalReferrals.toString(),
+                totalReferrals = referralsMetrics.totalReferrals.toString(),
                 referralsConversion = provider.referralsConversion?:"0.00"
             )
         }
-        item() {
+        item {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -362,7 +362,7 @@ fun HomeScreenProviderPreview(){
             isLoading = false,
             searchText = "",
             updateSearchText = {},
-            referralMetricsProvider = ReferralMetrics(
+            referralsMetrics = ReferralMetrics(
                 totalReferrals = 20,
                 pendingReferrals = 5,
                 processingReferrals = 3,
@@ -390,9 +390,7 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             bankName = "Produbanco",
             accountType = "Ahorros",
             moneyEarned = "1000",
-            moneyReceived = "950",
-            totalReferrals = 10,
-            pendingPayments = 1
+            moneyReceived = "950"
         ),
         referralMetrics = ReferralMetrics(
             totalReferrals = 5,
@@ -416,9 +414,7 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             bankName = "Pichincha",
             accountType = "Ahorros",
             moneyEarned = "1500",
-            moneyReceived = "1200",
-            totalReferrals = 10,
-            pendingPayments = 3
+            moneyReceived = "1200"
         ),
         referralMetrics = ReferralMetrics(
             totalReferrals = 5,
@@ -442,9 +438,7 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             bankName = "Banco de Guayaquil",
             accountType = "Ahorros",
             moneyEarned = "4000",
-            moneyReceived = "3500",
-            totalReferrals = 15,
-            pendingPayments = 4
+            moneyReceived = "3500"
         ),
         referralMetrics = ReferralMetrics(
             totalReferrals = 5,
@@ -468,9 +462,7 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             bankName = "Austro",
             accountType = "Ahorros",
             moneyEarned = "2000",
-            moneyReceived = "1700",
-            totalReferrals = 12,
-            pendingPayments = 2
+            moneyReceived = "1700"
         ),
         referralMetrics = ReferralMetrics(
             totalReferrals = 5,

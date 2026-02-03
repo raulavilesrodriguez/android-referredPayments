@@ -27,9 +27,7 @@ sealed class UserData {
         val bankName: String? = null,
         val accountType: String? = null, // Ahorros y corriente
         val moneyEarned: String? = null,
-        val moneyReceived: String? = null,
-        val totalReferrals: Int = 0,
-        val pendingPayments: Int = 0
+        val moneyReceived: String? = null
     ) : UserData()
 
     data class Provider(

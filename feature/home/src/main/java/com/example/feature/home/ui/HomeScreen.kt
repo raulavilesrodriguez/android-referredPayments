@@ -52,7 +52,7 @@ fun HomeScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val selectedIndustry by viewModel.selectedIndustry.collectAsState()
-    val referralsMetricsProvider by viewModel.uiStateReferralsMetrics.collectAsState()
+    val referralsMetrics by viewModel.uiStateReferralsMetrics.collectAsState()
     val usersAndMetrics by viewModel.usersAndMetrics.collectAsState()
 
     val options = ActionOptionsHome.getOptions()
@@ -75,7 +75,7 @@ fun HomeScreen(
         onIndustryChange = viewModel::onIndustryChange,
         industryOptions = industryOptions,
         onUserClick = { uId -> viewModel.navigationUserDetails(uId, openScreen)},
-        referralMetricsProvider = referralsMetricsProvider,
+        referralsMetrics = referralsMetrics,
         usersAndMetrics = usersAndMetrics
     )
 }
@@ -97,7 +97,7 @@ fun HomeScreenContent(
     onIndustryChange: (Int) -> Unit,
     industryOptions: List<Int>,
     onUserClick: (String) -> Unit,
-    referralMetricsProvider: ReferralMetrics,
+    referralsMetrics: ReferralMetrics,
     usersAndMetrics: List<UserAndReferralMetrics>
 ){
     val tabs = generateTabs()
@@ -178,7 +178,7 @@ fun HomeScreenContent(
                             onIndustryChange = onIndustryChange,
                             industryOptions = industryOptions,
                             onUserClick = onUserClick,
-                            referralMetricsProvider = referralMetricsProvider,
+                            referralsMetrics = referralsMetrics,
                             usersAndMetrics = usersAndMetrics
                         )
                     }
@@ -205,7 +205,7 @@ fun HomeMainContent(
     onIndustryChange: (Int) -> Unit,
     industryOptions: List<Int>,
     onUserClick: (String) -> Unit,
-    referralMetricsProvider: ReferralMetrics,
+    referralsMetrics: ReferralMetrics,
     usersAndMetrics: List<UserAndReferralMetrics>
 ) {
     if (user != null) {
@@ -219,14 +219,15 @@ fun HomeMainContent(
                 selectedIndustry = selectedIndustry,
                 onIndustryChange = onIndustryChange,
                 industryOptions = industryOptions,
-                onUserClick = onUserClick
+                onUserClick = onUserClick,
+                referralsMetrics = referralsMetrics
             )
             UserType.PROVIDER -> HomeScreenProvider(
                 user = user,
                 isLoading = isLoading,
                 searchText = searchText,
                 updateSearchText = updateSearchText,
-                referralMetricsProvider = referralMetricsProvider,
+                referralsMetrics = referralsMetrics,
                 onUserClick = onUserClick,
                 usersAndMetrics = usersAndMetrics
             )

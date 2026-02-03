@@ -83,9 +83,7 @@ val userClient = UserData.Client(
     bankName = "Produbanco",
     accountType = "Ahorros",
     moneyEarned = "1000",
-    moneyReceived = "950",
-    totalReferrals = 10,
-    pendingPayments = 1
+    moneyReceived = "950"
 )
 
 val userProvider = UserData.Provider(

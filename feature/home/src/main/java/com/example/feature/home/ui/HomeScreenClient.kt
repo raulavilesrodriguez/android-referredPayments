@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.avilesrodriguez.domain.model.industries.IndustriesType
+import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
@@ -59,7 +60,8 @@ fun HomeScreenClient(
     selectedIndustry: Int?,
     onIndustryChange: (Int) -> Unit,
     industryOptions: List<Int>,
-    onUserClick: (String) -> Unit
+    onUserClick: (String) -> Unit,
+    referralsMetrics: ReferralMetrics
 ) {
     val client = user as? UserData.Client
 
@@ -85,14 +87,14 @@ fun HomeScreenClient(
                 StatItem(
                     modifier = Modifier.weight(1f),
                     title = stringResource(R.string.referrals),
-                    value = "${client?.totalReferrals ?: 0}",
+                    value = "${referralsMetrics.totalReferrals}",
                     icon = Icons.Default.People,
                     color = MaterialTheme.colorScheme.primaryContainer
                 )
                 StatItem(
                     modifier = Modifier.weight(1f),
                     title = stringResource(R.string.pending_payments),
-                    value = "${client?.pendingPayments ?: 0}",
+                    value = "${referralsMetrics.pendingReferrals}",
                     icon = Icons.Default.AccountBalanceWallet,
                     color = MaterialTheme.colorScheme.secondaryContainer
                 )
@@ -232,7 +234,14 @@ fun HomeScreenClientPreview() {
             selectedIndustry = null,
             onIndustryChange = {},
             industryOptions = IndustriesType.options(true),
-            onUserClick = {}
+            onUserClick = {},
+            referralsMetrics = ReferralMetrics(
+                totalReferrals = 20,
+                pendingReferrals = 5,
+                processingReferrals = 3,
+                rejectedReferrals = 2,
+                paidReferrals = 10
+            )
         )
     }
 }
