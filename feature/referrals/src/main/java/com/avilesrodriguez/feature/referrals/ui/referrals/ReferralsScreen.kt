@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -24,6 +25,7 @@ import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.SearchField
+import com.avilesrodriguez.presentation.composables.SearchFieldBasic
 import com.avilesrodriguez.presentation.composables.SearchToolBarNoBack
 import com.avilesrodriguez.presentation.fakeData.generateFakeReferrals
 import com.avilesrodriguez.presentation.fakeData.userClient
@@ -65,39 +67,20 @@ private fun ReferralsScreenContent(
     clientWhoReferred: UserData?,
     providerThatReceived: UserData?
 ){
-    var showSearchField by remember { mutableStateOf(false) }
-    var showToolBar by remember { mutableStateOf(true) }
-
     Column(modifier = Modifier.fillMaxSize()){
-        when{
-            showSearchField -> {
-                SearchField(
-                    value = searchText,
-                    onValueChange = onValueChange,
-                    placeholder = R.string.search,
-                    leadingIcon = R.drawable.arrow_back,
-                    onLeadingIconClick = {
-                        showSearchField = false
-                        showToolBar = true
-                    }
-                )
-            }
-            showToolBar -> {
-                SearchToolBarNoBack(
-                    title = R.string.select_referred,
-                    iconSearch = R.drawable.search,
-                    iconSearchClick = {
-                        showSearchField = true
-                        showToolBar = false
-                    }
-                )
-            }
-        }
-        HorizontalDivider(
+        Text(
+            text= stringResource(R.string.search_your_referred),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp)
+        )
+        SearchFieldBasic(
+            value = searchText,
+            onValueChange = onValueChange,
+            placeholder = R.string.select_referred,
+            trailingIcon = R.drawable.search,
             modifier = Modifier
-                .padding(vertical = 8.dp),
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                .padding(16.dp)
         )
         Box(modifier = Modifier.weight(1f).fillMaxWidth()){
             if(!isLoading){
@@ -109,7 +92,7 @@ private fun ReferralsScreenContent(
                         clientWhoReferred = clientWhoReferred,
                         providerThatReceived = providerThatReceived,
                         modifier = Modifier
-                            .padding(horizontal = 8.dp, vertical = 16.dp)
+                            .padding(horizontal = 16.dp, vertical = 16.dp)
                     )
                 } else {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

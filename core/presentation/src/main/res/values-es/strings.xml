@@ -77,6 +77,7 @@
     <string name="information_referral">Información de Referido</string>
     <string name="invalid_phone_number">Inválido número telefónico</string>
     <string name="invalid_name">Inválido nombre</string>
+    <string name="search_your_referred">Busca tu referido</string>
     <string name="select_referred">Seleccionar Referido</string>
     <string name="no_have_referreds">No tienes referidos</string>
     <string name="referred_from">Referido desde: %s</string>

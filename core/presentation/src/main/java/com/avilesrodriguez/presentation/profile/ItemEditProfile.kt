@@ -26,6 +26,7 @@ fun ItemEditProfile(
     @DrawableRes icon: Int,
     @StringRes title: Int,
     data: String,
+    @DrawableRes iconEdit: Int? = null,
     onClick: () -> Unit
 ){
     Row(
@@ -55,6 +56,13 @@ fun ItemEditProfile(
             Text(
                 text = data,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        if(iconEdit != null){
+            Icon(
+                painter = painterResource(id = iconEdit),
+                contentDescription = null
             )
         }
     }

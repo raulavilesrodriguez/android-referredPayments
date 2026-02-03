@@ -137,9 +137,9 @@ fun ProfileReferral(
 
         when(user){
             is UserData.Client -> {
-                ItemEditProfile(R.drawable.name, title = R.string.name_referred, data = referral.name){onNameClick()}
-                ItemEditProfile(R.drawable.mail, title = R.string.email_referred, data = referral.email){onEmailClick()}
-                ItemEditProfile(R.drawable.phone, title = R.string.phone_number_referred, data = referral.numberPhone){onPhoneClick()}
+                ItemEditProfile(R.drawable.name, title = R.string.name_referred, data = referral.name, iconEdit = R.drawable.edit_gray){onNameClick()}
+                ItemEditProfile(R.drawable.mail, title = R.string.email_referred, data = referral.email, iconEdit = R.drawable.edit_gray){onEmailClick()}
+                ItemEditProfile(R.drawable.phone, title = R.string.phone_number_referred, data = referral.numberPhone, iconEdit = R.drawable.edit_gray){onPhoneClick()}
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 8.dp),
                     thickness = 1.dp,
@@ -183,7 +183,8 @@ fun ReferralStatus(status: ReferralStatus){
             painter = painterResource(status.toDisplayIcon()),
             contentDescription = null,
             modifier = Modifier
-                .padding(end = 8.dp)
+                .padding(end = 8.dp),
+            tint = status.toColor()
         )
         Box(
             modifier = Modifier
