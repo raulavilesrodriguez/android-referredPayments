@@ -22,6 +22,8 @@ import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,6 +43,7 @@ class ReferralViewModel @Inject constructor(
 
     var clientWhoReferred by mutableStateOf<UserData?>(null)
     var providerThatReceived by mutableStateOf<UserData?>(null)
+    private var loadJob: Job? = null
 
     val currentUserId
         get() = currentUserIdUseCase()
@@ -61,13 +64,18 @@ class ReferralViewModel @Inject constructor(
     }
 
     fun loadReferralInformation(referralId: String){
-        try {
-            launchCatching {
-                val referral = getReferralById(referralId)
-                _referralState.value = referral?: Referral()
+        loadJob?.cancel()
+        loadJob = launchCatching {
+            val referral = getReferralById(referralId)
+            if(referral != null){
+                _referralState.value = referral
+                val clientDeferred = async { getUser(referral.clientId) }
+                val providerDeferred = async { getUser(referral.providerId) }
+                clientWhoReferred = clientDeferred.await()
+                providerThatReceived = providerDeferred.await()
+            } else {
+                _referralState.value = Referral()
             }
-        } catch (ie: Throwable){
-            Log.e("ReferralViewModel", "Error loading referral information", ie)
         }
     }
 

@@ -113,11 +113,13 @@ private fun ReferralsScreenContent(
                             .padding(horizontal = 8.dp, vertical = 16.dp)
                     )
                 } else {
-                    Text(text = stringResource(R.string.no_have_referreds))
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = stringResource(R.string.no_have_referreds))
+                    }
                 }
             } else {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    Text(text = stringResource(R.string.no_have_referreds))
                 }
             }
         }
