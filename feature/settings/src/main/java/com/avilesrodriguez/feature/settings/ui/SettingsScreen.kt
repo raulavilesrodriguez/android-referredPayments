@@ -144,11 +144,6 @@ fun Profile(
                         title = R.string.settings_identity_card_provider,
                         data = userData.ciOrRuc?: stringResource(R.string.no_information))
                     ItemProfile(
-                        icon = R.drawable.bank,
-                        title = R.string.settings_count_number_bank_provider,
-                        data = userData.countNumber?:stringResource(R.string.no_information)
-                    )
-                    ItemProfile(
                         icon = R.drawable.industry,
                         title = R.string.settings_industry,
                         data = userData.industry.name

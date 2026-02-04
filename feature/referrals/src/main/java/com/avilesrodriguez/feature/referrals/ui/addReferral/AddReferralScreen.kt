@@ -113,7 +113,7 @@ fun FormAddReferral(
             Text(
                 text = stringResource(R.string.required_field),
                 modifier = Modifier.padding(16.dp),
-                color = MaterialTheme.colorScheme.error
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
             )
         }
     }

@@ -13,5 +13,4 @@ data class Referral(
     val status: ReferralStatus = ReferralStatus.PENDING,
     val createdAt: Long = System.currentTimeMillis(),
     val voucherUrl: String? = null,  // la foto del pago que sube el Provider
-    val messages: List<String> = emptyList()
 )

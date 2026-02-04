@@ -190,14 +190,6 @@ fun EditScreenContent(
                     title = R.string.settings_identity_card_provider,
                     modifier = Modifier.fieldModifier()
                 )
-                TextFieldProfile(
-                    value = userData.countNumber?: "",
-                    onNewValue = onCountNumberBankChange,
-                    maxLength = MAX_LENGTH_COUNT_NUMBER_BANK,
-                    icon = R.drawable.bank,
-                    title = R.string.settings_count_number_bank_provider,
-                    modifier = Modifier.fieldModifier()
-                )
                 MenuDropdownBox(
                     options = industryOptions,
                     selectedOption = userData.industry.label(),
