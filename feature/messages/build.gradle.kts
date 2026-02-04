@@ -5,14 +5,16 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hiltAndroid)
 }
 
 configure<LibraryExtension> {
-    namespace = "com.avilesrodriguez.presentation"
+    namespace = "com.avilesrodriguez.feature.messages"
     compileSdk = 36
 
     defaultConfig {
-        minSdk = 29
+        minSdk = 28
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -38,6 +40,7 @@ configure<LibraryExtension> {
 
 dependencies {
     implementation(project(":core:domain"))
+    implementation(project(":core:presentation"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -58,15 +61,15 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.coil)
-    implementation(libs.ucrop)
+
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.accompanist.permissions)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material.icons.core)
 
-    implementation(libs.vico.compose)
-    implementation(libs.vico.compose.m3)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.navigation.compose)
 }
 
 tasks.withType<KotlinJvmCompile>().configureEach {
