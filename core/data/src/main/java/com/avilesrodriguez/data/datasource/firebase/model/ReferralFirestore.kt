@@ -20,7 +20,7 @@ data class ReferralFirestore(
     val voucherUrl: String? = null
 )
 
-fun Referral.toFirestore(): ReferralFirestore {
+fun Referral.toReferralFirestore(): ReferralFirestore {
     return ReferralFirestore(
         id = id,
         clientId = clientId,
@@ -35,7 +35,7 @@ fun Referral.toFirestore(): ReferralFirestore {
     )
 }
 
-fun ReferralFirestore.toDomain(): Referral{
+fun ReferralFirestore.toReferralDomain(): Referral{
     val referralStatusType = try {
         ReferralStatus.valueOf(status?.uppercase() ?: "PENDING")
     } catch (e: Exception){

@@ -1,8 +1,8 @@
 package com.avilesrodriguez.data.datasource.firebase
 
 import com.avilesrodriguez.data.datasource.firebase.model.MessageFirestore
-import com.avilesrodriguez.data.datasource.firebase.model.toDomain
-import com.avilesrodriguez.data.datasource.firebase.model.toFirestore
+import com.avilesrodriguez.data.datasource.firebase.model.toMessageDomain
+import com.avilesrodriguez.data.datasource.firebase.model.toMessageFirestore
 import com.avilesrodriguez.domain.model.message.Message
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -14,11 +14,11 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class MessagesDataSource @Inject constructor(
+class MessageDataSource @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
     suspend fun saveMessage(message: Message) {
-        val messageFirestore = message.toFirestore()
+        val messageFirestore = message.toMessageFirestore()
         val docRef = if (message.id.isEmpty()) {
             firestore.collection(MESSAGES_COLLECTION).document()
         } else {
@@ -31,7 +31,7 @@ class MessagesDataSource @Inject constructor(
     fun getMessagesByReferral(referralId: String): Flow<List<Message>> = callbackFlow {
         val query = firestore.collection(MESSAGES_COLLECTION)
             .whereEqualTo(REFERRAL_ID_FIELD, referralId)
-            .orderBy(CREATED_AT_FIELD, Query.Direction.ASCENDING)
+            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING) //mas nuevos al inicio
 
         val listener: ListenerRegistration = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
@@ -40,7 +40,7 @@ class MessagesDataSource @Inject constructor(
             }
 
             val messages = snapshot?.documents?.mapNotNull { document ->
-                document.toObject(MessageFirestore::class.java)?.toDomain()
+                document.toObject(MessageFirestore::class.java)?.toMessageDomain()
             } ?: emptyList()
 
             trySend(messages).isSuccess
@@ -48,7 +48,25 @@ class MessagesDataSource @Inject constructor(
         awaitClose { listener.remove() }
     }
 
-    suspend fun deleteMessage(messageId: String) {
+    suspend fun markAsRead(messageId: String) {
+        firestore.collection(MESSAGES_COLLECTION).document(messageId)
+            .update(IS_READ_FIELD, true)
+            .await()
+    }
+
+    suspend fun markAsDeletedBySender(messageId: String) {
+        firestore.collection(MESSAGES_COLLECTION).document(messageId)
+            .update(IS_DELETED_BY_SENDER_FIELD, true)
+            .await()
+    }
+
+    suspend fun markAsDeletedByReceiver(messageId: String){
+        firestore.collection(MESSAGES_COLLECTION).document(messageId)
+            .update(IS_DELETED_BY_RECEIVER_FIELD, true)
+            .await()
+    }
+
+    suspend fun deleteMessagePermanently(messageId: String) {
         firestore.collection(MESSAGES_COLLECTION).document(messageId).delete().await()
     }
 
@@ -56,5 +74,8 @@ class MessagesDataSource @Inject constructor(
         private const val MESSAGES_COLLECTION = "messages"
         private const val REFERRAL_ID_FIELD = "referralId"
         private const val CREATED_AT_FIELD = "createdAt"
+        private const val IS_READ_FIELD = "isRead"
+        private const val IS_DELETED_BY_SENDER_FIELD = "isDeletedBySender"
+        private const val IS_DELETED_BY_RECEIVER_FIELD = "isDeletedByReceiver"
     }
 }

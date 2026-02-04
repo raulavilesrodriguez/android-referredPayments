@@ -1,8 +1,8 @@
 package com.avilesrodriguez.data.datasource.firebase
 
 import com.avilesrodriguez.data.datasource.firebase.model.ReferralFirestore
-import com.avilesrodriguez.data.datasource.firebase.model.toDomain
-import com.avilesrodriguez.data.datasource.firebase.model.toFirestore
+import com.avilesrodriguez.data.datasource.firebase.model.toReferralDomain
+import com.avilesrodriguez.data.datasource.firebase.model.toReferralFirestore
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -18,7 +18,7 @@ class ReferralDataSource @Inject constructor(
     private val firestore: FirebaseFirestore,
 ) {
     suspend fun saveReferral(referral: Referral) {
-        val referralFirestore = referral.toFirestore()
+        val referralFirestore = referral.toReferralFirestore()
         val docRef = if (referral.id.isEmpty()) {
             firestore.collection(REFERRALS_COLLECTION).document()
         } else {
@@ -67,7 +67,7 @@ class ReferralDataSource @Inject constructor(
             .get()
             .await()
 
-        return documentSnapshot.toObject(ReferralFirestore::class.java)?.toDomain()
+        return documentSnapshot.toObject(ReferralFirestore::class.java)?.toReferralDomain()
     }
 
     suspend fun updateReferralStatus(referralId: String, status: String, voucherUrl: String?) {
@@ -122,7 +122,7 @@ class ReferralDataSource @Inject constructor(
             }
 
             val referrals = snapshot?.documents?.mapNotNull { document ->
-                document.toObject(ReferralFirestore::class.java)?.toDomain()
+                document.toObject(ReferralFirestore::class.java)?.toReferralDomain()
             } ?: emptyList()
 
             trySend(referrals).isSuccess

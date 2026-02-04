@@ -98,7 +98,7 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
     }
 }
 
-fun UserDataFirestore.toDomain(): UserData? {
+fun UserDataFirestore.toUserDataDomain(): UserData? {
     return when (this) {
         is UserDataFirestore.Client -> UserData.Client(
             uid = uid ?: "",

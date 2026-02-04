@@ -3,7 +3,8 @@ package com.avilesrodriguez.data.datasource.firebase
 import android.util.Log
 import com.avilesrodriguez.data.datasource.firebase.model.ReferralFirestore
 import com.avilesrodriguez.data.datasource.firebase.model.UserDataFirestore
-import com.avilesrodriguez.data.datasource.firebase.model.toDomain
+import com.avilesrodriguez.data.datasource.firebase.model.toReferralDomain
+import com.avilesrodriguez.data.datasource.firebase.model.toUserDataDomain
 import com.avilesrodriguez.data.datasource.firebase.model.toUserDataFirestore
 import com.avilesrodriguez.domain.model.user.UserData
 import com.google.firebase.auth.FirebaseAuth
@@ -49,7 +50,7 @@ class StoreDataSource @Inject constructor(
             else -> null
         }
 
-        return firestoreUser?.toDomain()
+        return firestoreUser?.toUserDataDomain()
     }
 
     suspend fun deactivateUser(uid: String) {
@@ -150,7 +151,7 @@ class StoreDataSource @Inject constructor(
             }
 
             val referrals = snapshot?.documents?.mapNotNull { document ->
-                document.toObject(ReferralFirestore::class.java)?.toDomain()
+                document.toObject(ReferralFirestore::class.java)?.toReferralDomain()
             } ?: emptyList()
 
             if(referrals.isEmpty()){
@@ -178,7 +179,7 @@ class StoreDataSource @Inject constructor(
                                         "PROVIDER" -> userDoc.toObject(UserDataFirestore.Provider::class.java)
                                         else -> null
                                     }
-                                    firestoreUser?.toDomain()
+                                    firestoreUser?.toUserDataDomain()
                                 } else null
                             } catch (e: Exception) {
                                 Log.e("StoreDataSource", "Error al obtener cliente $clientId: ${e.message}")
@@ -218,7 +219,7 @@ class StoreDataSource @Inject constructor(
                     "PROVIDER" -> document.toObject(UserDataFirestore.Provider::class.java)
                     else -> null
                 }
-                firestoreUser?.toDomain()
+                firestoreUser?.toUserDataDomain()
             } ?: emptyList()
             trySend(users).isSuccess
         }

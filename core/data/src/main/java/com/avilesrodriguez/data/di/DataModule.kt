@@ -4,11 +4,13 @@ import android.content.Context
 import com.avilesrodriguez.data.datasource.dataStore.AuthPreferencesDataSource
 import com.avilesrodriguez.data.repository.AccountRepository
 import com.avilesrodriguez.data.repository.AuthPreferencesRepository
+import com.avilesrodriguez.data.repository.MessageRepository
 import com.avilesrodriguez.data.repository.ReferralRepository
 import com.avilesrodriguez.data.repository.StorageRepository
 import com.avilesrodriguez.data.repository.StoreRepository
 import com.avilesrodriguez.domain.interfaces.IAccountRepository
 import com.avilesrodriguez.domain.interfaces.IAuthPreferences
+import com.avilesrodriguez.domain.interfaces.IMessageRepository
 import com.avilesrodriguez.domain.interfaces.IReferralRepository
 import com.avilesrodriguez.domain.interfaces.IStorageRepository
 import com.avilesrodriguez.domain.interfaces.IStoreRepository
@@ -49,4 +51,6 @@ abstract class DataModule {
     @Binds
     abstract fun provideReferralRepository(impl: ReferralRepository): IReferralRepository
 
+    @Binds
+    abstract fun provideMessageRepository(impl: MessageRepository): IMessageRepository
 }
