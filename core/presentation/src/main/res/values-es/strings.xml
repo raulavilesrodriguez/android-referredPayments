@@ -9,6 +9,7 @@
     <string name="save">Guardar</string>
     <string name="settings">Configuración</string>
     <string name="edit_profile">Editar perfil</string>
+    <string name="you">Tú</string>
     <string name="cancel_crooper">Cancelar</string>
     <string name="confirm_crooper">Recortar</string>
     <string name="error_cropping">Error al recortar la imagen</string>

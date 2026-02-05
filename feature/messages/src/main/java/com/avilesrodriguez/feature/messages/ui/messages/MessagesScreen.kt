@@ -32,6 +32,8 @@ fun MessagesScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val user by viewModel.userDataStore.collectAsState()
     val referralState by viewModel.referralState.collectAsState()
+    val clientWhoReferred = viewModel.clientWhoReferred
+    val providerThatReceived = viewModel.providerThatReceived
 
     MessagesScreenContent(
         onBackClick = onBackClick,
@@ -43,7 +45,9 @@ fun MessagesScreen(
         user = user,
         referral = referralState,
         isLoading = isLoading,
-        onDeletedMessage = { message -> viewModel.onDeleteMessage(message) }
+        onDeletedMessage = { message -> viewModel.onDeleteMessage(message) },
+        clientWhoReferred = clientWhoReferred,
+        providerThatReceived = providerThatReceived
     )
 }
 
@@ -57,7 +61,9 @@ fun MessagesScreenContent(
     user: UserData?,
     referral: Referral,
     isLoading: Boolean,
-    onDeletedMessage: (Message) -> Unit
+    onDeletedMessage: (Message) -> Unit,
+    clientWhoReferred: UserData?,
+    providerThatReceived: UserData?
 ){
 
 }

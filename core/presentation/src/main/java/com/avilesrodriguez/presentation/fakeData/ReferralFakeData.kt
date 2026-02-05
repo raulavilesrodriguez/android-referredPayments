@@ -71,7 +71,7 @@ val referral = Referral(
 )
 
 val userClient = UserData.Client(
-    uid = "1",
+    uid = "1u",
     isActive = true,
     name = "Brayan Muelas",
     email = "byron@gmail.com",
@@ -87,7 +87,7 @@ val userClient = UserData.Client(
 )
 
 val userProvider = UserData.Provider(
-    uid = "2",
+    uid = "2u",
     isActive = true,
     name = "Seguros Atlantida",
     email = "support@evicertia.com",
