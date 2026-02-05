@@ -90,8 +90,8 @@ class ReferralViewModel @Inject constructor(
         openScreen(NavRoutes.EDIT_PHONE_REFERRAL)
     }
 
-    fun onPayReferral(openScreen: (String) -> Unit){
-        openScreen(NavRoutes.PAY_REFERRAL)
+    fun onProcessReferral(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.MESSAGES_SCREEN.replace("{id}", _referralState.value.id))
     }
 
     fun updateName(newName: String){

@@ -71,7 +71,7 @@ fun ReferralScreen(
         onNameClick = { viewModel.onNameReferral(openScreen)},
         onEmailClick = { viewModel.onEmailReferral(openScreen)},
         onPhoneClick = { viewModel.onPhoneReferral(openScreen)},
-        onPayClick = { viewModel.onPayReferral(openScreen)}
+        onProcessClick = { viewModel.onProcessReferral(openScreen)}
     )
 }
 
@@ -85,7 +85,7 @@ fun ReferralScreenContent(
     onNameClick: () -> Unit,
     onEmailClick: () -> Unit,
     onPhoneClick: () -> Unit,
-    onPayClick: () -> Unit
+    onProcessClick: () -> Unit
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -105,7 +105,7 @@ fun ReferralScreenContent(
                 onNameClick = onNameClick,
                 onEmailClick = onEmailClick,
                 onPhoneClick = onPhoneClick,
-                onPayClick = onPayClick,
+                onProcessClick = onProcessClick,
                 modifier = Modifier.padding(paddingValues)
             )
         }
@@ -121,7 +121,7 @@ fun ProfileReferral(
     onNameClick: () -> Unit,
     onEmailClick: () -> Unit,
     onPhoneClick: () -> Unit,
-    onPayClick: () -> Unit,
+    onProcessClick: () -> Unit,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -147,6 +147,10 @@ fun ProfileReferral(
                 )
                 val nameProvider = providerThatReceived?.name?.truncate(30)?:""
                 ItemProfile(R.drawable.step, title = R.string.referring, data = nameProvider)
+                BasicButton(
+                    text = R.string.review_payment_process,
+                    modifier = Modifier.basicButton()
+                ) { onProcessClick() }
             }
             is UserData.Provider -> {
                 ItemProfile(icon = R.drawable.name, title = R.string.name_referred, data = referral.name)
@@ -160,10 +164,9 @@ fun ProfileReferral(
                 val nameClient = clientWhoReferred?.name?.truncate(30)?:""
                 ItemProfile(R.drawable.step, title = R.string.referral, data = nameClient)
                 BasicButton(
-                    R.string.paid_to,
-                    Modifier.basicButton(),
-                    referral.name.truncate(25)
-                ) { onPayClick() }
+                    text = R.string.process_referral,
+                    modifier = Modifier.basicButton(),
+                ) { onProcessClick() }
             }
             else -> {}
         }
@@ -216,7 +219,7 @@ fun ProfileReferralPreview(){
             onNameClick = {},
             onEmailClick = {},
             onPhoneClick = {},
-            onPayClick = {}
+            onProcessClick = {}
         )
     }
 }

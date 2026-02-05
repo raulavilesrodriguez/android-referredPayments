@@ -114,6 +114,8 @@
     <string name="comment_save_name_referred">Please check that this name is correct</string>
     <string name="comment_save_email_referred">Please check that this email is correct</string>
     <string name="comment_save_phone_number_referred">Please check that this mobile phone number is correct</string>
+    <string name="review_payment_process">Review Payment Process</string>
+    <string name="process_referral">Process Referral</string>
     <!-- Referral Metrics -->
     <string name="all_referrals">All Referrals</string>
     <string name="pending">Pending</string>

@@ -128,6 +128,8 @@
     <string name="total_referrals">Total Referidos</string>
     <string name="comment_save_name_referred">Por favor, revisa que este nombre sea el correcto</string>
     <string name="comment_save_phone_number_referred">Por favor verifica que este número de teléfono móvil sea correcto</string>
+    <string name="review_payment_process">Revisar Proceso de Pago</string>
+    <string name="process_referral">Procesar Referido</string>
     <string name="all_referrals">Todos los Referidos</string>
     <string name="pending">Pendiente</string>
     <string name="processing">Procesando</string>

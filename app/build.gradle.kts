@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":feature:referrals"))
     implementation(project(":feature:payments"))
     implementation(project(":feature:home"))
+    implementation(project(":feature:messages"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
