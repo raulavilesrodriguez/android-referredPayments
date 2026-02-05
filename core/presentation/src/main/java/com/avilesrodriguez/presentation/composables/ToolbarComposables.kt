@@ -46,7 +46,8 @@ fun ToolBarWithIcon(
     @DrawableRes iconBack: Int,
     @StringRes title: Int,
     backClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    argument: String? = null
 ){
     Row(
         modifier = modifier
@@ -65,7 +66,7 @@ fun ToolBarWithIcon(
         }
         Spacer(modifier = Modifier.width(16.dp))
         Text(
-            text = stringResource(id = title),
+            text = stringResource(id = title, argument?:""),
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .padding(start = 4.dp)

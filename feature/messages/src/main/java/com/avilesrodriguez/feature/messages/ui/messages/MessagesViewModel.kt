@@ -138,6 +138,10 @@ class MessagesViewModel @Inject constructor(
         }
     }
 
+    fun onNewMessageClick(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.NEW_MESSAGE.replace("{id}", referralState.value.id))
+    }
+
     fun onMessageClick(message: Message, openScreen: (String) -> Unit){
         launchCatching {
             markAsReadMessage(message.id)

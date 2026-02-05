@@ -117,6 +117,9 @@
     <string name="comment_save_phone_number_referred">Please check that this mobile phone number is correct</string>
     <string name="review_payment_process">Review Payment Process</string>
     <string name="process_referral">Process Referral</string>
+    <string name="search_in_mail">Search in mail</string>
+    <string name="emails_referral">Emails: %s</string>
+    <string name="no_have_emails">You don\'t have emails"</string>
     <!-- Referral Metrics -->
     <string name="all_referrals">All Referrals</string>
     <string name="pending">Pending</string>

@@ -5,15 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,9 +20,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
-import com.avilesrodriguez.presentation.composables.SearchField
 import com.avilesrodriguez.presentation.composables.SearchFieldBasic
-import com.avilesrodriguez.presentation.composables.SearchToolBarNoBack
 import com.avilesrodriguez.presentation.fakeData.generateFakeReferrals
 import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.fakeData.userProvider

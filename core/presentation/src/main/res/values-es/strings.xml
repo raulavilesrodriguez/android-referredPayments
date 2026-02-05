@@ -131,6 +131,9 @@
     <string name="comment_save_phone_number_referred">Por favor verifica que este número de teléfono móvil sea correcto</string>
     <string name="review_payment_process">Revisar Proceso de Pago</string>
     <string name="process_referral">Procesar Referido</string>
+    <string name="search_in_mail">Buscar en mensajes</string>
+    <string name="emails_referral">Emails: %s</string>
+    <string name="no_have_emails">No tienes mensajes</string>
     <string name="all_referrals">Todos los Referidos</string>
     <string name="pending">Pendiente</string>
     <string name="processing">Procesando</string>

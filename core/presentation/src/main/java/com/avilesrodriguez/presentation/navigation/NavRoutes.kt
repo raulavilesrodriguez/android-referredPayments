@@ -13,15 +13,15 @@ object NavRoutes {
 
     const val Home = "home"
 
-    const val NEW_REFERRAL = "new_referral/{id}"
+    const val NEW_REFERRAL = "new_referral/{id}"  //id del provider
 
-    const val USER_DETAIL = "user_detail/{id}"
+    const val USER_DETAIL = "user_detail/{id}" //id del user client o provider
     object UserArgs {
         const val ID = "id"
     }
 
     const val REFERRAL_GRAPH = "referral_graph"
-    const val REFERRAL_DETAIL = "referral_detail/{id}"
+    const val REFERRAL_DETAIL = "referral_detail/{id}" //id del referral
     object ReferralArgs {
         const val ID = "id"
     }
@@ -30,8 +30,9 @@ object NavRoutes {
     const val EDIT_EMAIL_REFERRAL = "edit_email_referral"
     const val EDIT_PHONE_REFERRAL = "edit_phone_referral"
     const val MESSAGES_GRAPH = "messages_graph"
-    const val MESSAGES_SCREEN = "messages_screen/{id}"
-    const val MESSAGE_SCREEN = "message_screen/{id}"
+    const val MESSAGES_SCREEN = "messages_screen/{id}" //id del referral
+    const val NEW_MESSAGE = "new_message/{id}" //id del referral
+    const val MESSAGE_SCREEN = "message_screen/{id}" //id del message
     object MessageArgs {
         const val ID = "id"
     }
