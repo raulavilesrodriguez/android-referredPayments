@@ -108,13 +108,13 @@ class ReferralViewModel @Inject constructor(
                 referralId = _referralState.value.id,
                 senderId = currentUserId,
                 receiverId = _referralState.value.clientId,
-                subject = subject +_referralState.value.name,
+                subject = "$subject ${_referralState.value.name}",
                 content = content,
                 createdAt = System.currentTimeMillis()
             )
             saveMessage(systemMessage)
             loadReferralInformation(_referralState.value.id)
-            openScreen(NavRoutes.MESSAGES_SCREEN.replace("{id}", _referralState.value.id))
+            //openScreen(NavRoutes.MESSAGES_SCREEN.replace("{id}", _referralState.value.id))
             _isLoading.value = false
         }
     }

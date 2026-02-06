@@ -137,6 +137,10 @@
     <string name="accept_and_view_contact">Aceptar y Ver Contacto</string>
     <string name="content_referral_accepted">He aceptado tu referido. A partir de este momento iniciaré el proceso de contacto y venta. Te mantendré informado por este medio.</string>
     <string name="view_process_details">Ver Proceso de Seguimiento</string>
+    <string name="new_email">Nuevo Email</string>
+    <string name="status_update">Actualización del Estado</string>
+    <string name="message_body">Cuerpo del Mensaje</string>
+    <string name="send">Enviar</string>
     <string name="all_referrals">Todos los Referidos</string>
     <string name="pending">Pendiente</string>
     <string name="processing">Procesando</string>
@@ -149,4 +153,7 @@
     <string name="payment_rating">Rating de Pagos</string>
     <string name="comment_save_email_referred">Por favor, comprueba que este correo electrónico sea correcto.</string>
     <string name="subject_referral_accepted">"Referido Aceptado: "</string>
+    <string name="subject">Asunto</string>
+    <string name="attachments">Archivos Adjuntos</string>
+    <string name="attach">Adjuntar</string>
 </resources>

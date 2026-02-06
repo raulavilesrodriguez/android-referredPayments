@@ -25,6 +25,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import androidx.core.net.toUri
+import com.avilesrodriguez.domain.model.referral.ReferralStatus
+import com.avilesrodriguez.domain.usecases.UpdateReferralFields
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_SUBJECT
 
@@ -36,7 +38,8 @@ class NewMessageViewModel @Inject constructor(
     private val getUser: GetUser,
     private val getReferralById: GetReferralById,
     private val uploadFile: UploadFile,
-    @param:ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context,
+    private val updateReferralFields: UpdateReferralFields
 ) : BaseViewModel() {
     private val _newMessageState = MutableStateFlow(Message())
     val newMessageState: StateFlow<Message> = _newMessageState.asStateFlow()
@@ -44,6 +47,7 @@ class NewMessageViewModel @Inject constructor(
     val userDataStore: StateFlow<UserData?> = _userDataStore
     private val _referralState = MutableStateFlow(Referral())
     val referralState: StateFlow<Referral> = _referralState.asStateFlow()
+    private val _initialStatus = MutableStateFlow(ReferralStatus.PROCESSING)
     var clientWhoReferred by mutableStateOf<UserData?>(null)
     var providerThatReceived by mutableStateOf<UserData?>(null)
     private val _localFiles = MutableStateFlow<List<String>>(emptyList())
@@ -68,6 +72,7 @@ class NewMessageViewModel @Inject constructor(
             val referral = getReferralById(referralId)
             if(referral != null){
                 _referralState.value = referral
+                _initialStatus.value = referral.status
                 val clientDeferred = async { getUser(referral.clientId) }
                 val providerDeferred = async { getUser(referral.providerId) }
                 clientWhoReferred = clientDeferred.await()
@@ -89,7 +94,15 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun onAttachFiles(uris: List<String>){
-        _localFiles.value += uris
+        _localFiles.value = (_localFiles.value + uris).distinct()
+    }
+
+    fun onRemoveFile(uri: String){
+        _localFiles.value -= uri
+    }
+
+    fun onStatusChange(newStatus: ReferralStatus){
+        _referralState.value = _referralState.value.copy(status = newStatus)
     }
 
     fun onSaveMessage(popUp: () -> Unit){
@@ -98,6 +111,14 @@ class NewMessageViewModel @Inject constructor(
 
         launchCatching {
             _isLoading.value = true
+
+            val newStatus = _referralState.value.status
+            if(_initialStatus.value != newStatus){
+                val updates = mapOf(
+                    "status" to newStatus.name
+                )
+                updateReferralFields(_referralState.value.id, updates)
+            }
 
             val receiverId = if (currentUserId == referral.clientId) {
                 referral.providerId
@@ -127,7 +148,6 @@ class NewMessageViewModel @Inject constructor(
             saveMessage(message)
             _isLoading.value = false
             popUp()
-
         }
     }
 }

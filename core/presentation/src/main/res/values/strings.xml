@@ -124,8 +124,15 @@
     <string name="subject_referral_accepted">Referral Accepted: </string>
     <string name="content_referral_accepted">I have accepted your referral. From this moment on,
         I will begin the contact and sales process. I will keep you informed through this channel.</string>
-
     <string name="view_process_details">View Process Details</string>
+    <string name="new_email">New Email</string>
+    <string name="status_update">Status Update</string>
+    <string name="subject">Subject</string>
+    <string name="message_body">Message Body</string>
+    <string name="attachments">Attachments</string>
+    <string name="attach">Attach</string>
+    <string name="send">Send"</string>
+
     <!-- Referral Metrics -->
     <string name="all_referrals">All Referrals</string>
     <string name="pending">Pending</string>
