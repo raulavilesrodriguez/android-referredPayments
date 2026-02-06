@@ -4,7 +4,8 @@ import android.util.Patterns
 import java.util.regex.Pattern
 
 const val MAX_LENGTH_NAME = 30
-const val MAX_LENGTH_INDUSTRY = 20
+const val MAX_LENGTH_SUBJECT = 100
+const val MAX_LENGTH_CONTENT = 500
 const val MAX_LENGTH_IDENTITY_CARD = 10
 const val MAX_LENGTH_RUC = 13
 const val MAX_LENGTH_COUNT_NUMBER_BANK = 20

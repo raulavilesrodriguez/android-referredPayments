@@ -4,12 +4,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.avilesrodriguez.domain.ext.normalizeName
+import com.avilesrodriguez.domain.model.message.Message
 import com.avilesrodriguez.domain.model.referral.Referral
+import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetReferralById
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
+import com.avilesrodriguez.domain.usecases.SaveMessage
 import com.avilesrodriguez.domain.usecases.UpdateReferralFields
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
@@ -33,7 +36,8 @@ class ReferralViewModel @Inject constructor(
     private val hasUser: HasUser,
     private val getUser: GetUser,
     private val getReferralById: GetReferralById,
-    private val updateReferralFields: UpdateReferralFields
+    private val updateReferralFields: UpdateReferralFields,
+    private val saveMessage: SaveMessage
 ) : BaseViewModel() {
     private val _referralState = MutableStateFlow(Referral())
     val referralState: StateFlow<Referral> = _referralState.asStateFlow()
@@ -42,6 +46,8 @@ class ReferralViewModel @Inject constructor(
 
     var clientWhoReferred by mutableStateOf<UserData?>(null)
     var providerThatReceived by mutableStateOf<UserData?>(null)
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     private var loadJob: Job? = null
 
     val currentUserId
@@ -88,6 +94,29 @@ class ReferralViewModel @Inject constructor(
 
     fun onPhoneReferral(openScreen: (String) -> Unit){
         openScreen(NavRoutes.EDIT_PHONE_REFERRAL)
+    }
+
+    fun onAcceptReferral(subject:String, content:String, openScreen: (String) -> Unit){
+        launchCatching {
+            _isLoading.value = true
+            val updates = mapOf(
+                "status" to ReferralStatus.PROCESSING.name
+            )
+            updateReferralFields(_referralState.value.id, updates)
+
+            val systemMessage = Message(
+                referralId = _referralState.value.id,
+                senderId = currentUserId,
+                receiverId = _referralState.value.clientId,
+                subject = subject +_referralState.value.name,
+                content = content,
+                createdAt = System.currentTimeMillis()
+            )
+            saveMessage(systemMessage)
+            loadReferralInformation(_referralState.value.id)
+            openScreen(NavRoutes.MESSAGES_SCREEN.replace("{id}", _referralState.value.id))
+            _isLoading.value = false
+        }
     }
 
     fun onProcessReferral(openScreen: (String) -> Unit){

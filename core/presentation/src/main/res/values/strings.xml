@@ -120,6 +120,12 @@
     <string name="search_in_mail">Search in mail</string>
     <string name="emails_referral">Emails: %s</string>
     <string name="no_have_emails">You don\'t have emails"</string>
+    <string name="accept_and_view_contact">Accept and View Contact</string>
+    <string name="subject_referral_accepted">Referral Accepted: </string>
+    <string name="content_referral_accepted">I have accepted your referral. From this moment on,
+        I will begin the contact and sales process. I will keep you informed through this channel.</string>
+
+    <string name="view_process_details">View Process Details</string>
     <!-- Referral Metrics -->
     <string name="all_referrals">All Referrals</string>
     <string name="pending">Pending</string>

@@ -52,7 +52,7 @@ sealed class UserDataFirestore {
         val industry: String? = null,
         val companyDescription: String? = null,
         val paymentRating: Double = 0.0,
-        val totalPayouts: Int = 0,
+        val totalPayouts: Int = 0, //pagos
         val website: String? = null
     ) : UserDataFirestore()
 }

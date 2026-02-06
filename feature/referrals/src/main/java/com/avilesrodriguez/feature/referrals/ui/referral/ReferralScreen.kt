@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -59,18 +61,25 @@ fun ReferralScreen(
     }
     val referral by viewModel.referralState.collectAsState()
     val user by viewModel.userDataStore.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     val clientWhoReferred = viewModel.clientWhoReferred
     val providerThatReceived = viewModel.providerThatReceived
+
+    val subjectAccept = stringResource(R.string.subject_referral_accepted)
+    val contentAccept = stringResource(R.string.content_referral_accepted)
+
 
     ReferralScreenContent(
         onBackClick = onBackClick,
         referral = referral,
         user = user,
+        isLoading = isLoading,
         clientWhoReferred = clientWhoReferred,
         providerThatReceived = providerThatReceived,
         onNameClick = { viewModel.onNameReferral(openScreen)},
         onEmailClick = { viewModel.onEmailReferral(openScreen)},
         onPhoneClick = { viewModel.onPhoneReferral(openScreen)},
+        onAcceptReferral = { viewModel.onAcceptReferral(subjectAccept, contentAccept, openScreen)},
         onProcessClick = { viewModel.onProcessReferral(openScreen)}
     )
 }
@@ -80,11 +89,13 @@ fun ReferralScreenContent(
     onBackClick: () -> Unit,
     referral: Referral,
     user: UserData?,
+    isLoading: Boolean,
     clientWhoReferred: UserData?,
     providerThatReceived: UserData?,
     onNameClick: () -> Unit,
     onEmailClick: () -> Unit,
     onPhoneClick: () -> Unit,
+    onAcceptReferral: () -> Unit,
     onProcessClick: () -> Unit
 ){
     Scaffold(
@@ -97,17 +108,24 @@ fun ReferralScreenContent(
             )
         },
         content = { paddingValues ->
-            ProfileReferral(
-                referral = referral,
-                user = user,
-                clientWhoReferred = clientWhoReferred,
-                providerThatReceived = providerThatReceived,
-                onNameClick = onNameClick,
-                onEmailClick = onEmailClick,
-                onPhoneClick = onPhoneClick,
-                onProcessClick = onProcessClick,
-                modifier = Modifier.padding(paddingValues)
-            )
+            if(!isLoading){
+                ProfileReferral(
+                    referral = referral,
+                    user = user,
+                    clientWhoReferred = clientWhoReferred,
+                    providerThatReceived = providerThatReceived,
+                    onNameClick = onNameClick,
+                    onEmailClick = onEmailClick,
+                    onPhoneClick = onPhoneClick,
+                    onAcceptReferral = onAcceptReferral,
+                    onProcessClick = onProcessClick,
+                    modifier = Modifier.padding(paddingValues)
+                )
+            } else{
+                Box(Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
+            }
         }
     )
 }
@@ -121,6 +139,7 @@ fun ProfileReferral(
     onNameClick: () -> Unit,
     onEmailClick: () -> Unit,
     onPhoneClick: () -> Unit,
+    onAcceptReferral: () -> Unit,
     onProcessClick: () -> Unit,
     modifier: Modifier = Modifier
 ){
@@ -153,9 +172,18 @@ fun ProfileReferral(
                 ) { onProcessClick() }
             }
             is UserData.Provider -> {
+                val isPending = referral.status == ReferralStatus.PENDING
                 ItemProfile(icon = R.drawable.name, title = R.string.name_referred, data = referral.name)
-                ItemProfile(icon = R.drawable.mail, title = R.string.email_referred, data = referral.email)
-                ItemProfile(icon = R.drawable.phone, title = R.string.phone_number_referred, data = referral.numberPhone)
+                ItemProfile(
+                    icon = R.drawable.mail,
+                    title = R.string.email_referred,
+                    data = if(isPending) "••••@••••.com" else referral.email
+                )
+                ItemProfile(
+                    icon = R.drawable.phone,
+                    title = R.string.phone_number_referred,
+                    data = if(isPending) "09••••••••" else referral.numberPhone
+                )
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 8.dp),
                     thickness = 1.dp,
@@ -163,10 +191,17 @@ fun ProfileReferral(
                 )
                 val nameClient = clientWhoReferred?.name?.truncate(30)?:""
                 ItemProfile(R.drawable.step, title = R.string.referral, data = nameClient)
-                BasicButton(
-                    text = R.string.process_referral,
-                    modifier = Modifier.basicButton(),
-                ) { onProcessClick() }
+                if(isPending){
+                    BasicButton(
+                        text = R.string.accept_and_view_contact,
+                        modifier = Modifier.basicButton()
+                    ) { onAcceptReferral() }
+                } else {
+                    BasicButton(
+                        text = R.string.process_referral,
+                        modifier = Modifier.basicButton(),
+                    ) { onProcessClick() }
+                }
             }
             else -> {}
         }
@@ -214,11 +249,13 @@ fun ProfileReferralPreview(){
             onBackClick = {},
             referral = referral,
             user = userProvider,
+            isLoading = false,
             clientWhoReferred = userClient,
             providerThatReceived = userProvider,
             onNameClick = {},
             onEmailClick = {},
             onPhoneClick = {},
+            onAcceptReferral = {},
             onProcessClick = {}
         )
     }
