@@ -25,4 +25,12 @@ class StorageDataSource @Inject constructor(
         return downloadUrl
 
     }
+
+    suspend fun uploadFile(localUri: String, remotePath: String): String {
+        val storageRef = firebaseStorage.reference.child(remotePath)
+
+        storageRef.putFile(localUri.toUri()).await()
+
+        return storageRef.downloadUrl.await().toString()
+    }
 }

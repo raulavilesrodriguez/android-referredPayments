@@ -7,7 +7,7 @@ data class Message(
     val receiverId: String = "",
     val subject: String = "",
     val content: String = "",
-    val imagesUrl: List<String> = emptyList(),
+    val attachmentsUrl: List<String> = emptyList(),
     val createdAt: Long = System.currentTimeMillis(),
     val isRead: Boolean = false,
     val isDeletedBySender: Boolean = false,

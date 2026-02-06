@@ -15,4 +15,8 @@ class StorageRepository @Inject constructor(
     override suspend fun downloadUrlPhoto(remotePath: String): String {
         return data.downloadUrlPhoto(remotePath)
     }
+
+    override suspend fun uploadFile(localUri: String, remotePath: String): String {
+        return data.uploadFile(localUri, remotePath)
+    }
 }
