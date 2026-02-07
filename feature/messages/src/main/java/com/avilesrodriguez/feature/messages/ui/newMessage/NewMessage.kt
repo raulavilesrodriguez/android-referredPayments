@@ -37,10 +37,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.message.Message
@@ -55,6 +57,10 @@ import com.avilesrodriguez.presentation.ext.MAX_LENGTH_SUBJECT
 import com.avilesrodriguez.presentation.ext.toDisplayName
 import com.avilesrodriguez.presentation.ext.toDisplayIcon
 import com.avilesrodriguez.presentation.ext.toColor
+import com.avilesrodriguez.presentation.fakeData.message1
+import com.avilesrodriguez.presentation.fakeData.referral
+import com.avilesrodriguez.presentation.fakeData.userClient
+import com.avilesrodriguez.presentation.fakeData.userProvider
 
 @Composable
 fun NewMessage(
@@ -70,6 +76,9 @@ fun NewMessage(
     val referral by viewModel.referralState.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
     val localFiles by viewModel.localFiles.collectAsState()
+    val clientWhoReferred = viewModel.clientWhoReferred
+    val providerThatReceived = viewModel.providerThatReceived
+
 
     NewMessageContent(
         onBackClick = onBackClick,
@@ -83,7 +92,9 @@ fun NewMessage(
         onAttachFiles = viewModel::onAttachFiles,
         onRemoveFile = viewModel::onRemoveFile,
         onStatusChange = viewModel::onStatusChange,
-        onSaveMessage = { viewModel.onSaveMessage(onBackClick) }
+        onSaveMessage = { viewModel.onSaveMessage(onBackClick) },
+        clientWhoReferred = clientWhoReferred,
+        providerThatReceived = providerThatReceived
     )
 
 }
@@ -101,7 +112,9 @@ fun NewMessageContent(
     onAttachFiles: (List<String>) -> Unit,
     onRemoveFile: (String) -> Unit,
     onStatusChange: (ReferralStatus) -> Unit,
-    onSaveMessage: () -> Unit
+    onSaveMessage: () -> Unit,
+    clientWhoReferred: UserData?,
+    providerThatReceived: UserData?
 ){
     Scaffold(
         topBar = {
@@ -124,6 +137,8 @@ fun NewMessageContent(
                 onRemoveFile = onRemoveFile,
                 onStatusChange = onStatusChange,
                 onSaveMessage = onSaveMessage,
+                clientWhoReferred = clientWhoReferred,
+                providerThatReceived = providerThatReceived,
                 modifier = Modifier.padding(paddingValues),
             )
         }
@@ -144,6 +159,8 @@ private fun NewEmail(
     onRemoveFile: (String) -> Unit,
     onStatusChange: (ReferralStatus) -> Unit,
     onSaveMessage: () -> Unit,
+    clientWhoReferred: UserData?,
+    providerThatReceived: UserData?,
     modifier: Modifier = Modifier
 ){
     val launcher = rememberLauncherForActivityResult(
@@ -159,20 +176,98 @@ private fun NewEmail(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        val from = when(user){
+            is UserData.Provider -> {providerThatReceived?.name?:""}
+            is UserData.Client -> {clientWhoReferred?.name?:""}
+            else -> {""}
+        }
+
+        val to = when(user){
+            is UserData.Provider -> {clientWhoReferred?.name?:""}
+            is UserData.Client -> {providerThatReceived?.name?:""}
+            else -> {""}
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top=0.dp),
+            horizontalArrangement = Arrangement.Start
+        ){
+            Text(
+                text = stringResource(R.string.from),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = from,
+                style = MaterialTheme.typography.titleSmall
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start
+        ){
+            Text(
+                text = stringResource(R.string.to),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = to,
+                style = MaterialTheme.typography.titleSmall
+            )
+        }
+
+        Column {
+            OutlinedTextField(
+                value = newMessageState.subject,
+                onValueChange = onSubjectChange,
+                label = { Text(stringResource(R.string.subject)) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp)
+            )
+            Text(
+                text = "${newMessageState.subject.length}/$MAX_LENGTH_SUBJECT",
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.End,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
         // --- 1. SELECTOR DE ESTADO (Solo para Providers) ---
         if (user is UserData.Provider) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(
                     text = stringResource(R.string.status_update),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(R.string.referred, referral.name),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 val statusOptions = listOf(
                     ReferralStatus.PROCESSING,
                     ReferralStatus.REJECTED,
                     ReferralStatus.PAID
                 )
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     items(statusOptions) { status ->
                         val isSelected = referral.status == status
                         FilterChip(
@@ -195,25 +290,6 @@ private fun NewEmail(
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         }
 
-        // --- 2. ASUNTO ---
-        Column {
-            OutlinedTextField(
-                value = newMessageState.subject,
-                onValueChange = onSubjectChange,
-                label = { Text(stringResource(R.string.subject)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp)
-            )
-            Text(
-                text = "${newMessageState.subject.length}/$MAX_LENGTH_SUBJECT",
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.End,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
         // --- 3. CONTENIDO DEL MENSAJE ---
         Column {
             OutlinedTextField(
@@ -222,7 +298,7 @@ private fun NewEmail(
                 label = { Text(stringResource(R.string.message_body)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 150.dp),
+                    .heightIn(min = 160.dp),
                 shape = RoundedCornerShape(12.dp)
             )
             Text(
@@ -276,5 +352,36 @@ private fun NewEmail(
                 }
             }
         }
+        Text(
+            text = stringResource(R.string.warning_to_send_pay),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun NewMessagePreview(){
+    MaterialTheme {
+        NewMessageContent(
+            onBackClick = {},
+            newMessageState = message1,
+            user = userProvider,
+            referral = referral,
+            loading = false,
+            localFiles = emptyList(),
+            onSubjectChange = {},
+            onContentChange = {},
+            onAttachFiles = {},
+            onRemoveFile = {},
+            onStatusChange = {},
+            onSaveMessage = {},
+            clientWhoReferred = userClient,
+            providerThatReceived = userProvider
+        )
     }
 }

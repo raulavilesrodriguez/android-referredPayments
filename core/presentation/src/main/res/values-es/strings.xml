@@ -141,6 +141,8 @@
     <string name="status_update">Actualización del Estado</string>
     <string name="message_body">Cuerpo del Mensaje</string>
     <string name="send">Enviar</string>
+    <string name="to">A</string>
+    <string name="warning_to_send_pay">Advertencia: Para enviar el email con el Status de Pagado debes adjuntar el Vaucher de Pago</string>
     <string name="all_referrals">Todos los Referidos</string>
     <string name="pending">Pendiente</string>
     <string name="processing">Procesando</string>
@@ -156,4 +158,5 @@
     <string name="subject">Asunto</string>
     <string name="attachments">Archivos Adjuntos</string>
     <string name="attach">Adjuntar</string>
+    <string name="from">De</string>
 </resources>

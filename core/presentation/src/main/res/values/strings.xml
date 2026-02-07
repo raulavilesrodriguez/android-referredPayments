@@ -125,6 +125,7 @@
     <string name="content_referral_accepted">I have accepted your referral. From this moment on,
         I will begin the contact and sales process. I will keep you informed through this channel.</string>
     <string name="view_process_details">View Process Details</string>
+    <!-- Email -->
     <string name="new_email">New Email</string>
     <string name="status_update">Status Update</string>
     <string name="subject">Subject</string>
@@ -132,6 +133,9 @@
     <string name="attachments">Attachments</string>
     <string name="attach">Attach</string>
     <string name="send">Send"</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="warning_to_send_pay">Warning: To send the email with the Paid Status, you must attach the Payment Voucher</string>
 
     <!-- Referral Metrics -->
     <string name="all_referrals">All Referrals</string>

@@ -65,7 +65,7 @@ val referral = Referral(
     nameLowercase = "juana liceo",
     email = "juana.liceo@petstore.com",
     numberPhone = "0999654321",
-    status = ReferralStatus.PENDING,
+    status = ReferralStatus.PROCESSING,
     createdAt = System.currentTimeMillis(),
     voucherUrl = ""
 )

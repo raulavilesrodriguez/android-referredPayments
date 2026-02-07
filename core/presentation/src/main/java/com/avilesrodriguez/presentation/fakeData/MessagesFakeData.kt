@@ -10,7 +10,7 @@ val message1 = Message(
     subject = "In Process to contact Referred",
     content = "In Process to contact Referred Juana Liceo, with mobile number: 0999654321, email: uana.liceo@petstore.com" +
             "referred by: Brayan Muelas",
-    imagesUrl = emptyList(),
+    attachmentsUrl = emptyList(),
     createdAt = System.currentTimeMillis(),
     isRead = false,
     isDeletedBySender = false,
