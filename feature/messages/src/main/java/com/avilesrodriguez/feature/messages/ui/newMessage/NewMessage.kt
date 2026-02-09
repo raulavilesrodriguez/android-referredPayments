@@ -37,7 +37,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -120,7 +119,7 @@ fun NewMessageContent(
         topBar = {
             ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
-                title = R.string.new_email,
+                title = R.string.process_referral,
                 backClick = { onBackClick() }
             )
         },
@@ -191,7 +190,7 @@ private fun NewEmail(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top=0.dp),
+                .padding(top=8.dp),
             horizontalArrangement = Arrangement.Start
         ){
             Text(

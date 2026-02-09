@@ -94,6 +94,7 @@
     <string name="financial">Financiero</string>
     <string name="other">Otros</string>
     <string name="count_number_pay">Número de cuenta:</string>
+    <string name="pay_commission">Pagar Comisión</string>
     <string name="policies">Políticas</string>
     <string name="policies_title">Política de uso y programa de referidos</string>
     <string name="policies_intro">Esta aplicación ofrece un programa de referidos basado exclusivamente         en compras reales y verificables de productos o servicios proporcionados         por empresas registradas en la plataforma.</string>
@@ -143,6 +144,7 @@
     <string name="send">Enviar</string>
     <string name="to">A</string>
     <string name="warning_to_send_pay">Advertencia: Para enviar el email con el Status de Pagado debes adjuntar el Vaucher de Pago</string>
+    <string name="client_bank_details">Datos Bancarios del Cliente</string>
     <string name="all_referrals">Todos los Referidos</string>
     <string name="pending">Pendiente</string>
     <string name="processing">Procesando</string>

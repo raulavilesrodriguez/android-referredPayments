@@ -115,6 +115,7 @@
     <string name="comment_save_name_referred">Please check that this name is correct</string>
     <string name="comment_save_email_referred">Please check that this email is correct</string>
     <string name="comment_save_phone_number_referred">Please check that this mobile phone number is correct</string>
+    <!-- Process Referral -->
     <string name="review_payment_process">Review Payment Process</string>
     <string name="process_referral">Process Referral</string>
     <string name="search_in_mail">Search in mail</string>
@@ -125,7 +126,6 @@
     <string name="content_referral_accepted">I have accepted your referral. From this moment on,
         I will begin the contact and sales process. I will keep you informed through this channel.</string>
     <string name="view_process_details">View Process Details</string>
-    <!-- Email -->
     <string name="new_email">New Email</string>
     <string name="status_update">Status Update</string>
     <string name="subject">Subject</string>
@@ -136,6 +136,7 @@
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="warning_to_send_pay">Warning: To send the email with the Paid Status, you must attach the Payment Voucher</string>
+    <string name="client_bank_details">Client Bank Details</string>
 
     <!-- Referral Metrics -->
     <string name="all_referrals">All Referrals</string>
@@ -169,6 +170,7 @@
     <string name="bank_name">Bank name: </string>
     <string name="account_type">Account type: </string>
     <string name="count_number_pay">Count number: </string>
+    <string name="pay_commission">Pay Commission</string>
 
     <!-- Policies Screen -->
     <string name="policies">Policies</string>

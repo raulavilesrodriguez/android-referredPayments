@@ -51,6 +51,11 @@ fun FormButtons(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        OutlinedButton(
+            onClick = onCancel,
+        ) {
+            Text(text = stringResource(cancelText))
+        }
         Button(
             onClick = onConfirm,
             enabled = enabled
@@ -64,11 +69,6 @@ fun FormButtons(
             }else{
                 Text(text = stringResource(confirmText))
             }
-        }
-        OutlinedButton(
-            onClick = onCancel,
-        ) {
-            Text(text = stringResource(cancelText))
         }
     }
 }
