@@ -171,6 +171,17 @@
     <string name="account_type">Account type: </string>
     <string name="count_number_pay">Count number: </string>
     <string name="pay_commission">Pay Commission</string>
+    <string name="amount_usd">Amount USD</string>
+    <string name="proof_of_payment">Proof of Payment - %s</string>
+    <string name="choose_your_bank">Choose your bank</string>
+    <string name="bank_of_pichincha">Pichincha mobile banking</string>
+    <string name="bank_of_guayaquil">Bank Guayaquil</string>
+    <string name="bank_of_pacific">BdP Pacific</string>
+    <string name="produbanco">Produbanco</string>
+    <string name="bank_bolivariano">Bank Bolivariano</string>
+    <string name="bank_international">Bank International</string>
+    <string name="bank_austro">Bank of the Austro</string>
+
 
     <!-- Policies Screen -->
     <string name="policies">Policies</string>

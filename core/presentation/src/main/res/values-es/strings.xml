@@ -95,6 +95,9 @@
     <string name="other">Otros</string>
     <string name="count_number_pay">Número de cuenta:</string>
     <string name="pay_commission">Pagar Comisión</string>
+    <string name="amount_usd">Cantidad USD</string>
+    <string name="proof_of_payment">Comprobante de Pago - %s</string>
+    <string name="bank_austro">Banco del Austro</string>
     <string name="policies">Políticas</string>
     <string name="policies_title">Política de uso y programa de referidos</string>
     <string name="policies_intro">Esta aplicación ofrece un programa de referidos basado exclusivamente         en compras reales y verificables de productos o servicios proporcionados         por empresas registradas en la plataforma.</string>
@@ -161,4 +164,11 @@
     <string name="attachments">Archivos Adjuntos</string>
     <string name="attach">Adjuntar</string>
     <string name="from">De</string>
+    <string name="choose_your_bank">Escoge tu banco</string>
+    <string name="bank_of_pichincha">Pichincha banca móvil</string>
+    <string name="bank_of_guayaquil">Banco Guayaquil</string>
+    <string name="bank_of_pacific">BdP Pacifico</string>
+    <string name="produbanco">Produbanco</string>
+    <string name="bank_bolivariano">Banco Bolivariano</string>
+    <string name="bank_international">Banco Internacional</string>
 </resources>

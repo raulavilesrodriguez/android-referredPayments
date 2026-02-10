@@ -286,6 +286,25 @@ private fun NewEmail(
                     }
                 }
             }
+            if(referral.status == ReferralStatus.PAID){
+                (clientWhoReferred as? UserData.Client)?.let { client ->
+                    BankDetailsCard(
+                        client = client,
+                        amountUsd = "",
+                        onAmountChange = {},
+                        onPayClick = {},
+                        onCancelButton = {},
+                        onCopyClick = {}
+                    )
+                }
+                val subjectPaid = stringResource(R.string.proof_of_payment, referral.name)
+                onSubjectChange(subjectPaid)
+                LaunchedEffect(Unit) {
+                    if(newMessageState.subject.isBlank()){
+                        onSubjectChange(subjectPaid)
+                    }
+                }
+            }
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         }
 

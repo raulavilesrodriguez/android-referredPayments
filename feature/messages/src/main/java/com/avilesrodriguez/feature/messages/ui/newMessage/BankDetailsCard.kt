@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,12 +41,15 @@ import com.avilesrodriguez.presentation.R
 @Composable
 fun BankDetailsCard(
     client: UserData.Client,
+    amountUsd: String,
+    onAmountChange: (String) -> Unit,
     onPayClick: () -> Unit,
     onCancelButton: () -> Unit,
     onCopyClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),        colors = CardDefaults.cardColors(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
         ),
         shape = RoundedCornerShape(12.dp)
@@ -62,6 +66,16 @@ fun BankDetailsCard(
             DetailRow(label = R.string.account_type, value = client.accountType ?: "")
             DetailRowCopy(label = R.string.count_number_pay, value = client.countNumberPay ?: ""){onCopyClick()}
             DetailRowCopy(label = R.string.identity_card, value = client.identityCard ?: ""){onCopyClick()}
+            Spacer(Modifier.height(8.dp))
+            OutlinedTextField(
+                value = amountUsd,
+                onValueChange = onAmountChange,
+                label = { Text(stringResource(R.string.amount_usd)) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp)
+            )
+            Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
