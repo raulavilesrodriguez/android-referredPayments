@@ -9,6 +9,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,10 +51,17 @@ import kotlinx.coroutines.CoroutineScope
 
 
 @Composable
-fun MainNavigation(){
+fun MainNavigation(sharedFileUri: String? = null){
     WinAppTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             val appState = rememberAppState()
+
+            // React to share file
+            LaunchedEffect(sharedFileUri) {
+                sharedFileUri?.let { uri ->
+                    appState.navigate(NavRoutes.NEW_MESSAGE)
+                }
+            }
 
             Scaffold(
                 snackbarHost = {
@@ -276,7 +284,8 @@ private fun NavGraphBuilder.addNewMessage(appState: AppState){
         val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
         NewMessage(
             referralId = referralId,
-            onBackClick = { appState.popUp() }
+            onBackClick = { appState.popUp() },
+            openScreen = { route -> appState.navigate(route) }
         )
     }
 }

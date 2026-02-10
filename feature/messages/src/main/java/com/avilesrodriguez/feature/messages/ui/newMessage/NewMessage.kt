@@ -65,6 +65,7 @@ import com.avilesrodriguez.presentation.fakeData.userProvider
 fun NewMessage(
     referralId: String?,
     onBackClick: () -> Unit,
+    openScreen: (String) -> Unit,
     viewModel: NewMessageViewModel = hiltViewModel()
 ){
     LaunchedEffect(Unit) {
@@ -93,9 +94,9 @@ fun NewMessage(
         onStatusChange = viewModel::onStatusChange,
         onSaveMessage = { viewModel.onSaveMessage(onBackClick) },
         clientWhoReferred = clientWhoReferred,
-        providerThatReceived = providerThatReceived
+        providerThatReceived = providerThatReceived,
+        onStatusPay = {viewModel.onStatusPay(openScreen)}
     )
-
 }
 
 @Composable
@@ -113,7 +114,8 @@ fun NewMessageContent(
     onStatusChange: (ReferralStatus) -> Unit,
     onSaveMessage: () -> Unit,
     clientWhoReferred: UserData?,
-    providerThatReceived: UserData?
+    providerThatReceived: UserData?,
+    onStatusPay: () -> Unit,
 ){
     Scaffold(
         topBar = {
@@ -138,6 +140,7 @@ fun NewMessageContent(
                 onSaveMessage = onSaveMessage,
                 clientWhoReferred = clientWhoReferred,
                 providerThatReceived = providerThatReceived,
+                onStatusPay = onStatusPay,
                 modifier = Modifier.padding(paddingValues),
             )
         }
@@ -160,6 +163,7 @@ private fun NewEmail(
     onSaveMessage: () -> Unit,
     clientWhoReferred: UserData?,
     providerThatReceived: UserData?,
+    onStatusPay: () -> Unit,
     modifier: Modifier = Modifier
 ){
     val launcher = rememberLauncherForActivityResult(
@@ -287,23 +291,7 @@ private fun NewEmail(
                 }
             }
             if(referral.status == ReferralStatus.PAID){
-                (clientWhoReferred as? UserData.Client)?.let { client ->
-                    BankDetailsCard(
-                        client = client,
-                        amountUsd = "",
-                        onAmountChange = {},
-                        onPayClick = {},
-                        onCancelButton = {},
-                        onCopyClick = {}
-                    )
-                }
-                val subjectPaid = stringResource(R.string.proof_of_payment, referral.name)
-                onSubjectChange(subjectPaid)
-                LaunchedEffect(Unit) {
-                    if(newMessageState.subject.isBlank()){
-                        onSubjectChange(subjectPaid)
-                    }
-                }
+                onStatusPay()
             }
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         }
@@ -355,11 +343,18 @@ private fun NewEmail(
                 Text(stringResource(R.string.attach))
             }
 
+            val isVoucherRequired = referral.status == ReferralStatus.PAID
+            val hasAttachment = localFiles.isNotEmpty()
+            val canSend = !loading &&
+                    newMessageState.subject.isNotBlank() &&
+                    newMessageState.content.isNotBlank() &&
+                    (!isVoucherRequired || hasAttachment)
+
             Button(
                 onClick = onSaveMessage,
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp),
-                enabled = !loading && newMessageState.subject.isNotBlank() && newMessageState.content.isNotBlank()
+                enabled = canSend
             ) {
                 if (loading) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
@@ -399,7 +394,8 @@ fun NewMessagePreview(){
             onStatusChange = {},
             onSaveMessage = {},
             clientWhoReferred = userClient,
-            providerThatReceived = userProvider
+            providerThatReceived = userProvider,
+            onStatusPay = {}
         )
     }
 }

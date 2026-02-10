@@ -23,6 +23,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Este intent-filter permite que la app aparezca cuando el usuario pulsa "Compartir"
+                 en otra aplicación (como la galería o el banco) para enviar imágenes o PDFs -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+
             <!-- this intent-filter to Deep Links -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

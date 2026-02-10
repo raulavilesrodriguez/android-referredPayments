@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
@@ -26,6 +27,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,9 +37,44 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
+import com.avilesrodriguez.presentation.banksPays.BanksEcuador
+import com.avilesrodriguez.presentation.banksPays.options
+import com.avilesrodriguez.presentation.composables.MenuDropdownBoxLeadIcon
 
+@Composable
+fun PayReferral(
+    onBackClick: () -> Unit,
+    openScreen: (String) -> Unit,
+    viewModel: NewMessageViewModel = hiltViewModel()
+){
+    val newMessageState by viewModel.newMessageState.collectAsState()
+    val user by viewModel.userDataStore.collectAsState()
+    val referral by viewModel.referralState.collectAsState()
+    val loading by viewModel.isLoading.collectAsState()
+    val localFiles by viewModel.localFiles.collectAsState()
+    val clientWhoReferred = viewModel.clientWhoReferred
+    val amountUsdState by viewModel.amountUsdState.collectAsState()
+    val selectedOption by viewModel.selectedOption.collectAsState()
+
+    val subjectPaid = stringResource(R.string.proof_of_payment, referral.name)
+    if(clientWhoReferred != null){
+        val client = clientWhoReferred as UserData.Client
+        BankDetailsCard(
+            client = client,
+            amountUsd = amountUsdState,
+            onAmountChange = viewModel::onAmountChange,
+            onPayClick = {  },
+            onCancelButton = onBackClick,
+            onCopyClick = {},
+            selectedOption = selectedOption?.label,
+            onBankChange = viewModel::onBankChange,
+            onSendPay = {}
+        )
+    }
+}
 @Composable
 fun BankDetailsCard(
     client: UserData.Client,
@@ -45,8 +82,12 @@ fun BankDetailsCard(
     onAmountChange: (String) -> Unit,
     onPayClick: () -> Unit,
     onCancelButton: () -> Unit,
-    onCopyClick: () -> Unit
+    onCopyClick: () -> Unit,
+    selectedOption: Int?,
+    onBankChange: (Int) -> Unit,
+    onSendPay: () -> Unit
 ) {
+    val banksOptions = BanksEcuador.options()
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -66,14 +107,22 @@ fun BankDetailsCard(
             DetailRow(label = R.string.account_type, value = client.accountType ?: "")
             DetailRowCopy(label = R.string.count_number_pay, value = client.countNumberPay ?: ""){onCopyClick()}
             DetailRowCopy(label = R.string.identity_card, value = client.identityCard ?: ""){onCopyClick()}
-            Spacer(Modifier.height(8.dp))
             OutlinedTextField(
                 value = amountUsd,
                 onValueChange = onAmountChange,
                 label = { Text(stringResource(R.string.amount_usd)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
                 singleLine = true,
+                maxLines = 1,
                 shape = RoundedCornerShape(12.dp)
+            )
+            MenuDropdownBoxLeadIcon(
+                options = banksOptions,
+                selectedOption = selectedOption?:R.string.choose_your_bank,
+                onClick = onBankChange,
+                modifier = Modifier.widthIn(max = 164.dp)
             )
             Spacer(Modifier.height(8.dp))
             Row(

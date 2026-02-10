@@ -27,8 +27,11 @@ import javax.inject.Inject
 import androidx.core.net.toUri
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.usecases.UpdateReferralFields
+import com.avilesrodriguez.presentation.banksPays.BanksEcuador
+import com.avilesrodriguez.presentation.banksPays.getById
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_SUBJECT
+import com.avilesrodriguez.presentation.navigation.NavRoutes
 
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
@@ -54,6 +57,11 @@ class NewMessageViewModel @Inject constructor(
     val localFiles = _localFiles.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    private val _amountUsdState = MutableStateFlow("")
+    val amountUsdState: StateFlow<String> = _amountUsdState.asStateFlow()
+    private val _selectedOption = MutableStateFlow<BanksEcuador?>(null)
+    val selectedOption: StateFlow<BanksEcuador?> = _selectedOption.asStateFlow()
+
     private var referralJob: Job? = null
     val currentUserId
         get() = currentUserIdUseCase()
@@ -150,4 +158,18 @@ class NewMessageViewModel @Inject constructor(
             popUp()
         }
     }
+
+    fun onAmountChange(amountUsd: String){
+        _amountUsdState.value = amountUsd
+    }
+
+    fun onBankChange(bank: Int){
+        val filteredBank = BanksEcuador.getById(bank)
+        _selectedOption.value = filteredBank
+    }
+
+    fun onStatusPay(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.PAY_REFERRAL)
+    }
+
 }
