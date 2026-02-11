@@ -1,10 +1,12 @@
 package com.avilesrodriguez.feature.messages.ui.newMessage
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,9 +21,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -53,6 +56,9 @@ import com.avilesrodriguez.presentation.banksPays.BanksEcuador
 import com.avilesrodriguez.presentation.banksPays.options
 import com.avilesrodriguez.presentation.composables.MenuDropdownBoxLeadIcon
 import com.avilesrodriguez.presentation.attachment.AttachmentPreviews
+import com.avilesrodriguez.presentation.banksPays.copyClientData
+import com.avilesrodriguez.presentation.banksPays.openBankApp
+import kotlinx.coroutines.delay
 
 @Composable
 fun PayReferral(
@@ -73,8 +79,14 @@ fun PayReferral(
     val amountUsdState by viewModel.amountUsdState.collectAsState()
     val selectedOption by viewModel.selectedOption.collectAsState()
 
+    val context = LocalContext.current
+
     val subjectPaid = stringResource(R.string.proof_of_payment, referral.name)
     val contentPaid = stringResource(R.string.content_payment, amountUsdState, referral.name)
+    val labelBank = selectedOption?.label?.let {
+        stringResource(it)
+    }?:""
+
 
     if(clientWhoReferred != null){
         val client = clientWhoReferred as UserData.Client
@@ -82,9 +94,9 @@ fun PayReferral(
             client = client,
             amountUsd = amountUsdState,
             onAmountChange = viewModel::onAmountChange,
-            onPayClick = {  },  //open apps of banks
+            onPayClick = { openBankApp(labelBank, context) },  //open apps of banks
             onCancelButton = onBackClick,
-            onCopyClick = {}, //copy data referral
+            onCopyClick = {infoUser -> copyClientData(context, infoUser)}, //copy data referral
             selectedOption = selectedOption?.label,
             onBankChange = viewModel::onBankChange,
             onSendPay = {viewModel.onSendPay(subjectPaid, contentPaid, openAndPopUp)},
@@ -108,7 +120,7 @@ fun BankDetailsCard(
     onAmountChange: (String) -> Unit,
     onPayClick: () -> Unit,
     onCancelButton: () -> Unit,
-    onCopyClick: () -> Unit,
+    onCopyClick: (String) -> Unit,
     selectedOption: Int?,
     onBankChange: (Int) -> Unit,
     onSendPay: () -> Unit,
@@ -135,8 +147,8 @@ fun BankDetailsCard(
             Spacer(Modifier.height(8.dp))
             DetailRow(label = R.string.bank_name, value = client.bankName ?: "")
             DetailRow(label = R.string.account_type, value = client.accountType ?: "")
-            DetailRowCopy(label = R.string.count_number_pay, value = client.countNumberPay ?: ""){onCopyClick()}
-            DetailRowCopy(label = R.string.identity_card, value = client.identityCard ?: ""){onCopyClick()}
+            DetailRowCopy(label = R.string.count_number_pay, value = client.countNumberPay ?: ""){onCopyClick(it)}
+            DetailRowCopy(label = R.string.identity_card, value = client.identityCard ?: ""){onCopyClick(it)}
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
                     text = stringResource(R.string.amount_usd),
@@ -179,11 +191,13 @@ fun BankDetailsCard(
                     Icon(Icons.Default.Cancel, null, modifier = Modifier.size(18.dp))
                     Text(stringResource(R.string.cancel))
                 }
+                val canPay = !loading && selectedOption !=null
                 Button(
                     onClick = { onPayClick() },
                     modifier = Modifier
                         .padding(top = 8.dp)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    enabled = canPay
                 ) {
                     Icon(Icons.Default.Apps, null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
@@ -199,15 +213,14 @@ fun BankDetailsCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .weight(1f)
                         .heightIn(min = 100.dp)
-                        .padding(vertical = 8.dp)
                         .background(
                             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                             RoundedCornerShape(8.dp)
@@ -224,19 +237,22 @@ fun BankDetailsCard(
                         AttachmentPreviews(uris = localFiles, onRemove = onRemoveFile)
                     }
                 }
-                val canSend = !loading && amountUsd.isNotBlank() && amountUsd.toDouble() > 0.0 && localFiles.isNotEmpty()
+                val amountValue = amountUsd.toDoubleOrNull() ?: 0.0
+                val canSend = !loading && amountUsd.isNotBlank() && amountValue > 0.0 && localFiles.isNotEmpty()
                 Button(
                     onClick = { onSendPay() },
-                    modifier = Modifier,
+                    modifier = Modifier.height(50.dp),
                     shape = RoundedCornerShape(12.dp),
-                    enabled = canSend
+                    enabled = canSend,
+                    contentPadding = PaddingValues(12.dp)
                 ) {
                     if (loading) {
                         CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
                     } else {
-                        Icon(Icons.AutoMirrored.Filled.Send, null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.send))
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.AutoMirrored.Filled.Send, null)
+                            Text(stringResource(R.string.send), style = MaterialTheme.typography.labelSmall)
+                        }
                     }
                 }
             }
@@ -261,25 +277,44 @@ private fun DetailRow(@StringRes label: Int, value: String) {
 }
 
 @Composable
-private fun DetailRowCopy(@StringRes label: Int, value: String, onCopyClick: () -> Unit){
+private fun DetailRowCopy(@StringRes label: Int, value: String, onCopyClick: (String) -> Unit){
     var isSelected by remember { mutableStateOf(false) }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+    LaunchedEffect(isSelected) {
+        if (isSelected) {
+            delay(2500L)
+            isSelected = false
+        }
+    }
+    Row(
+        Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(stringResource(label), style = MaterialTheme.typography.bodySmall)
         Text(value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
-        if(isSelected){
-            IconButton(
-                onClick = { isSelected = false },
-            ) {
-                Icon(Icons.Default.Bookmark, null, modifier = Modifier.size(18.dp))
-            }
-        }else{
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             IconButton(
                 onClick = {
-                    onCopyClick()
-                    isSelected = !isSelected
-                          },
+                    onCopyClick(value)
+                    isSelected = true
+                },
+                enabled = !isSelected
             ) {
-                Icon(Icons.Default.BookmarkBorder, null, modifier = Modifier.size(18.dp))
+                Icon(
+                    imageVector = if (isSelected) Icons.Default.CheckCircle else Icons.Default.ContentCopy,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = if (isSelected) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurface
+                )
+            }
+            if (isSelected) {
+                Text(
+                    text = stringResource(R.string.copied),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF4CAF50),
+                    modifier = Modifier.animateContentSize()
+                )
             }
         }
     }
