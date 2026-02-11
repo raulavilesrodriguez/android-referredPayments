@@ -135,7 +135,8 @@
     <string name="send">Send"</string>
     <string name="from">From</string>
     <string name="to">To</string>
-    <string name="warning_to_send_pay">Warning: To send the email with the Paid Status, you must attach the Payment Voucher</string>
+    <string name="warning_to_send_pay">Warning: To send the email with the Paid Status, you must attach the Payment Voucher.
+    Additionally, the amount paid must be greater than USD 0.0</string>
     <string name="client_bank_details">Client Bank Details</string>
 
     <!-- Referral Metrics -->
@@ -173,6 +174,9 @@
     <string name="pay_commission">Pay Commission</string>
     <string name="amount_usd">Amount USD</string>
     <string name="proof_of_payment">Proof of Payment - %s</string>
+    <string name="content_payment">The payment of USD %1$s has been made successfully by the referred user: %2$s </string>
+    <string name="proof_of_payment_attach">Proof of Payment Attach</string>
+    <string name="no_files_attached">No files attached</string>
     <string name="choose_your_bank">Choose your bank</string>
     <string name="bank_of_pichincha">Pichincha mobile banking</string>
     <string name="bank_of_guayaquil">Bank Guayaquil</string>

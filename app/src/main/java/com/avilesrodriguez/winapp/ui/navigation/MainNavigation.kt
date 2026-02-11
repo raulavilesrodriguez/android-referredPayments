@@ -32,6 +32,8 @@ import com.avilesrodriguez.feature.auth.ui.sign_up.SignUpScreen
 import com.avilesrodriguez.feature.auth.ui.splash.SplashScreen
 import com.avilesrodriguez.feature.messages.ui.messages.MessagesScreen
 import com.avilesrodriguez.feature.messages.ui.newMessage.NewMessage
+import com.avilesrodriguez.feature.messages.ui.newMessage.NewMessageViewModel
+import com.avilesrodriguez.feature.messages.ui.newMessage.PayReferral
 import com.avilesrodriguez.feature.referrals.ui.addReferral.AddReferralScreen
 import com.avilesrodriguez.feature.referrals.ui.referral.EditEmailReferral
 import com.avilesrodriguez.feature.referrals.ui.referral.EditNameReferral
@@ -59,7 +61,9 @@ fun MainNavigation(sharedFileUri: String? = null){
             // React to share file
             LaunchedEffect(sharedFileUri) {
                 sharedFileUri?.let { uri ->
-                    appState.navigate(NavRoutes.NEW_MESSAGE)
+                    // CODIFICAR la URI para que sea segura en la ruta
+                    val encodedUri = java.net.URLEncoder.encode(uri, "UTF-8")
+                    appState.navigate("${NavRoutes.PAY_REFERRAL}?sharedUri=$encodedUri")
                 }
             }
 
@@ -93,7 +97,7 @@ fun MainNavigation(sharedFileUri: String? = null){
                     addDetailUser(appState)
                     addNewReferral(appState)
                     addMessages(appState)
-                    addNewMessage(appState)
+                    newMessageGraph(appState)
                 }
             }
         }
@@ -276,16 +280,49 @@ private fun NavGraphBuilder.addMessages(appState: AppState){
     }
 }
 
-private fun NavGraphBuilder.addNewMessage(appState: AppState){
-    composable(
-        route = NavRoutes.NEW_MESSAGE,
-        arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID) { type = NavType.StringType }),
-    ){ backStackEntry ->
-        val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
-        NewMessage(
-            referralId = referralId,
-            onBackClick = { appState.popUp() },
-            openScreen = { route -> appState.navigate(route) }
-        )
+private fun NavGraphBuilder.newMessageGraph(appState: AppState){
+    navigation(
+        startDestination = NavRoutes.NEW_MESSAGE,
+        route = NavRoutes.NEW_MESSAGE_GRAPH
+    ){
+        composable(
+            route = NavRoutes.NEW_MESSAGE,
+            arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID) { type = NavType.StringType }),
+        ){ backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                appState.navController.getBackStackEntry(NavRoutes.NEW_MESSAGE_GRAPH)
+            }
+            val viewModel: NewMessageViewModel = hiltViewModel(parentEntry)
+            val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
+            NewMessage(
+                referralId = referralId,
+                onBackClick = { appState.popUp() },
+                openScreen = { route -> appState.navigate(route) },
+                viewModel = viewModel
+            )
+        }
+        composable(
+            route = NavRoutes.PAY_REFERRAL,
+            arguments = listOf(
+                navArgument("sharedUri") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ){ backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                appState.navController.getBackStackEntry(NavRoutes.NEW_MESSAGE_GRAPH)
+            }
+            val viewModel: NewMessageViewModel = hiltViewModel(parentEntry)
+            // Extraer la URI de los argumentos
+            val sharedUri = backStackEntry.arguments?.getString("sharedUri")
+            PayReferral(
+                sharedUri = sharedUri,
+                onBackClick = { appState.popUp() },
+                openAndPopUp = {route, popUp -> appState.navigateAndPopUp(route, popUp)},
+                viewModel = viewModel
+            )
+        }
     }
 }

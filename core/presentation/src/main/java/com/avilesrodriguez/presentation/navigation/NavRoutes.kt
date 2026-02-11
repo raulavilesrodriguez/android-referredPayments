@@ -29,7 +29,7 @@ object NavRoutes {
     const val EDIT_NAME_REFERRAL = "edit_name_referral"
     const val EDIT_EMAIL_REFERRAL = "edit_email_referral"
     const val EDIT_PHONE_REFERRAL = "edit_phone_referral"
-    const val MESSAGES_GRAPH = "messages_graph"
+    const val NEW_MESSAGE_GRAPH = "messages_graph"
     const val MESSAGES_SCREEN = "messages_screen/{id}" //id del referral
     const val NEW_MESSAGE = "new_message/{id}" //id del referral
     const val MESSAGE_SCREEN = "message_screen/{id}" //id del message
@@ -37,6 +37,6 @@ object NavRoutes {
         const val ID = "id"
     }
 
-    const val PAY_REFERRAL = "pay_referral"
+    const val PAY_REFERRAL = "pay_referral?sharedUri={sharedUri}"
 
 }

@@ -146,7 +146,7 @@
     <string name="message_body">Cuerpo del Mensaje</string>
     <string name="send">Enviar</string>
     <string name="to">A</string>
-    <string name="warning_to_send_pay">Advertencia: Para enviar el email con el Status de Pagado debes adjuntar el Vaucher de Pago</string>
+    <string name="warning_to_send_pay">Advertencia: Para enviar el email con el Status de Pagado debes adjuntar el Vaucher de Pago. Adicionalmente, la cantidad pagada debe ser mayo a USD 0.0</string>
     <string name="client_bank_details">Datos Bancarios del Cliente</string>
     <string name="all_referrals">Todos los Referidos</string>
     <string name="pending">Pendiente</string>
@@ -164,6 +164,9 @@
     <string name="attachments">Archivos Adjuntos</string>
     <string name="attach">Adjuntar</string>
     <string name="from">De</string>
+    <string name="content_payment">"El pago de USD %1$s se ha realizado con éxito por el referido: %2$s "</string>
+    <string name="proof_of_payment_attach">Comprobante de Pago Adjunto</string>
+    <string name="no_files_attached">No hay archivos adjuntos</string>
     <string name="choose_your_bank">Escoge tu banco</string>
     <string name="bank_of_pichincha">Pichincha banca móvil</string>
     <string name="bank_of_guayaquil">Banco Guayaquil</string>

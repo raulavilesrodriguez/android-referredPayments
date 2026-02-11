@@ -160,7 +160,19 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun onAmountChange(amountUsd: String){
-        _amountUsdState.value = amountUsd
+        val filtered = buildString {
+            var dotUsed = false
+            amountUsd.forEach { char ->
+                when {
+                    char.isDigit() -> append(char)
+                    char == '.' && !dotUsed -> {
+                        append(char)
+                        dotUsed = true
+                    }
+                }
+            }
+        }
+        _amountUsdState.value = filtered
     }
 
     fun onBankChange(bank: Int){
@@ -170,6 +182,43 @@ class NewMessageViewModel @Inject constructor(
 
     fun onStatusPay(openScreen: (String) -> Unit){
         openScreen(NavRoutes.PAY_REFERRAL)
+    }
+
+    fun onSendPay(subjectPaid:String, contentPaid: String, openAndPopUp: (String, String) -> Unit){
+        launchCatching {
+            _isLoading.value = true
+            val referral = _referralState.value
+
+            // 1. Subir el voucher (tomamos el primero de localFiles)
+            val localVoucherUri = _localFiles.value.firstOrNull() ?: return@launchCatching
+            val extension = getExtensionFromUri(context.contentResolver, localVoucherUri.toUri())
+            val remotePath = "vouchers/${referral.id}_${System.currentTimeMillis()}.$extension"
+            val voucherUrl = uploadFile(localVoucherUri, remotePath)
+
+            // 2. Actualizar Referido a PAID con la URL del voucher
+            val referralUpdates = mapOf(
+                "status" to ReferralStatus.PAID.name,
+                "voucherUrl" to voucherUrl,
+                "amountPaid" to amountUsdState.value.toDouble()
+            )
+            updateReferralFields(referral.id, referralUpdates)
+
+            // 3. Crear Mensaje de Confirmación
+            val confirmationMessage = Message(
+                referralId = referral.id,
+                senderId = currentUserId,
+                receiverId = referral.clientId,
+                subject = subjectPaid,
+                content = contentPaid,
+                attachmentsUrl = listOf(voucherUrl),
+                createdAt = System.currentTimeMillis()
+            )
+            saveMessage(confirmationMessage)
+
+            _isLoading.value = false
+            // Navegation
+            openAndPopUp(NavRoutes.MESSAGES_SCREEN, NavRoutes.PAY_REFERRAL)
+        }
     }
 
 }

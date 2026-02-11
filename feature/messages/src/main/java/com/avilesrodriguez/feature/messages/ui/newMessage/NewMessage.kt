@@ -365,14 +365,6 @@ private fun NewEmail(
                 }
             }
         }
-        Text(
-            text = stringResource(R.string.warning_to_send_pay),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        )
     }
 }
 
