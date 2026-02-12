@@ -83,9 +83,7 @@ fun PayReferral(
 
     val subjectPaid = stringResource(R.string.proof_of_payment, referral.name)
     val contentPaid = stringResource(R.string.content_payment, amountUsdState, referral.name)
-    val labelBank = selectedOption?.label?.let {
-        stringResource(it)
-    }?:""
+    val selectedBankPackage = selectedOption?.packageName ?:""
 
 
     if(clientWhoReferred != null){
@@ -94,12 +92,14 @@ fun PayReferral(
             client = client,
             amountUsd = amountUsdState,
             onAmountChange = viewModel::onAmountChange,
-            onPayClick = { openBankApp(labelBank, context) },  //open apps of banks
+            onPayClick = {
+                if(selectedBankPackage.isNotBlank()) openBankApp(selectedBankPackage, context)
+                },  //open apps of banks
             onCancelButton = onBackClick,
             onCopyClick = {infoUser -> copyClientData(context, infoUser)}, //copy data referral
             selectedOption = selectedOption?.label,
             onBankChange = viewModel::onBankChange,
-            onSendPay = {viewModel.onSendPay(subjectPaid, contentPaid, openAndPopUp)},
+            onSendPay = {viewModel.onSendPay(subjectPaid, contentPaid, openAndPopUp)}, //update info referral and user.Client
             loading = loading,
             localFiles = localFiles,
             onRemoveFile = viewModel::onRemoveFile

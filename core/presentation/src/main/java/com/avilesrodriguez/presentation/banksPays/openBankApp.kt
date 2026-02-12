@@ -9,7 +9,7 @@ fun openBankApp(packageName: String, context: Context){
     if (intent != null) {
         context.startActivity(intent)
     } else {
-        // Si no está instalada, abrir Play Store
+        // Si no está instalada, abrir Play Store Android
         val playStoreIntent =
             Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())
         context.startActivity(playStoreIntent)

@@ -87,7 +87,7 @@ class StoreDataSource @Inject constructor(
             .update(updateMap)
             .await()
 
-        // Delete of Firebase AUTH (para que l email quede libre)
+        // Delete of Firebase AUTH (para que el email quede libre)
         firebaseAuth.currentUser?.delete()?.await()
     }
 
