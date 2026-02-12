@@ -11,6 +11,22 @@ class StoreRepository @Inject constructor(
 ): IStoreRepository {
     override suspend fun saveUser(user: UserData) = data.saveUser(user)
 
+    override suspend fun updateUser(uid: String, updates: Map<String, Any>) {
+        data.updateUser(uid, updates)
+    }
+
+    override suspend fun updateUserClientMetrics(uid: String, amountPaid: Double) {
+        data.updateUserClientMetrics(uid, amountPaid)
+    }
+
+    override suspend fun updateUserProviderMetrics(
+        uid: String,
+        moneyPaid: Double,
+        referralsConversion: String
+    ) {
+        data.updateUserProviderMetrics(uid, moneyPaid, referralsConversion)
+    }
+
     override suspend fun getUser(uid: String): UserData? {
         return data.getUser(uid)
     }

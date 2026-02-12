@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,9 +24,12 @@ import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.BuildCircle
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DataExploration
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Crop169
 import androidx.compose.material.icons.outlined.DoneOutline
+import androidx.compose.material.icons.outlined.Payment
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
@@ -76,7 +81,7 @@ fun HomeScreenProvider(
         item {
             BalanceCardProvider(
                 totalReferrals = referralsMetrics.totalReferrals.toString(),
-                referralsConversion = provider.referralsConversion?:"0.00"
+                referralsConversion = provider.referralsConversion
             )
         }
         item {
@@ -86,28 +91,9 @@ fun HomeScreenProvider(
             ) {
                 StatItem(
                     modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.money_paid),
-                    value = "$${provider.moneyPaid ?: "0.00"}",
-                    icon = Icons.Default.AccountBalanceWallet,
-                    color = MaterialTheme.colorScheme.primaryContainer
-                )
-                StatItem(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.money_to_pay),
-                    value = "$${provider.moneyToPay ?: "0.00"}",
-                    icon = Icons.Default.AccountBalanceWallet,
-                    color = MaterialTheme.colorScheme.secondaryContainer
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                StatItem(
-                    modifier = Modifier.weight(1f),
                     title = stringResource(R.string.total_payout),
                     value = "${provider.totalPayouts}",
-                    icon = Icons.Outlined.DoneOutline,
+                    icon = Icons.Outlined.Payment,
                     color = MaterialTheme.colorScheme.primaryContainer
                 )
                 StatItem(
@@ -117,6 +103,21 @@ fun HomeScreenProvider(
                     icon = Icons.Default.Star,
                     color = MaterialTheme.colorScheme.secondaryContainer
                 )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(imageVector = Icons.Default.AccountBalanceWallet,contentDescription = null, modifier = Modifier.size(24.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Column {
+                    Text(text = "$${provider.moneyPaid}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text(text = stringResource(R.string.money_paid), fontSize = 12.sp, maxLines = 1)
+                }
             }
         }
         item{
@@ -153,7 +154,7 @@ fun HomeScreenProvider(
 }
 
 @Composable
-private fun BalanceCardProvider(totalReferrals: String, referralsConversion: String) {
+private fun BalanceCardProvider(totalReferrals: String, referralsConversion: String? = null) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -177,16 +178,20 @@ private fun BalanceCardProvider(totalReferrals: String, referralsConversion: Str
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text=stringResource(R.string.referrals_conversion),
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-            Text(
-                text = referralsConversion,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color= MaterialTheme.colorScheme.onPrimary
-            )
+
+            if(referralsConversion != null){
+                Text(
+                    text=stringResource(R.string.referrals_conversion),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+                Text(
+                    text = referralsConversion,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color= MaterialTheme.colorScheme.onPrimary
+                )
+            }
+
         }
     }
 }
@@ -389,8 +394,7 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             countNumberPay = "12223440455",
             bankName = "Produbanco",
             accountType = "Ahorros",
-            moneyEarned = "1000",
-            moneyReceived = "950"
+            moneyEarned = 1000.0
         ),
         referralMetrics = ReferralMetrics(
             totalReferrals = 5,
@@ -413,8 +417,7 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             countNumberPay = "12223440466",
             bankName = "Pichincha",
             accountType = "Ahorros",
-            moneyEarned = "1500",
-            moneyReceived = "1200"
+            moneyEarned = 1500.0
         ),
         referralMetrics = ReferralMetrics(
             totalReferrals = 5,
@@ -437,8 +440,7 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             countNumberPay = "12223440498",
             bankName = "Banco de Guayaquil",
             accountType = "Ahorros",
-            moneyEarned = "4000",
-            moneyReceived = "3500"
+            moneyEarned = 4000.0
         ),
         referralMetrics = ReferralMetrics(
             totalReferrals = 5,
@@ -461,8 +463,7 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             countNumberPay = "10273440456",
             bankName = "Austro",
             accountType = "Ahorros",
-            moneyEarned = "2000",
-            moneyReceived = "1700"
+            moneyEarned = 2000.0
         ),
         referralMetrics = ReferralMetrics(
             totalReferrals = 5,

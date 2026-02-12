@@ -30,8 +30,7 @@ sealed class UserDataFirestore {
         val countNumberPay: String? = null, // cuenta para recibir pagos
         val bankName: String? = null,
         val accountType: String? = null, // Ahorros y corriente
-        val moneyEarned: String? = null,
-        val moneyReceived: String? = null
+        val moneyEarned: Double? = null
     ) : UserDataFirestore()
 
     data class Provider(
@@ -46,8 +45,7 @@ sealed class UserDataFirestore {
         override val nameLowercase: String? = null,
         val ciOrRuc: String? = null, // Datos fiscales
         val countNumber: String? = null, // cuenta para pagar
-        val moneyPaid: String? = null,
-        val moneyToPay: String? = null,
+        val moneyPaid: Double? = null,
         val referralsConversion: String? = null,
         val industry: String? = null,
         val companyDescription: String? = null,
@@ -72,8 +70,7 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
             countNumberPay = countNumberPay,
             bankName = bankName,
             accountType = accountType,
-            moneyEarned = moneyEarned,
-            moneyReceived = moneyReceived
+            moneyEarned = moneyEarned
         )
         is UserData.Provider -> UserDataFirestore.Provider(
             uid = uid,
@@ -87,7 +84,6 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
             ciOrRuc = ciOrRuc,
             countNumber = countNumber,
             moneyPaid = moneyPaid,
-            moneyToPay = moneyToPay,
             referralsConversion = referralsConversion,
             industry = industry.name,
             companyDescription = companyDescription,
@@ -112,8 +108,7 @@ fun UserDataFirestore.toUserDataDomain(): UserData? {
             countNumberPay = countNumberPay,
             bankName = bankName,
             accountType = accountType,
-            moneyEarned = moneyEarned,
-            moneyReceived = moneyReceived
+            moneyEarned = moneyEarned?:0.0
         )
         is UserDataFirestore.Provider -> {
             val domainIndustriesType = try {
@@ -132,8 +127,7 @@ fun UserDataFirestore.toUserDataDomain(): UserData? {
                 nameLowercase = nameLowercase,
                 ciOrRuc = ciOrRuc,
                 countNumber = countNumber,
-                moneyPaid = moneyPaid,
-                moneyToPay = moneyToPay,
+                moneyPaid = moneyPaid?:0.0,
                 referralsConversion = referralsConversion,
                 industry = domainIndustriesType,
                 companyDescription = companyDescription,

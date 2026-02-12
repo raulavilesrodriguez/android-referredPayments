@@ -8,6 +8,7 @@ import com.avilesrodriguez.data.datasource.firebase.model.toUserDataDomain
 import com.avilesrodriguez.data.datasource.firebase.model.toUserDataFirestore
 import com.avilesrodriguez.domain.model.user.UserData
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -32,6 +33,38 @@ class StoreDataSource @Inject constructor(
         firestore.collection(USERS_COLLECTION)
             .document(user.uid)
             .set(firestoreUser, SetOptions.merge())
+            .await()
+    }
+
+    suspend fun updateUser(uid: String, updates: Map<String, Any>) {
+        if(uid.isEmpty()) return
+        firestore.collection(USERS_COLLECTION)
+            .document(uid)
+            .update(updates)
+            .await()
+    }
+
+    suspend fun updateUserClientMetrics(uid: String, amountPaid: Double){
+        if(uid.isEmpty()) return
+        val updates = mapOf(
+            "moneyEarned" to FieldValue.increment(amountPaid),
+        )
+        firestore.collection(USERS_COLLECTION)
+            .document(uid)
+            .update(updates)
+            .await()
+    }
+
+    suspend fun updateUserProviderMetrics(uid: String, moneyPaid: Double, referralsConversion: String){
+        if(uid.isEmpty()) return
+        val updates = mapOf(
+            "moneyPaid" to FieldValue.increment(moneyPaid),
+            "totalPayouts" to FieldValue.increment(1),
+            "referralsConversion" to referralsConversion
+        )
+        firestore.collection(USERS_COLLECTION)
+            .document(uid)
+            .update(updates)
             .await()
     }
 

@@ -74,8 +74,7 @@ fun HomeScreenClient(
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             BalanceCard(
-                balance = client?.moneyEarned ?: "0.00",
-                received = client?.moneyReceived ?: "0.00"
+                balance = client?.moneyEarned.toString()
             )
         }
         //Statics
@@ -147,7 +146,7 @@ fun HomeScreenClient(
 }
 
 @Composable
-fun BalanceCard(balance: String, received: String) {
+fun BalanceCard(balance: String, received: String? = null) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -171,7 +170,9 @@ fun BalanceCard(balance: String, received: String) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(text=stringResource(R.string.charged), color = MaterialTheme.colorScheme.onPrimary)
-            Text("$$received", fontWeight = FontWeight.Bold, color= MaterialTheme.colorScheme.onPrimary)
+            if(received != null){
+                Text("$$received", fontWeight = FontWeight.Bold, color= MaterialTheme.colorScheme.onPrimary)
+            }
         }
     }
 }

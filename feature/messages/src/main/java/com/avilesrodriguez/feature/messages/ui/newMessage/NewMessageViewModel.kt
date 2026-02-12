@@ -27,13 +27,16 @@ import javax.inject.Inject
 import androidx.core.net.toUri
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
-import com.avilesrodriguez.domain.usecases.SaveUser
 import com.avilesrodriguez.domain.usecases.UpdateReferralFields
+import com.avilesrodriguez.domain.usecases.UpdateUserClientMetrics
+import com.avilesrodriguez.domain.usecases.UpdateUserProviderMetrics
 import com.avilesrodriguez.presentation.banksPays.BanksEcuador
 import com.avilesrodriguez.presentation.banksPays.getById
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_SUBJECT
 import com.avilesrodriguez.presentation.navigation.NavRoutes
+import kotlinx.coroutines.flow.first
+import java.util.Locale
 
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
@@ -45,8 +48,9 @@ class NewMessageViewModel @Inject constructor(
     private val uploadFile: UploadFile,
     @param:ApplicationContext private val context: Context,
     private val updateReferralFields: UpdateReferralFields,
-    private val saveUser: SaveUser,
-    private val getReferralsByProvider: GetReferralsByProvider
+    private val getReferralsByProvider: GetReferralsByProvider,
+    private val updateUserClientMetrics: UpdateUserClientMetrics,
+    private val updateUserProviderMetrics: UpdateUserProviderMetrics
 ) : BaseViewModel() {
     private val _newMessageState = MutableStateFlow(Message())
     val newMessageState: StateFlow<Message> = _newMessageState.asStateFlow()
@@ -65,9 +69,7 @@ class NewMessageViewModel @Inject constructor(
     val amountUsdState: StateFlow<String> = _amountUsdState.asStateFlow()
     private val _selectedOption = MutableStateFlow<BanksEcuador?>(null)
     val selectedOption: StateFlow<BanksEcuador?> = _selectedOption.asStateFlow()
-    private val _allReferrals = MutableStateFlow<List<Referral>>(emptyList())
     private var referralJob: Job? = null
-    private var referralsJob: Job? = null
 
     val currentUserId
         get() = currentUserIdUseCase()
@@ -194,6 +196,7 @@ class NewMessageViewModel @Inject constructor(
         launchCatching {
             _isLoading.value = true
             val referral = _referralState.value
+            val amountPaid = _amountUsdState.value.toDoubleOrNull() ?: 0.0
 
             // 1. Subir el voucher (tomamos el primero de localFiles)
             val localVoucherUri = _localFiles.value.firstOrNull() ?: return@launchCatching
@@ -205,7 +208,7 @@ class NewMessageViewModel @Inject constructor(
             val referralUpdates = mapOf(
                 "status" to ReferralStatus.PAID.name,
                 "voucherUrl" to voucherUrl,
-                "amountPaid" to amountUsdState.value.toDouble(),
+                "amountPaid" to amountPaid,
                 "createdAt" to System.currentTimeMillis()
             )
             updateReferralFields(referral.id, referralUpdates)
@@ -222,35 +225,27 @@ class NewMessageViewModel @Inject constructor(
             )
             saveMessage(confirmationMessage)
 
-            val client = clientWhoReferred as UserData.Client
-            val moneyEarnedClient = client.moneyEarned?.toDoubleOrNull() ?: 0.0
-            client.moneyEarned = (moneyEarnedClient + amountUsdState.value.toDouble()).toString()
-            saveUser(client)
+            // metricas client
+            updateUserClientMetrics(referral.clientId, amountPaid)
 
-            val provider = providerThatReceived as UserData.Provider
-            val moneyPaidProvider = provider.moneyPaid?.toDoubleOrNull() ?: 0.0
-            provider.moneyPaid = (moneyPaidProvider + amountUsdState.value.toDouble()).toString()
-            val totalPayouts = provider.totalPayouts + 1
-            provider.totalPayouts = totalPayouts
-            allReferralsByProvider(provider.uid)
-            val referralsByProvider = _allReferrals.value
-            val referralsConversion = totalPayouts.toDouble() / referralsByProvider.size
-            provider.referralsConversion = referralsConversion.toString()
-            saveUser(provider)
+            // metricas provider
+            val provider = providerThatReceived as? UserData.Provider
+            val allReferralsList = getReferralsByProvider(referral.providerId).first()
+            val newTotalPayouts = (provider?.totalPayouts ?: 0) + 1
+            val conversion = if (allReferralsList.isNotEmpty()) {
+                newTotalPayouts.toDouble() / allReferralsList.size
+            } else 0.0
+
+            updateUserProviderMetrics(
+                uid = referral.providerId,
+                moneyPaid = amountPaid,
+                referralsConversion = String.format(Locale.US, "%.2f", conversion)
+            )
 
             _isLoading.value = false
             // Navegation
-            openAndPopUp(NavRoutes.MESSAGES_SCREEN, NavRoutes.PAY_REFERRAL)
-        }
-    }
-
-    private fun allReferralsByProvider(providerId: String){
-        referralsJob?.cancel()
-        referralsJob = launchCatching {
-            getReferralsByProvider(providerId)
-                .collect { referrals ->
-                    _allReferrals.value = referrals
-                }
+            val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
+            openAndPopUp(route, NavRoutes.PAY_REFERRAL)
         }
     }
 
