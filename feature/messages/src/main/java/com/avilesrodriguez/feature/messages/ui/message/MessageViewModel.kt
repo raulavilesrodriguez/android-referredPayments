@@ -69,8 +69,8 @@ class MessageViewModel @Inject constructor(
             if(message != null){
                 _messageState.value = message
                 fetchReferralData(message.referralId) //al ser suspend se obliga a loadJob a esperar que se ejecute esta func
-                _isLoading.value = false
             }
+            _isLoading.value = false
         }
     }
 
@@ -101,7 +101,8 @@ class MessageViewModel @Inject constructor(
 
     fun replyMessage(openScreen: (String) -> Unit){
         val referralId = _referralState.value.id
-        openScreen(NavRoutes.NEW_MESSAGE.replace("{${NavRoutes.ReferralArgs.ID}}", referralId))
+        val route = NavRoutes.NEW_MESSAGE.replace("{${NavRoutes.ReferralArgs.ID}}", referralId)
+        openScreen(route)
     }
 
 }

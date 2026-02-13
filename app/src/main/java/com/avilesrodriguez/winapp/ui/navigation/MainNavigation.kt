@@ -30,6 +30,7 @@ import androidx.navigation.navigation
 import com.avilesrodriguez.feature.auth.ui.login.LoginScreen
 import com.avilesrodriguez.feature.auth.ui.sign_up.SignUpScreen
 import com.avilesrodriguez.feature.auth.ui.splash.SplashScreen
+import com.avilesrodriguez.feature.messages.ui.message.MessageScreen
 import com.avilesrodriguez.feature.messages.ui.messages.MessagesScreen
 import com.avilesrodriguez.feature.messages.ui.newMessage.NewMessage
 import com.avilesrodriguez.feature.messages.ui.newMessage.NewMessageViewModel
@@ -96,6 +97,7 @@ fun MainNavigation(sharedFileUri: String? = null){
                     addNewReferral(appState)
                     addMessages(appState)
                     newMessageGraph(appState)
+                    viewMessage(appState)
                 }
             }
         }
@@ -322,5 +324,19 @@ private fun NavGraphBuilder.newMessageGraph(appState: AppState){
                 viewModel = viewModel
             )
         }
+    }
+}
+
+private fun NavGraphBuilder.viewMessage(appState: AppState){
+    composable(
+        route = NavRoutes.MESSAGE_SCREEN,
+        arguments = listOf(navArgument(NavRoutes.MessageArgs.ID) { type = NavType.StringType }),
+    ){ backStackEntry ->
+        val messageId = backStackEntry.arguments?.getString(NavRoutes.MessageArgs.ID)
+        MessageScreen(
+            messageId = messageId,
+            onBackClick = { appState.popUp() },
+            openScreen = { route -> appState.navigate(route) }
+        )
     }
 }
