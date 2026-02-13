@@ -1,19 +1,19 @@
 package com.avilesrodriguez.presentation.navigation
 
 object NavRoutes {
-    const val Splash = "splash"
+    const val SPLASH = "splash"
 
-    const val Login = "login"
+    const val LOGIN = "login"
 
-    const val SignUp = "sign_up"
+    const val SIGN_UP = "sign_up"
 
-    const val EditUser = "edit_user"
+    const val EDIT_USER = "edit_user"
 
-    const val Policies = "policies"
+    const val POLICIES = "policies"
 
-    const val Home = "home"
+    const val HOME = "home"
 
-    const val NEW_REFERRAL = "new_referral/{id}"  //id del provider
+    const val NEW_REFERRAL = "new_referral/{id}"  //id del user provider
 
     const val USER_DETAIL = "user_detail/{id}" //id del user client o provider
     object UserArgs {

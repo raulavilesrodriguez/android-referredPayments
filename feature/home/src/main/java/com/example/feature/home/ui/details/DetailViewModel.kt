@@ -53,11 +53,13 @@ class DetailViewModel @Inject constructor(
     }
 
     fun onAddReferClick(uid: String, openScreen: (String) -> Unit){
-        openScreen(NavRoutes.NEW_REFERRAL.replace("{id}", uid))
+        val route = NavRoutes.NEW_REFERRAL.replace("{${NavRoutes.UserArgs.ID}}", uid)
+        openScreen(route)
     }
 
     fun onReferClick(id: String, openScreen: (String) -> Unit){
-        openScreen(NavRoutes.REFERRAL_DETAIL.replace("{id}", id))
+        val route = NavRoutes.REFERRAL_DETAIL.replace("{${NavRoutes.ReferralArgs.ID}}", id)
+        openScreen(route)
     }
 
     private fun loadReferralsByClientByProvider(uidClient: String){

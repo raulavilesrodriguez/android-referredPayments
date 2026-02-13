@@ -133,7 +133,8 @@ class ReferralsViewModel @Inject constructor(
             clientWhoReferred = getUser(referral.clientId)
             providerThatReceived = getUser(referral.providerId)
         }
-        openScreen(NavRoutes.REFERRAL_DETAIL.replace("{id}", referral.id))
+        val route = NavRoutes.REFERRAL_DETAIL.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
+        openScreen(route)
     }
 
 }

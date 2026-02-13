@@ -120,7 +120,9 @@ class ReferralViewModel @Inject constructor(
     }
 
     fun onProcessReferral(openScreen: (String) -> Unit){
-        openScreen(NavRoutes.MESSAGES_SCREEN.replace("{id}", _referralState.value.id))
+        val referralId = _referralState.value.id
+        val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referralId)
+        openScreen(route)
     }
 
     fun updateName(newName: String){

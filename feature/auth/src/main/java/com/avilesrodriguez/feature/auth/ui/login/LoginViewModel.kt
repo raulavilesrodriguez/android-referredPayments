@@ -48,7 +48,7 @@ class LoginViewModel @Inject constructor(
         launchCatching {
             signIn(email, password)
             setNotFirstTime()
-            openAndPopUp(NavRoutes.Home, NavRoutes.Login)
+            openAndPopUp(NavRoutes.HOME, NavRoutes.LOGIN)
         }
     }
 
@@ -64,7 +64,7 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onNavigateToSignUp(openAndPopUp: (String, String) -> Unit){
-        openAndPopUp(NavRoutes.SignUp, NavRoutes.Login)
+        openAndPopUp(NavRoutes.SIGN_UP, NavRoutes.LOGIN)
     }
 
 }

@@ -64,8 +64,8 @@ class AddReferralViewModel @Inject constructor(
     fun onNumberPhoneChange(newNumberPhone: String){
         val filtered = newNumberPhone.filter { it.isDigit() }.take(MIN_PASS_LENGTH_PHONE_ECUADOR)
         _addReferralState.value = _addReferralState.value.copy(numberPhone = filtered)
-        val currentState = _addReferralState
-        _addReferralState.value = _addReferralState.value.copy(isEntryValid = validateInput(currentState.value))
+        val currentState = _addReferralState.value
+        _addReferralState.value = _addReferralState.value.copy(isEntryValid = validateInput(currentState))
     }
 
     fun onSaveClick(providerId: String?, openAndPopUp: (String, String) -> Unit){
@@ -93,7 +93,7 @@ class AddReferralViewModel @Inject constructor(
             saveReferral(referral)
 
             // navigate to home screen
-            openAndPopUp(NavRoutes.Home, NavRoutes.NEW_REFERRAL)
+            openAndPopUp(NavRoutes.HOME, NavRoutes.NEW_REFERRAL)
         }.invokeOnCompletion { _addReferralState.value = _addReferralState.value.copy(isSaving = false) }
     }
 }

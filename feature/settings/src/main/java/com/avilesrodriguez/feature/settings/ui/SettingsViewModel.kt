@@ -79,7 +79,7 @@ class SettingsViewModel @Inject constructor(
     fun secureDeleteAccount(restartApp: (String) -> Unit){
         launchCatching {
             secureDeleteAccount(currentUserId)
-            restartApp(NavRoutes.Splash)
+            restartApp(NavRoutes.SPLASH)
         }
     }
 

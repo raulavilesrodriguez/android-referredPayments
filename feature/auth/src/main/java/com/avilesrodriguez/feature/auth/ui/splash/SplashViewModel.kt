@@ -41,17 +41,17 @@ class SplashViewModel @Inject constructor(
                 waitDelay(startTime)
 
                 if (user?.name !=null){
-                    openAndPopUp(NavRoutes.Home, NavRoutes.Splash)
+                    openAndPopUp(NavRoutes.HOME, NavRoutes.SPLASH)
                 } else {
-                    openAndPopUp(NavRoutes.Login, NavRoutes.Splash)
+                    openAndPopUp(NavRoutes.LOGIN, NavRoutes.SPLASH)
                 }
             } else {
                 val firstTime = isFirstTime()
                 waitDelay(startTime)
                 if(firstTime){
-                    openAndPopUp(NavRoutes.SignUp, NavRoutes.Splash)
+                    openAndPopUp(NavRoutes.SIGN_UP, NavRoutes.SPLASH)
                 } else {
-                    openAndPopUp(NavRoutes.Login, NavRoutes.Splash)
+                    openAndPopUp(NavRoutes.LOGIN, NavRoutes.SPLASH)
                 }
             }
         }

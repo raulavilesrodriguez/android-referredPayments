@@ -98,11 +98,11 @@ class SignUpViewModel @Inject constructor(
             saveUser(newUser)
             setNotFirstTime()
             // navigation
-            openAndPopUp(NavRoutes.Home, NavRoutes.SignUp)
+            openAndPopUp(NavRoutes.HOME, NavRoutes.SIGN_UP)
         }
     }
 
     fun onNavigateToSignIn(openAndPopUp: (String, String) -> Unit){
-        openAndPopUp(NavRoutes.Login, NavRoutes.SignUp)
+        openAndPopUp(NavRoutes.LOGIN, NavRoutes.SIGN_UP)
     }
 }

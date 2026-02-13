@@ -83,7 +83,7 @@ fun MainNavigation(sharedFileUri: String? = null){
             ) { innerPadding ->
                 NavHost(
                     navController = appState.navController,
-                    startDestination = NavRoutes.Splash,
+                    startDestination = NavRoutes.SPLASH,
                     modifier = Modifier.padding(innerPadding)
                 ) {
                     addSplash(appState)
@@ -124,7 +124,7 @@ fun resources(): Resources {
 }
 
 private fun NavGraphBuilder.addSplash(appState: AppState) {
-    composable(NavRoutes.Splash) {
+    composable(NavRoutes.SPLASH) {
         SplashScreen(
             openAndPopUp = {route, popUp -> appState.navigateAndPopUp(route, popUp)}
         )
@@ -132,7 +132,7 @@ private fun NavGraphBuilder.addSplash(appState: AppState) {
 }
 
 private fun NavGraphBuilder.addSignUp(appState: AppState){
-    composable(NavRoutes.SignUp) {
+    composable(NavRoutes.SIGN_UP) {
         SignUpScreen(
             openAndPopUp = {route, popUp -> appState.navigateAndPopUp(route, popUp)}
         )
@@ -140,7 +140,7 @@ private fun NavGraphBuilder.addSignUp(appState: AppState){
 }
 
 private fun NavGraphBuilder.addLogin(appState: AppState){
-    composable(NavRoutes.Login) {
+    composable(NavRoutes.LOGIN) {
         LoginScreen(
             openAndPopUp = {route, popUp -> appState.navigateAndPopUp(route, popUp)}
         )
@@ -148,7 +148,7 @@ private fun NavGraphBuilder.addLogin(appState: AppState){
 }
 
 private fun NavGraphBuilder.addHome(appState: AppState){
-    composable(NavRoutes.Home) {
+    composable(NavRoutes.HOME) {
         HomeScreen(
             openScreen = {route -> appState.navigate(route)},
             restartApp = {route -> appState.clearAndNavigate(route)}
@@ -157,7 +157,7 @@ private fun NavGraphBuilder.addHome(appState: AppState){
 }
 
 private fun NavGraphBuilder.addPolicies(appState: AppState){
-    composable(NavRoutes.Policies) {
+    composable(NavRoutes.POLICIES) {
         PoliciesScreen(
             popUp = {appState.popUp()}
         )
@@ -165,7 +165,7 @@ private fun NavGraphBuilder.addPolicies(appState: AppState){
 }
 
 private fun NavGraphBuilder.addEditUser(appState: AppState) {
-    composable(NavRoutes.EditUser) {
+    composable(NavRoutes.EDIT_USER) {
         EditScreen(
             popUp = { appState.popUp() }
         )

@@ -136,20 +136,21 @@ class HomeViewModel @Inject constructor(
 
     fun onActionClick(openScreen: (String) -> Unit, restartApp: (String) -> Unit, action: Int){
         when(ActionOptionsHome.getById(action)){
-            ActionOptionsHome.POLICIES -> openScreen(NavRoutes.Policies)
+            ActionOptionsHome.POLICIES -> openScreen(NavRoutes.POLICIES)
             ActionOptionsHome.SIGN_OUT -> launchCatching {
                 signOut()
-                restartApp(NavRoutes.Splash)
+                restartApp(NavRoutes.SPLASH)
             }
         }
     }
 
     fun editUser(openScreen: (String) -> Unit){
-        openScreen(NavRoutes.EditUser)
+        openScreen(NavRoutes.EDIT_USER)
     }
 
     fun navigationUserDetails(uid:String, openScreen: (String) -> Unit){
-        openScreen(NavRoutes.USER_DETAIL.replace("{id}", uid))
+        val route = NavRoutes.USER_DETAIL.replace("{${NavRoutes.UserArgs.ID}}", uid)
+        openScreen(route)
     }
 
     private fun updateMetrics(referrals: List<Referral>) {
