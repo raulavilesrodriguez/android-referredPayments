@@ -1,29 +1,45 @@
 package com.avilesrodriguez.feature.messages.ui.message
 
+import android.content.Context
+import android.content.Intent
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.avilesrodriguez.domain.model.message.Message
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.user.UserData
+import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetMessageById
 import com.avilesrodriguez.domain.usecases.GetReferralById
 import com.avilesrodriguez.domain.usecases.GetUser
+import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
+import androidx.core.net.toUri
+import com.avilesrodriguez.presentation.R
+import com.avilesrodriguez.presentation.snackbar.SnackbarManager
+import kotlinx.coroutines.coroutineScope
 
 @HiltViewModel
-class MessageViewModel(
+class MessageViewModel @Inject constructor(
+    private val currentUserIdUseCase: CurrentUserId,
+    private val hasUser: HasUser,
     private val getMessageById: GetMessageById,
     private val getReferralById: GetReferralById,
     private val getUser: GetUser,
+    @param:ApplicationContext private val context: Context  //to view the field. Se necesita para el intent
 ): BaseViewModel() {
+    private val _userDataStore = MutableStateFlow<UserData?>(null)
+    val userDataStore: StateFlow<UserData?> = _userDataStore
     private val _messageState = MutableStateFlow(Message())
     val messageState: StateFlow<Message> = _messageState.asStateFlow()
     private val _referralState = MutableStateFlow(Referral())
@@ -33,7 +49,17 @@ class MessageViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     private var loadJob: Job? = null
-    private var referralJob: Job? = null
+
+    val currentUserId
+        get() = currentUserIdUseCase()
+
+    init {
+        launchCatching {
+            if(hasUser()){
+                _userDataStore.value = getUser(currentUserId)
+            }
+        }
+    }
 
     fun loadMessage(messageId: String){
         loadJob?.cancel()
@@ -42,29 +68,40 @@ class MessageViewModel(
             val message = getMessageById(messageId)
             if(message != null){
                 _messageState.value = message
-                loadReferral()
+                fetchReferralData(message.referralId) //al ser suspend se obliga a loadJob a esperar que se ejecute esta func
                 _isLoading.value = false
             }
         }
     }
 
-    fun loadReferral(){
-        referralJob?.cancel()
-        referralJob = launchCatching {
-            val referralId = _messageState.value.referralId
-            val referral = getReferralById(referralId)
-            if(referral != null){
+    private suspend fun fetchReferralData(referralId: String){
+        val referral = getReferralById(referralId)
+        if(referral != null){
+            _referralState.value = referral
+            // coroutineScope para poder usar async en la funcion suspend
+            coroutineScope {
                 val client = async { getUser(referral.clientId) }
                 val provider = async { getUser(referral.providerId) }
-                _referralState.value = referral
                 clientWhoReferred = client.await()
                 providerThatReceived = provider.await()
             }
         }
     }
 
+    fun downloadFile(uriString: String){
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, uriString.toUri())
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            Log.e("MessageViewModel", "Error al abrir el archivo", e)
+            SnackbarManager.showMessage(R.string.no_open_file_attachment)
+        }
+    }
+
     fun replyMessage(openScreen: (String) -> Unit){
-        openScreen(NavRoutes.NEW_MESSAGE.replace("{${NavRoutes.ReferralArgs.ID}}", referralState.value.id))
+        val referralId = _referralState.value.id
+        openScreen(NavRoutes.NEW_MESSAGE.replace("{${NavRoutes.ReferralArgs.ID}}", referralId))
     }
 
 }
