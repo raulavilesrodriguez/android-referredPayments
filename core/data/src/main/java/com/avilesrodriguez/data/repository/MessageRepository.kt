@@ -32,4 +32,8 @@ class MessageRepository @Inject constructor(
     override suspend fun deleteMessagePermanently(messageId: String) {
         data.deleteMessagePermanently(messageId)
     }
+
+    override suspend fun getMessageById(messageId: String): Message? {
+        return data.getMessageById(messageId)
+    }
 }

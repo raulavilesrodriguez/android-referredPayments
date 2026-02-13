@@ -10,4 +10,5 @@ interface IMessageRepository {
     suspend fun markAsDeletedBySender(messageId: String)
     suspend fun markAsDeletedByReceiver(messageId: String)
     suspend fun deleteMessagePermanently(messageId: String)
+    suspend fun getMessageById(messageId: String): Message?
 }

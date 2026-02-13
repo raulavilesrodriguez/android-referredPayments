@@ -70,6 +70,15 @@ class MessageDataSource @Inject constructor(
         firestore.collection(MESSAGES_COLLECTION).document(messageId).delete().await()
     }
 
+    suspend fun getMessageById(messageId: String): Message? {
+        val documentSnapshot = firestore.collection(MESSAGES_COLLECTION)
+            .document(messageId)
+            .get()
+            .await()
+
+        return documentSnapshot.toObject(MessageFirestore::class.java)?.toMessageDomain()
+    }
+
     companion object {
         private const val MESSAGES_COLLECTION = "messages"
         private const val REFERRAL_ID_FIELD = "referralId"

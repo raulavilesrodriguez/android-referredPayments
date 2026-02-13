@@ -61,9 +61,7 @@ fun MainNavigation(sharedFileUri: String? = null){
             // React to share file
             LaunchedEffect(sharedFileUri) {
                 sharedFileUri?.let { uri ->
-                    // CODIFICAR la URI para que sea segura en la ruta
-                    val encodedUri = java.net.URLEncoder.encode(uri, "UTF-8")
-                    appState.navigate("${NavRoutes.PAY_REFERRAL}?sharedUri=$encodedUri")
+                    appState.navigate(NavRoutes.buildPayReferralRoute(uri))
                 }
             }
 
@@ -302,7 +300,7 @@ private fun NavGraphBuilder.newMessageGraph(appState: AppState){
             )
         }
         composable(
-            route = NavRoutes.PAY_REFERRAL,
+            route = NavRoutes.PAY_REFERRAL_ROUTE,
             arguments = listOf(
                 navArgument("sharedUri") {
                     type = NavType.StringType

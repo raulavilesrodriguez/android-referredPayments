@@ -189,7 +189,15 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun onStatusPay(openScreen: (String) -> Unit){
+        resetValues()
         openScreen(NavRoutes.PAY_REFERRAL)
+    }
+
+    private fun resetValues(){
+        _localFiles.value = emptyList()
+        _newMessageState.value = Message()
+        _amountUsdState.value = ""
+        _selectedOption.value = null
     }
 
     fun onSendPay(subjectPaid:String, contentPaid: String, openAndPopUp: (String, String) -> Unit){
@@ -245,7 +253,7 @@ class NewMessageViewModel @Inject constructor(
             _isLoading.value = false
             // Navegation
             val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
-            openAndPopUp(route, NavRoutes.PAY_REFERRAL)
+            openAndPopUp(route, NavRoutes.PAY_REFERRAL_ROUTE)
         }
     }
 

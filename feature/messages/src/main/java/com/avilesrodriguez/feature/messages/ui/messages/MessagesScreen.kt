@@ -64,7 +64,7 @@ fun MessagesScreen(
 }
 
 @Composable
-fun MessagesScreenContent(
+private fun MessagesScreenContent(
     onBackClick: () -> Unit,
     searchText: String,
     onValueChange: (String) -> Unit,
