@@ -24,11 +24,8 @@ import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.BuildCircle
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.DataExploration
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Crop169
-import androidx.compose.material.icons.outlined.DoneOutline
 import androidx.compose.material.icons.outlined.Payment
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -179,18 +176,16 @@ private fun BalanceCardProvider(totalReferrals: String, referralsConversion: Str
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            if(referralsConversion != null){
-                Text(
-                    text=stringResource(R.string.referrals_conversion),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-                Text(
-                    text = referralsConversion,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color= MaterialTheme.colorScheme.onPrimary
-                )
-            }
+            Text(
+                text=stringResource(R.string.referrals_conversion),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Text(
+                text = referralsConversion?: "0.00",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color= MaterialTheme.colorScheme.onPrimary
+            )
 
         }
     }

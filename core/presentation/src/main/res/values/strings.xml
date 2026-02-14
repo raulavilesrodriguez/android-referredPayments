@@ -12,6 +12,8 @@
     <string name="you">You</string>
     <string name="copied">Copied</string>
     <string name="reply">Reply</string>
+    <string name="downloading">Downloading</string>
+    <string name="download_error">Download error</string>
     <!-- Photo -->
     <string name="cancel_crooper">Cancel</string>
     <string name="confirm_crooper">Crop</string>
@@ -137,6 +139,7 @@
     <string name="send">Send"</string>
     <string name="from">From</string>
     <string name="to">To</string>
+    <string name="date">Date</string>
     <string name="warning_to_send_pay">Warning: To send the email with the Paid Status, you must attach the Payment Voucher.
     Additionally, the amount paid must be greater than USD 0.0</string>
     <string name="client_bank_details">Client Bank Details</string>

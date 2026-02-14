@@ -107,8 +107,18 @@ fun HomeScreenClient(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
+                MenuDropdownBox(
+                    options = industryOptions,
+                    selectedOption = selectedIndustry?:R.string.all_industries,
+                    onClick = onIndustryChange,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .fillMaxWidth()
+                )
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -118,12 +128,6 @@ fun HomeScreenClient(
                         placeholder = R.string.search,
                         trailingIcon = R.drawable.search,
                         modifier = Modifier.weight(1f)
-                    )
-                    MenuDropdownBox(
-                        options = industryOptions,
-                        selectedOption = selectedIndustry?:R.string.all_industries,
-                        onClick = onIndustryChange,
-                        modifier = Modifier.widthIn(max = 164.dp)
                     )
                 }
             }
@@ -169,8 +173,9 @@ fun BalanceCard(balance: String, received: String? = null) {
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text=stringResource(R.string.charged), color = MaterialTheme.colorScheme.onPrimary)
+
             if(received != null){
+                Text(text=stringResource(R.string.charged), color = MaterialTheme.colorScheme.onPrimary)
                 Text("$$received", fontWeight = FontWeight.Bold, color= MaterialTheme.colorScheme.onPrimary)
             }
         }

@@ -1,6 +1,5 @@
 package com.avilesrodriguez.feature.messages.ui.message
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +39,7 @@ import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.attachment.AttachmentDownload
 import com.avilesrodriguez.presentation.composables.ButtonWithIcon
+import com.avilesrodriguez.presentation.time.formatTimeBasic
 
 @Composable
 fun MessageScreen(
@@ -147,6 +147,7 @@ private fun Email(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        val formattedDate = formatTimeBasic(messageState.createdAt)
         val from = when(user){
             is UserData.Provider -> {providerThatReceived?.name?:""}
             is UserData.Client -> {clientWhoReferred?.name?:""}
@@ -160,18 +161,19 @@ private fun Email(
         }
         InfoHeadEmail(title = stringResource(R.string.from), value = from, modifier = Modifier.padding(top=8.dp))
         InfoHeadEmail(title = stringResource(R.string.to), value = to)
+        InfoHeadEmail(title = stringResource(R.string.date), value = formattedDate)
         InfoHeadEmail(title = stringResource(R.string.subject), value = messageState.subject)
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         Text(
             text = messageState.content,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
         )
         if(messageState.attachmentsUrl.isNotEmpty()) {
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
             Text(
                 text = stringResource(R.string.attachments),
                 style = MaterialTheme.typography.titleSmall,

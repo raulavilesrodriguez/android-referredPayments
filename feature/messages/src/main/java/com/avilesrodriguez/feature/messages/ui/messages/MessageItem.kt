@@ -64,7 +64,7 @@ fun MessageItem(
             .clip(RoundedCornerShape(8.dp))
             .background(backgroundColor)
             .clickable { onClick() }
-            .padding(horizontal = 8.dp, vertical = 12.dp),
+            .padding(horizontal = 12.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {

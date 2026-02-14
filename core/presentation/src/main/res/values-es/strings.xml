@@ -12,6 +12,8 @@
     <string name="you">Tú</string>
     <string name="copied">Copiado</string>
     <string name="reply">Responder</string>
+    <string name="downloading">Descargando</string>
+    <string name="download_error">Error en la descarga</string>
     <string name="cancel_crooper">Cancelar</string>
     <string name="confirm_crooper">Recortar</string>
     <string name="error_cropping">Error al recortar la imagen</string>
@@ -148,6 +150,7 @@
     <string name="message_body">Cuerpo del Mensaje</string>
     <string name="send">Enviar</string>
     <string name="to">A</string>
+    <string name="date">Fecha</string>
     <string name="warning_to_send_pay">Advertencia: Para enviar el email con el Status de Pagado debes adjuntar el Vaucher de Pago. Adicionalmente, la cantidad pagada debe ser mayo a USD 0.0</string>
     <string name="client_bank_details">Datos Bancarios del Cliente</string>
     <string name="no_open_file_attachment">Instala una aplicación que permita abrir este archivo</string>

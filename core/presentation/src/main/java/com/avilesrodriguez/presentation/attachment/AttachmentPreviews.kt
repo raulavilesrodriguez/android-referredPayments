@@ -44,7 +44,7 @@ fun AttachmentPreviews(
                     onClick = { onRemove(uriString) },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .size(24.dp)
+                        .size(18.dp)
                         .background(
                             Color.Black.copy(alpha = 0.5f),
                             androidx.compose.foundation.shape.RoundedCornerShape(50)
