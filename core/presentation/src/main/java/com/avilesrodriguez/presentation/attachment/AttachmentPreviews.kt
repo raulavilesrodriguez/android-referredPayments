@@ -44,17 +44,17 @@ fun AttachmentPreviews(
                     onClick = { onRemove(uriString) },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .size(18.dp)
+                        .size(24.dp)
                         .background(
                             Color.Black.copy(alpha = 0.5f),
-                            androidx.compose.foundation.shape.RoundedCornerShape(50)
+                            RoundedCornerShape(50)
                         )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }

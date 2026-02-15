@@ -148,15 +148,24 @@ private fun Email(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         val formattedDate = formatTimeBasic(messageState.createdAt)
+
         val from = when(user){
-            is UserData.Provider -> {providerThatReceived?.name?:""}
-            is UserData.Client -> {clientWhoReferred?.name?:""}
+            is UserData.Provider -> {
+                if(user.uid == messageState.senderId) providerThatReceived?.name?:"" else clientWhoReferred?.name?:""
+            }
+            is UserData.Client -> {
+                if(user.uid == messageState.senderId) clientWhoReferred?.name?:"" else providerThatReceived?.name?:""
+            }
             else -> {""}
         }
 
         val to = when(user){
-            is UserData.Provider -> {clientWhoReferred?.name?:""}
-            is UserData.Client -> {providerThatReceived?.name?:""}
+            is UserData.Provider -> {
+                if(user.uid == messageState.receiverId) providerThatReceived?.name?:"" else clientWhoReferred?.name?:""
+            }
+            is UserData.Client -> {
+                if(user.uid == messageState.receiverId) clientWhoReferred?.name?:"" else providerThatReceived?.name?:""
+            }
             else -> {""}
         }
         InfoHeadEmail(title = stringResource(R.string.from), value = from, modifier = Modifier.padding(top=8.dp))
@@ -170,10 +179,9 @@ private fun Email(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
+                .padding(horizontal = 4.dp)
         )
         if(messageState.attachmentsUrl.isNotEmpty()) {
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
             Text(
                 text = stringResource(R.string.attachments),
                 style = MaterialTheme.typography.titleSmall,

@@ -5,10 +5,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -30,10 +31,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
-import androidx.core.net.toUri
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import kotlinx.coroutines.coroutineScope
+import androidx.core.net.toUri
 
 @HiltViewModel
 class MessageViewModel @Inject constructor(
@@ -94,12 +95,25 @@ class MessageViewModel @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun downloadFile(uriString: String) {
         try {
+            val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+
+            // 1. Verificamos si ya existe el ID de descarga para esta URL
+            val existingId = getExistingDownloadId(uriString)
+            if (existingId != -1L) {
+                val contentUri = downloadManager.getUriForDownloadedFile(existingId)
+                if (contentUri != null && isFileAccessible(contentUri)) {
+                    // Si el archivo es accesible, lo abrimos directamente
+                    openDownloadedFile(contentUri)
+                    return
+                }
+            }
             val cleanUrl = uriString.substringBefore("?")
             val decodedPath = Uri.decode(cleanUrl) // <--- DECODIFICA %2F a /
             val fileName = decodedPath.substringAfterLast("/")
-            val uri = Uri.parse(uriString)
+            val uri = uriString.toUri()
 
             // 1. Configuramos la descarga a través del sistema
             val request = DownloadManager.Request(uri)
@@ -109,30 +123,16 @@ class MessageViewModel @Inject constructor(
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
 
-            val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             val downloadId = downloadManager.enqueue(request)
-
             SnackbarManager.showMessage(R.string.downloading)
 
             // 2. Registramos un receptor para abrir el archivo cuando termine la descarga
             val onComplete = object : BroadcastReceiver() {
                 override fun onReceive(ctxt: Context?, intent: Intent?) {
-                    val query = DownloadManager.Query().setFilterById(downloadId)
-                    val cursor: Cursor = downloadManager.query(query)
-                    if (cursor.moveToFirst()) {
-                        // 1. Obtenemos los índices de las columnas de forma segura
-                        val statusIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
-                        val uriIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
-
-                        // 2. Verificamos que los índices sean válidos antes de usarlos
-                        if (statusIndex >= 0 && uriIndex >= 0) {
-                            if (cursor.getInt(statusIndex) == DownloadManager.STATUS_SUCCESSFUL) {
-                                val localUriString = cursor.getString(uriIndex)
-                                openDownloadedFile(localUriString)
-                            }
-                        }
+                    val contentUri = downloadManager.getUriForDownloadedFile(downloadId)
+                    if (contentUri != null) {
+                        openDownloadedFile(contentUri)
                     }
-                    cursor.close()
                     context.unregisterReceiver(this)
                 }
             }
@@ -146,17 +146,46 @@ class MessageViewModel @Inject constructor(
         }
     }
 
-    private fun openDownloadedFile(localUriString: String) {
+    private fun getExistingDownloadId(uriString: String): Long {
+        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val query = DownloadManager.Query().setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL)
+        val cursor = downloadManager.query(query) ?: return -1L
+
         try {
-            val localUri = Uri.parse(localUriString)
+            val uriCol = cursor.getColumnIndex(DownloadManager.COLUMN_URI)
+            val idCol = cursor.getColumnIndex(DownloadManager.COLUMN_ID)
+
+            if (uriCol >= 0 && idCol >= 0) {
+                while (cursor.moveToNext()) {
+                    if (cursor.getString(uriCol) == uriString) {
+                        return cursor.getLong(idCol)
+                    }
+                }
+            }
+        } finally {
+            cursor.close()
+        }
+        return -1L
+    }
+
+    private fun isFileAccessible(uri: Uri): Boolean {
+        return try {
+            context.contentResolver.openInputStream(uri)?.close()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun openDownloadedFile(localUri: Uri) {
+        try {
             val mimeType = context.contentResolver.getType(localUri)
                 ?: android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                    localUriString.substringAfterLast(".").lowercase()
+                    android.webkit.MimeTypeMap.getFileExtensionFromUrl(localUri.toString()).lowercase()
                 )
 
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(localUri, mimeType)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
@@ -164,7 +193,7 @@ class MessageViewModel @Inject constructor(
             chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(chooser)
         } catch (e: Exception) {
-            Log.e("MessageViewModel", "Error al abrir archivo descargado", e)
+            Log.e("MessageViewModel", "Error al abrir archivo", e)
         }
     }
 
