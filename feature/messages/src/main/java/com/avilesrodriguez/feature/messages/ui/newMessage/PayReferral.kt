@@ -31,6 +31,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -48,6 +49,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.user.UserData
@@ -58,6 +61,7 @@ import com.avilesrodriguez.presentation.composables.MenuDropdownBoxLeadIcon
 import com.avilesrodriguez.presentation.attachment.AttachmentPreviews
 import com.avilesrodriguez.presentation.banksPays.copyClientData
 import com.avilesrodriguez.presentation.banksPays.openBankApp
+import com.avilesrodriguez.presentation.fakeData.userClient
 import kotlinx.coroutines.delay
 
 @Composable
@@ -130,141 +134,144 @@ fun BankDetailsCard(
 ) {
     val banksOptions = BanksEcuador.options()
     //var isClickPay by remember { mutableStateOf(false) }
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
-        ),
-        shape = RoundedCornerShape(12.dp)
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = stringResource(R.string.client_bank_details),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
-            Spacer(Modifier.height(8.dp))
-            DetailRow(label = R.string.bank_name, value = client.bankName ?: "")
-            DetailRow(label = R.string.account_type, value = client.accountType ?: "")
-            DetailRowCopy(label = R.string.count_number_pay, value = client.countNumberPay ?: ""){onCopyClick(it)}
-            DetailRowCopy(label = R.string.identity_card, value = client.identityCard ?: ""){onCopyClick(it)}
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(
+            text = stringResource(R.string.client_bank_details),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSecondaryContainer
+        )
+        Spacer(Modifier.height(8.dp))
+        DetailRow(label = R.string.bank_name, value = client.bankName ?: "")
+        DetailRow(label = R.string.account_type, value = client.accountType ?: "")
+        DetailRowCopy(label = R.string.count_number_pay, value = client.countNumberPay ?: ""){onCopyClick(it)}
+        DetailRowCopy(label = R.string.identity_card, value = client.identityCard ?: ""){onCopyClick(it)}
+        Text(
+            text = stringResource(R.string.amount_to_pay),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        OutlinedTextField(
+            placeholder = {
                 Text(
-                    text = stringResource(R.string.amount_usd),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold
-                )
-                OutlinedTextField(
-                    value = amountUsd,
-                    onValueChange = onAmountChange,
-                    label = { Text(stringResource(R.string.zero)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    singleLine = true,
-                    maxLines = 1,
-                    shape = RoundedCornerShape(12.dp)
-                )
-            }
-
-            MenuDropdownBoxLeadIcon(
-                options = banksOptions,
-                selectedOption = selectedOption?:R.string.choose_your_bank,
-                onClick = onBankChange,
-                modifier = Modifier.widthIn(max = 164.dp)
+                    text=stringResource(R.string.usd_0_00),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) },
+            value = amountUsd,
+            onValueChange = onAmountChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            singleLine = true,
+            maxLines = 1,
+            shape = RoundedCornerShape(12.dp),
+            textStyle = LocalTextStyle.current.copy(
+                textAlign = TextAlign.Center
             )
-            Spacer(Modifier.height(8.dp))
-            Row(
+        )
+        Spacer(Modifier.height(2.dp))
+        MenuDropdownBoxLeadIcon(
+            options = banksOptions,
+            selectedOption = selectedOption?:R.string.choose_your_bank,
+            onClick = onBankChange,
+            modifier = Modifier.fillMaxWidth().padding(horizontal=16.dp)
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal=16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ){
+            OutlinedButton(
+                onClick = { onCancelButton() },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ){
-                OutlinedButton(
-                    onClick = { onCancelButton() },
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .fillMaxWidth(),
-                ) {
-                    Icon(Icons.Default.Cancel, null, modifier = Modifier.size(18.dp))
-                    Text(stringResource(R.string.cancel))
-                }
-                val canPay = !loading && selectedOption !=null
-                Button(
-                    onClick = { onPayClick() },
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .fillMaxWidth(),
-                    enabled = canPay
-                ) {
-                    Icon(Icons.Default.Apps, null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.pay_commission))
-                }
+                    .padding(vertical = 4.dp),
+            ) {
+                Icon(Icons.Default.Cancel, null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.cancel))
             }
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-            Text(
-                text = stringResource(R.string.proof_of_payment_attach),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Row(
+            Spacer(Modifier.width(12.dp))
+            val canPay = !loading && selectedOption !=null
+            Button(
+                onClick = { onPayClick() },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .heightIn(min = 100.dp)
-                        .background(
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                            RoundedCornerShape(8.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ){
-                    if (localFiles.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.no_files_attached),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    } else {
-                        AttachmentPreviews(uris = localFiles, onRemove = onRemoveFile)
-                    }
-                }
-                val amountValue = amountUsd.toDoubleOrNull() ?: 0.0
-                val canSend = !loading && amountUsd.isNotBlank() && amountValue > 0.0 && localFiles.isNotEmpty()
-                Button(
-                    onClick = { onSendPay() },
-                    modifier = Modifier.height(50.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    enabled = canSend,
-                    contentPadding = PaddingValues(12.dp)
-                ) {
-                    if (loading) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
-                    } else {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.AutoMirrored.Filled.Send, null)
-                            Text(stringResource(R.string.send), style = MaterialTheme.typography.labelSmall)
-                        }
-                    }
-                }
+                    .padding(vertical = 4.dp),
+                enabled = canPay
+            ) {
+                Icon(Icons.Default.Apps, null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.pay_commission))
             }
-            Text(
-                text = stringResource(R.string.warning_to_send_pay),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            )
         }
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+        Text(
+            text = stringResource(R.string.proof_of_payment_attach),
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = 100.dp)
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        RoundedCornerShape(8.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ){
+                if (localFiles.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.no_files_attached),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    AttachmentPreviews(uris = localFiles, onRemove = onRemoveFile)
+                }
+            }
+            val amountValue = amountUsd.toDoubleOrNull() ?: 0.0
+            val canSend = !loading && amountUsd.isNotBlank() && amountValue > 0.0 && localFiles.isNotEmpty()
+            Button(
+                onClick = { onSendPay() },
+                modifier = Modifier.height(50.dp),
+                shape = RoundedCornerShape(12.dp),
+                enabled = canSend,
+                contentPadding = PaddingValues(12.dp)
+            ) {
+                if (loading) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+                } else {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.AutoMirrored.Filled.Send, null)
+                        Text(stringResource(R.string.send), style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+            }
+        }
+        Text(
+            text = stringResource(R.string.warning_to_send_pay),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
     }
 }
 
@@ -317,5 +324,26 @@ private fun DetailRowCopy(@StringRes label: Int, value: String, onCopyClick: (St
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PayReferralPreview(){
+    MaterialTheme {
+        BankDetailsCard(
+            client = userClient,
+            amountUsd = "",
+            onAmountChange = {},
+            onPayClick = {},
+            onCancelButton = {},
+            onCopyClick = {},
+            selectedOption = null,
+            onBankChange = {},
+            onSendPay = {},
+            loading = false,
+            localFiles = emptyList(),
+            onRemoveFile = {}
+        )
     }
 }

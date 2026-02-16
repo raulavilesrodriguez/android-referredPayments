@@ -179,6 +179,8 @@
     <string name="count_number_pay">Count number: </string>
     <string name="pay_commission">Pay Commission</string>
     <string name="amount_usd">Amount USD</string>
+    <string name="amount_to_pay">Amount to Pay</string>
+    <string name="usd_0.00">USD 0.00</string>
     <string name="proof_of_payment">Proof of Payment - %s</string>
     <string name="content_payment">The payment of USD %1$s has been made successfully by the referred user: %2$s </string>
     <string name="proof_of_payment_attach">Proof of Payment Attach</string>
