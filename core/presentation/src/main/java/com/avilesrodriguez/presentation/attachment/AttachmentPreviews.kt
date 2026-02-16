@@ -27,7 +27,7 @@ fun AttachmentPreviews(
     onRemove: (String) -> Unit
 ) {
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(horizontal = 16.dp),
         modifier = Modifier.padding(vertical = 8.dp)
     ) {
