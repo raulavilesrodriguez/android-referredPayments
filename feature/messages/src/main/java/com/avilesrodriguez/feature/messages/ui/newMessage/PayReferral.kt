@@ -1,48 +1,22 @@
 package com.avilesrodriguez.feature.messages.ui.newMessage
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,6 +36,7 @@ import com.avilesrodriguez.presentation.attachment.AttachmentPreviews
 import com.avilesrodriguez.presentation.banksPays.copyClientData
 import com.avilesrodriguez.presentation.banksPays.openBankApp
 import com.avilesrodriguez.presentation.fakeData.userClient
+import com.avilesrodriguez.presentation.viewmodel.SharedAttachmentViewModel
 import kotlinx.coroutines.delay
 
 @Composable
@@ -69,13 +44,19 @@ fun PayReferral(
     sharedUri: String?,
     onBackClick: () -> Unit,
     openAndPopUp: (String, String) -> Unit,
-    viewModel: NewMessageViewModel = hiltViewModel()
+    viewModel: NewMessageViewModel = hiltViewModel(),
+    sharedAttachmentViewModel: SharedAttachmentViewModel = hiltViewModel(LocalActivity.current as ComponentActivity)
 ){
-    LaunchedEffect(sharedUri) {
-        sharedUri?.let { uri ->
-            viewModel.onAttachFiles(listOf(uri))
+    // Observamos el archivo del ViewModel compartido
+    val sharedFileFromActivity = sharedAttachmentViewModel.currentFileUri
+
+    LaunchedEffect(sharedFileFromActivity) {
+        if(sharedFileFromActivity != null){
+            viewModel.onAttachFiles(listOf(sharedFileFromActivity))
+            sharedAttachmentViewModel.consumeFile()
         }
     }
+
     val referral by viewModel.referralState.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
     val localFiles by viewModel.localFiles.collectAsState()
@@ -98,12 +79,12 @@ fun PayReferral(
             onAmountChange = viewModel::onAmountChange,
             onPayClick = {
                 if(selectedBankPackage.isNotBlank()) openBankApp(selectedBankPackage, context)
-                },  //open apps of banks
+                },
             onCancelButton = onBackClick,
-            onCopyClick = {infoUser -> copyClientData(context, infoUser)}, //copy data referral
+            onCopyClick = {infoUser -> copyClientData(context, infoUser)},
             selectedOption = selectedOption?.label,
             onBankChange = viewModel::onBankChange,
-            onSendPay = {viewModel.onSendPay(subjectPaid, contentPaid, openAndPopUp)}, //update info referral and user.Client
+            onSendPay = {viewModel.onSendPay(subjectPaid, contentPaid, openAndPopUp)},
             loading = loading,
             localFiles = localFiles,
             onRemoveFile = viewModel::onRemoveFile
@@ -117,6 +98,7 @@ fun PayReferral(
         }
     }
 }
+
 @Composable
 fun BankDetailsCard(
     client: UserData.Client,
@@ -133,10 +115,10 @@ fun BankDetailsCard(
     onRemoveFile: (String) -> Unit,
 ) {
     val banksOptions = BanksEcuador.options()
-    //var isClickPay by remember { mutableStateOf(false) }
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(16.dp),
+        .padding(16.dp)
+        .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -151,11 +133,13 @@ fun BankDetailsCard(
         DetailRow(label = R.string.account_type, value = client.accountType ?: "")
         DetailRowCopy(label = R.string.count_number_pay, value = client.countNumberPay ?: ""){onCopyClick(it)}
         DetailRowCopy(label = R.string.identity_card, value = client.identityCard ?: ""){onCopyClick(it)}
+        
         Text(
             text = stringResource(R.string.amount_to_pay),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
+        
         OutlinedTextField(
             placeholder = {
                 Text(
@@ -176,24 +160,26 @@ fun BankDetailsCard(
                 textAlign = TextAlign.Center
             )
         )
-        Spacer(Modifier.height(2.dp))
+        
         MenuDropdownBoxLeadIcon(
             options = banksOptions,
             selectedOption = selectedOption?:R.string.choose_your_bank,
             onClick = onBankChange,
-            modifier = Modifier.fillMaxWidth().padding(horizontal=16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         )
+        
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal=16.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ){
             OutlinedButton(
                 onClick = { onCancelButton() },
-                modifier = Modifier
-                    .padding(vertical = 4.dp),
+                modifier = Modifier.padding(vertical = 4.dp),
             ) {
                 Icon(Icons.Default.Cancel, null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
@@ -203,8 +189,7 @@ fun BankDetailsCard(
             val canPay = !loading && selectedOption !=null
             Button(
                 onClick = { onPayClick() },
-                modifier = Modifier
-                    .padding(vertical = 4.dp),
+                modifier = Modifier.padding(vertical = 4.dp),
                 enabled = canPay
             ) {
                 Icon(Icons.Default.Apps, null, modifier = Modifier.size(18.dp))
@@ -212,12 +197,13 @@ fun BankDetailsCard(
                 Text(stringResource(R.string.pay_commission))
             }
         }
-        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
         Text(
             text = stringResource(R.string.proof_of_payment_attach),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold
         )
+        
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -230,7 +216,7 @@ fun BankDetailsCard(
                     .weight(1f)
                     .heightIn(min = 100.dp)
                     .background(
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
                         RoundedCornerShape(8.dp)
                     ),
                 contentAlignment = Alignment.Center
@@ -245,8 +231,10 @@ fun BankDetailsCard(
                     AttachmentPreviews(uris = localFiles, onRemove = onRemoveFile)
                 }
             }
+            
             val amountValue = amountUsd.toDoubleOrNull() ?: 0.0
             val canSend = !loading && amountUsd.isNotBlank() && amountValue > 0.0 && localFiles.isNotEmpty()
+            
             Button(
                 onClick = { onSendPay() },
                 modifier = Modifier.height(50.dp),
@@ -264,6 +252,8 @@ fun BankDetailsCard(
                 }
             }
         }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         Text(
             text = stringResource(R.string.warning_to_send_pay),
             style = MaterialTheme.typography.labelSmall,
@@ -293,7 +283,9 @@ private fun DetailRowCopy(@StringRes label: Int, value: String, onCopyClick: (St
         }
     }
     Row(
-        Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

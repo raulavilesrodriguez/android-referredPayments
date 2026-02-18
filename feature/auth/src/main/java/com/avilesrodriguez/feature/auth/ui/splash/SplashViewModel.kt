@@ -29,7 +29,9 @@ class SplashViewModel @Inject constructor(
     val currentUserId
         get() = currentUserIdUseCase()
 
-    fun alreadyLoggedIn(openAndPopUp: (String, String) -> Unit){
+    fun alreadyLoggedIn(
+        openAndPopUp: (String, String) -> Unit
+    ){
         launchCatching {
             val startTime = System.currentTimeMillis()
             if(hasUser()){
@@ -39,7 +41,6 @@ class SplashViewModel @Inject constructor(
                     _userDataStore.value = user
                 }
                 waitDelay(startTime)
-
                 if (user?.name !=null){
                     openAndPopUp(NavRoutes.HOME, NavRoutes.SPLASH)
                 } else {

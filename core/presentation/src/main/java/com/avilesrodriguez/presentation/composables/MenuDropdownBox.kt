@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -76,6 +77,9 @@ fun MenuDropdownBoxLeadIcon(
     @StringRes title: Int?=null,
 ){
     var expanded by remember { mutableStateOf(false) }
+    
+    // Buscamos el icono correspondiente a la opción seleccionada para mostrarlo en el TextField
+    val selectedIcon = options.find { it.first == selectedOption }?.second
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -88,6 +92,17 @@ fun MenuDropdownBoxLeadIcon(
             readOnly = true,
             shape = RoundedCornerShape(16.dp),
             label = title?.let { { Text(stringResource(it)) } },
+            // Mostramos el logo del banco seleccionado aquí también
+            leadingIcon = selectedIcon?.let {
+                {
+                    Icon(
+                        painter = painterResource(id = it),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.Unspecified // Evita que se ponga negro
+                    )
+                }
+            },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
@@ -103,7 +118,8 @@ fun MenuDropdownBoxLeadIcon(
                         Icon(
                             painter = painterResource(id = selectionOption.second),
                             contentDescription = null,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.Unspecified // <--- CLAVE: Muestra los colores reales
                         )
                     },
                     text = { Text(stringResource(selectionOption.first)) },

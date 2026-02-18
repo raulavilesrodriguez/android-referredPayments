@@ -28,7 +28,9 @@ fun SplashScreen(
     viewModel: SplashViewModel = hiltViewModel()
 ){
     LaunchedEffect(Unit) {
-        viewModel.alreadyLoggedIn(openAndPopUp)
+        viewModel.alreadyLoggedIn(
+            openAndPopUp = openAndPopUp
+        )
     }
 
     val userData by viewModel.userDataStore.collectAsState()
