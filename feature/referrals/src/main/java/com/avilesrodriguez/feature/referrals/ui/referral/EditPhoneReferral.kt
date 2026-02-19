@@ -51,7 +51,7 @@ fun EditPhoneReferral(
 
 @Composable
 private fun EditPhoneReferralContent(
-    referral: Referral,
+    referral: Referral?,
     onBackClick: () -> Unit,
     updateNumberPhone: (String) -> Unit,
     onSaveClick: () -> Unit
@@ -77,7 +77,7 @@ private fun EditPhoneReferralContent(
 
 @Composable
 private fun PhoneContent(
-    referral: Referral,
+    referral: Referral?,
     updateNumberPhone: (String) -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -110,7 +110,7 @@ private fun PhoneContent(
 
 @Composable
 private fun PortraitPhoneContent(
-    referral: Referral,
+    referral: Referral?,
     updateNumberPhone: (String) -> Unit,
     onSaveClick: () -> Unit,
     focusRequester: FocusRequester,
@@ -125,7 +125,7 @@ private fun PortraitPhoneContent(
             horizontalAlignment = Alignment.End
         ) {
             PhoneFieldCursor(
-                value = referral.numberPhone,
+                value = referral?.numberPhone?:"",
                 onNewValue = updateNumberPhone,
                 focusRequester = focusRequester,
                 modifier = Modifier.fillMaxWidth()
@@ -142,7 +142,7 @@ private fun PortraitPhoneContent(
         }
         SaveButton(
             onClick = onSaveClick,
-            isFieldValid = referral.numberPhone.isNotBlank(),
+            isFieldValid = referral?.numberPhone?.isNotBlank()?:false,
             text = R.string.save,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -154,7 +154,7 @@ private fun PortraitPhoneContent(
 
 @Composable
 private fun LandscapePhoneContent(
-    referral: Referral,
+    referral: Referral?,
     updateNumberPhone: (String) -> Unit,
     onSaveClick: () -> Unit,
     focusRequester: FocusRequester,
@@ -174,7 +174,7 @@ private fun LandscapePhoneContent(
             horizontalArrangement = Arrangement.Center
         ){
             PhoneFieldCursor(
-                value = referral.numberPhone,
+                value = referral?.numberPhone?:"",
                 onNewValue = updateNumberPhone,
                 focusRequester = focusRequester,
                 modifier = Modifier
@@ -183,7 +183,7 @@ private fun LandscapePhoneContent(
             Spacer(modifier = Modifier.width(16.dp))
             SaveButton(
                 onClick = onSaveClick,
-                isFieldValid = referral.numberPhone.isNotBlank(),
+                isFieldValid = referral?.numberPhone?.isNotBlank()?:false,
                 text = R.string.save,
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 16.dp)

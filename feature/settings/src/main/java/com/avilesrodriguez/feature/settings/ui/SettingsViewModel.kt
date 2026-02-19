@@ -1,5 +1,6 @@
 package com.avilesrodriguez.feature.settings.ui
 
+import android.content.Context
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
@@ -10,6 +11,8 @@ import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SaveUser
 import com.avilesrodriguez.domain.usecases.SecureDeleteAccount
 import com.avilesrodriguez.domain.usecases.UploadPhoto
+import com.avilesrodriguez.presentation.banksPays.BanksEcuador
+import com.avilesrodriguez.presentation.banksPays.getById
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COUNT_NUMBER_BANK
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_IDENTITY_CARD
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
@@ -18,6 +21,7 @@ import com.avilesrodriguez.presentation.industries.getById
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,7 +35,8 @@ class SettingsViewModel @Inject constructor(
     private val uploadPhoto: UploadPhoto,
     private val downloadPhoto: DownloadUrlPhoto,
     private val saveUser: SaveUser,
-    private val secureDeleteAccount: SecureDeleteAccount
+    private val secureDeleteAccount: SecureDeleteAccount,
+    @param:ApplicationContext private val context: Context
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow<UserData?>(null)
     val uiState: StateFlow<UserData?> = _uiState
@@ -39,6 +44,8 @@ class SettingsViewModel @Inject constructor(
     val isSaving: StateFlow<Boolean> = _isSaving.asStateFlow()
     private val _isEntryValid = MutableStateFlow(true)
     val isEntryValid: StateFlow<Boolean> = _isEntryValid.asStateFlow()
+    private val _selectedOption = MutableStateFlow<BanksEcuador?>(null)
+    val selectedOption: StateFlow<BanksEcuador?> = _selectedOption.asStateFlow()
 
     private var localPhotoUri: String? = null
 
@@ -143,6 +150,16 @@ class SettingsViewModel @Inject constructor(
                 is UserData.Client -> currentState.copy(countNumberPay = filteredCountNumberBank)
                 is UserData.Provider -> currentState.copy(countNumber = filteredCountNumberBank)
             }
+        }
+    }
+
+    fun onBankChange(bank: Int){
+        val filteredBank = BanksEcuador.getById(bank)
+        _selectedOption.value = filteredBank
+        val currentState = _uiState.value
+        if(currentState is UserData.Client){
+            val bankNameString = filteredBank?.let { context.getString(it.label) } ?: ""
+            _uiState.value = currentState.copy(bankName = bankNameString)
         }
     }
 

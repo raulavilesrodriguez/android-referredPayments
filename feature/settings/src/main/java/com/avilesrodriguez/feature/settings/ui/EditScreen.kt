@@ -39,6 +39,8 @@ import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.avatar.DEFAULT_AVATAR_USER
+import com.avilesrodriguez.presentation.banksPays.BanksEcuador
+import com.avilesrodriguez.presentation.banksPays.options
 import com.avilesrodriguez.presentation.composables.FormButtons
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.composables.TextFieldProfile
@@ -49,6 +51,7 @@ import com.avilesrodriguez.presentation.ext.MAX_LENGTH_RUC
 import com.avilesrodriguez.presentation.ext.fieldModifier
 import com.avilesrodriguez.presentation.industries.options
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
+import com.avilesrodriguez.presentation.composables.MenuDropdownBoxLeadIcon
 import com.avilesrodriguez.presentation.industries.label
 import com.avilesrodriguez.presentation.photo.pickImageLauncher
 
@@ -61,6 +64,7 @@ fun EditScreen(
     val userData by viewModel.uiState.collectAsState()
     val isEntryValid by viewModel.isEntryValid.collectAsState()
     val industryOptions = IndustriesType.options(false)
+    val selectedOption by viewModel.selectedOption.collectAsState()
 
 
     val imagePicker = pickImageLauncher(
@@ -98,6 +102,8 @@ fun EditScreen(
                 onSaveClick = { viewModel.onSaveClick(popUp) },
                 onCancel = { viewModel.cancelEditUser(popUp) },
                 isEntryValid = isEntryValid,
+                selectedOption = selectedOption?.label,
+                onBankChange = viewModel::onBankChange,
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -117,8 +123,11 @@ fun EditScreenContent(
     onSaveClick: () -> Unit,
     onCancel:() -> Unit,
     isEntryValid: Boolean,
+    selectedOption: Int?,
+    onBankChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ){
+    val banksOptions = BanksEcuador.options()
     Column(
         modifier = modifier
                 .fillMaxWidth()
@@ -171,6 +180,14 @@ fun EditScreenContent(
                     icon = R.drawable.identity_card,
                     title = R.string.settings_identity_card_client,
                     Modifier.fieldModifier()
+                )
+                MenuDropdownBoxLeadIcon(
+                    options = banksOptions,
+                    selectedOption = selectedOption?:R.string.choose_your_bank,
+                    onClick = onBankChange,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
                 )
                 TextFieldProfile(
                     value = userData.countNumberPay?:"",
@@ -235,6 +252,8 @@ fun EditScreenContenPreview(){
             onPickImageClick = {},
             onSaveClick = {},
             onCancel = {},
+            selectedOption = null,
+            onBankChange = {},
             isEntryValid = true,
         )
     }

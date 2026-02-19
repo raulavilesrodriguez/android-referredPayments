@@ -129,24 +129,45 @@ fun Profile(
             when(userData){
                 is UserData.Client -> {
                     ItemProfile(
-                        icon = R.drawable.identity_card,
+                        icon = R.drawable.id_card,
                         title = R.string.settings_identity_card_client,
                         data = userData.identityCard?:stringResource(R.string.no_information))
                     ItemProfile(
                         icon = R.drawable.bank,
+                        title = R.string.settings_bank_name_client,
+                        data = userData.bankName?:stringResource(R.string.no_information)
+                    )
+                    ItemProfile(
+                        icon = R.drawable.account,
                         title = R.string.settings_count_number_bank_client,
                         data = userData.countNumberPay?:stringResource(R.string.no_information)
+                    )
+                    ItemProfile(
+                        icon = R.drawable.account_type,
+                        title = R.string.settings_account_type,
+                        data = userData.accountType?:stringResource(R.string.no_information)
                     )
                 }
                 is UserData.Provider -> {
                     ItemProfile(
-                        icon = R.drawable.identity_card,
+                        icon = R.drawable.id_card,
                         title = R.string.settings_identity_card_provider,
-                        data = userData.ciOrRuc?: stringResource(R.string.no_information))
+                        data = userData.ciOrRuc?: stringResource(R.string.no_information)
+                    )
                     ItemProfile(
                         icon = R.drawable.industry,
                         title = R.string.settings_industry,
                         data = userData.industry.name
+                    )
+                    ItemProfile(
+                        icon = R.drawable.description,
+                        title = R.string.company_description,
+                        data = userData.companyDescription?: stringResource(R.string.no_information)
+                    )
+                    ItemProfile(
+                        icon = R.drawable.website,
+                        title = R.string.website,
+                        data = userData.website?: stringResource(R.string.no_information)
                     )
                 }
                 else -> {

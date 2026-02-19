@@ -80,7 +80,7 @@ fun PayReferral(
             onPayClick = {
                 if(selectedBankPackage.isNotBlank()) openBankApp(selectedBankPackage, context)
                 },
-            onCancelButton = onBackClick,
+            onCancelButton = {viewModel.onCancelPay(openAndPopUp)},
             onCopyClick = {infoUser -> copyClientData(context, infoUser)},
             selectedOption = selectedOption?.label,
             onBankChange = viewModel::onBankChange,

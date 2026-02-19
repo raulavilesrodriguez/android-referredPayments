@@ -87,7 +87,7 @@ fun ReferralScreen(
 @Composable
 fun ReferralScreenContent(
     onBackClick: () -> Unit,
-    referral: Referral,
+    referral: Referral?,
     user: UserData?,
     isLoading: Boolean,
     clientWhoReferred: UserData?,
@@ -132,7 +132,7 @@ fun ReferralScreenContent(
 
 @Composable
 fun ProfileReferral(
-    referral: Referral,
+    referral: Referral?,
     user: UserData?,
     clientWhoReferred: UserData?,
     providerThatReceived: UserData?,
@@ -152,13 +152,13 @@ fun ProfileReferral(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ReferralStatus(status = referral.status)
+        if(referral != null) ReferralStatus(status = referral.status)
 
         when(user){
             is UserData.Client -> {
-                ItemEditProfile(R.drawable.name, title = R.string.name_referred, data = referral.name, iconEdit = R.drawable.edit_gray){onNameClick()}
-                ItemEditProfile(R.drawable.mail, title = R.string.email_referred, data = referral.email, iconEdit = R.drawable.edit_gray){onEmailClick()}
-                ItemEditProfile(R.drawable.phone, title = R.string.phone_number_referred, data = referral.numberPhone, iconEdit = R.drawable.edit_gray){onPhoneClick()}
+                ItemEditProfile(R.drawable.name, title = R.string.name_referred, data = referral?.name?:"", iconEdit = R.drawable.edit_gray){onNameClick()}
+                ItemEditProfile(R.drawable.mail, title = R.string.email_referred, data = referral?.email?:"", iconEdit = R.drawable.edit_gray){onEmailClick()}
+                ItemEditProfile(R.drawable.phone, title = R.string.phone_number_referred, data = referral?.numberPhone?:"", iconEdit = R.drawable.edit_gray){onPhoneClick()}
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 8.dp),
                     thickness = 1.dp,
@@ -172,17 +172,17 @@ fun ProfileReferral(
                 ) { onProcessClick() }
             }
             is UserData.Provider -> {
-                val isPending = referral.status == ReferralStatus.PENDING
-                ItemProfile(icon = R.drawable.name, title = R.string.name_referred, data = referral.name)
+                val isPending = referral?.status == ReferralStatus.PENDING
+                ItemProfile(icon = R.drawable.name, title = R.string.name_referred, data = referral?.name?:"")
                 ItemProfile(
                     icon = R.drawable.mail,
                     title = R.string.email_referred,
-                    data = if(isPending) "••••@••••.com" else referral.email
+                    data = if(isPending) "••••@••••.com" else referral?.email?:""
                 )
                 ItemProfile(
                     icon = R.drawable.phone,
                     title = R.string.phone_number_referred,
-                    data = if(isPending) "09••••••••" else referral.numberPhone
+                    data = if(isPending) "09••••••••" else referral?.numberPhone?:""
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 8.dp),

@@ -76,6 +76,8 @@
     <string name="settings_identity_card_client">Identity card</string>
     <string name="settings_identity_card_provider">Identity card or RUC</string>
     <string name="settings_count_number_bank_client">Count number bank to receive payments</string>
+    <string name="settings_bank_name_client">Bank name</string>
+    <string name="settings_account_type">Account type</string>
     <string name="settings_count_number_bank_provider">Count number bank to pay"</string>
     <string name="no_information">There is no information</string>
     <string name="required_field">Required fields cannot be empty</string>
@@ -144,6 +146,7 @@
     Additionally, the amount paid must be greater than USD 0.0</string>
     <string name="client_bank_details">Client Bank Details</string>
     <string name="no_open_file_attachment">Install an application that allows you to open this file.</string>
+    <string name="open_with">Open with</string>
 
     <!-- Referral Metrics -->
     <string name="all_referrals">All Referrals</string>
@@ -186,7 +189,7 @@
     <string name="proof_of_payment_attach">Proof of Payment Attach</string>
     <string name="no_files_attached">No files attached</string>
     <string name="choose_your_bank">Choose your bank</string>
-    <string name="bank_of_pichincha">Pichincha mobile banking</string>
+    <string name="bank_of_pichincha">Bank Pichincha</string>
     <string name="bank_of_guayaquil">Bank Guayaquil</string>
     <string name="bank_of_pacific">BdP Pacific</string>
     <string name="produbanco">Produbanco</string>

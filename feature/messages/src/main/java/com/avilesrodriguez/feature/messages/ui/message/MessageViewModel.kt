@@ -96,7 +96,7 @@ class MessageViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    fun downloadFile(uriString: String) {
+    fun downloadFile(uriString: String, labelOpen: String) {
         try {
             val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 
@@ -106,7 +106,7 @@ class MessageViewModel @Inject constructor(
                 val contentUri = downloadManager.getUriForDownloadedFile(existingId)
                 if (contentUri != null && isFileAccessible(contentUri)) {
                     // Si el archivo es accesible, lo abrimos directamente
-                    openDownloadedFile(contentUri)
+                    openDownloadedFile(contentUri, labelOpen)
                     return
                 }
             }
@@ -131,7 +131,7 @@ class MessageViewModel @Inject constructor(
                 override fun onReceive(ctxt: Context?, intent: Intent?) {
                     val contentUri = downloadManager.getUriForDownloadedFile(downloadId)
                     if (contentUri != null) {
-                        openDownloadedFile(contentUri)
+                        openDownloadedFile(contentUri, labelOpen)
                     }
                     context.unregisterReceiver(this)
                 }
@@ -173,11 +173,12 @@ class MessageViewModel @Inject constructor(
             context.contentResolver.openInputStream(uri)?.close()
             true
         } catch (e: Exception) {
+            Log.e("MessageViewModel", "Error al abrir archivo", e)
             false
         }
     }
 
-    private fun openDownloadedFile(localUri: Uri) {
+    private fun openDownloadedFile(localUri: Uri, labelOpen: String) {
         try {
             val mimeType = context.contentResolver.getType(localUri)
                 ?: android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(
@@ -189,7 +190,7 @@ class MessageViewModel @Inject constructor(
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
-            val chooser = Intent.createChooser(intent, "Abrir con...")
+            val chooser = Intent.createChooser(intent, labelOpen)
             chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(chooser)
         } catch (e: Exception) {

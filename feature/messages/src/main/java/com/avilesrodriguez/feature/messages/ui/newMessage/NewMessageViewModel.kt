@@ -200,6 +200,12 @@ class NewMessageViewModel @Inject constructor(
         _selectedOption.value = null
     }
 
+    fun onCancelPay(openAndPopUp: (String, String) -> Unit){
+        val referral = _referralState.value
+        val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
+        openAndPopUp(route, NavRoutes.NEW_MESSAGE_GRAPH)
+    }
+
     fun onSendPay(subjectPaid:String, contentPaid: String, openAndPopUp: (String, String) -> Unit){
         launchCatching {
             _isLoading.value = true

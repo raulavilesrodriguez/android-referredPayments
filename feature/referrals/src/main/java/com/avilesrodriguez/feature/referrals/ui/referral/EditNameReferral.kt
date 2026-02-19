@@ -54,7 +54,7 @@ fun EditNameReferral(
 
 @Composable
 private fun EditNameReferralContent(
-    referral: Referral,
+    referral: Referral?,
     onBackClick: () -> Unit,
     updateName: (String) -> Unit,
     onSaveClick: () -> Unit
@@ -81,7 +81,7 @@ private fun EditNameReferralContent(
 
 @Composable
 private fun NameContent(
-    referral: Referral,
+    referral: Referral?,
     updateName: (String) -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -114,7 +114,7 @@ private fun NameContent(
 
 @Composable
 private fun PortraitNameContent(
-    referral: Referral,
+    referral: Referral?,
     updateName: (String) -> Unit,
     onSaveClick: () -> Unit,
     focusRequester: FocusRequester,
@@ -129,7 +129,7 @@ private fun PortraitNameContent(
             horizontalAlignment = Alignment.End
         ) {
             NameTextFieldCursor(
-                value = referral.name,
+                value = referral?.name?:"",
                 onNewValue = updateName,
                 focusRequester = focusRequester,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -146,7 +146,7 @@ private fun PortraitNameContent(
         }
         SaveButton(
             onClick = onSaveClick,
-            isFieldValid = referral.name.isNotBlank(),
+            isFieldValid = referral?.name?.isNotBlank()?:false,
             text = R.string.save,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -158,7 +158,7 @@ private fun PortraitNameContent(
 
 @Composable
 private fun LandscapeNameContent(
-    referral: Referral,
+    referral: Referral?,
     updateName: (String) -> Unit,
     onSaveClick: () -> Unit,
     focusRequester: FocusRequester,
@@ -178,7 +178,7 @@ private fun LandscapeNameContent(
             horizontalArrangement = Arrangement.Center
         ){
             NameTextFieldCursor(
-                value = referral.name,
+                value = referral?.name?:"",
                 onNewValue = updateName,
                 focusRequester = focusRequester,
                 modifier = Modifier.weight(0.7f)
@@ -186,7 +186,7 @@ private fun LandscapeNameContent(
             Spacer(modifier = Modifier.width(16.dp))
             SaveButton(
                 onClick = onSaveClick,
-                isFieldValid = referral.name.isNotBlank(),
+                isFieldValid = referral?.name?.isNotBlank()?:false,
                 text = R.string.save,
                 modifier = Modifier
                     .padding(bottom = 16.dp)

@@ -1,5 +1,7 @@
 package com.avilesrodriguez.feature.messages.ui.message
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,7 +29,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -41,6 +41,7 @@ import com.avilesrodriguez.presentation.attachment.AttachmentDownload
 import com.avilesrodriguez.presentation.composables.ButtonWithIcon
 import com.avilesrodriguez.presentation.time.formatTimeBasic
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MessageScreen(
     messageId: String?,
@@ -58,6 +59,8 @@ fun MessageScreen(
     val clientWhoReferred = viewModel.clientWhoReferred
     val providerThatReceived = viewModel.providerThatReceived
 
+    val labelOpen = stringResource(R.string.open_with)
+
     if(!isLoading){
         MessageScreenContent(
             onBackClick = onBackClick,
@@ -67,7 +70,7 @@ fun MessageScreen(
             clientWhoReferred = clientWhoReferred,
             providerThatReceived = providerThatReceived,
             onReplyClick = { viewModel.replyMessage(openScreen) },
-            downloadFile = {viewModel.downloadFile(it)}
+            downloadFile = {viewModel.downloadFile(it, labelOpen)}
         )
     }else{
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

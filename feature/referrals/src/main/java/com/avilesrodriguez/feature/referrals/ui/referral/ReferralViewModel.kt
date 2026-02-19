@@ -26,6 +26,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,8 +40,8 @@ class ReferralViewModel @Inject constructor(
     private val updateReferralFields: UpdateReferralFields,
     private val saveMessage: SaveMessage
 ) : BaseViewModel() {
-    private val _referralState = MutableStateFlow(Referral())
-    val referralState: StateFlow<Referral> = _referralState.asStateFlow()
+    private val _referralState = MutableStateFlow<Referral?>(null)
+    val referralState: StateFlow<Referral?> = _referralState.asStateFlow()
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
 
@@ -54,11 +55,11 @@ class ReferralViewModel @Inject constructor(
         get() = currentUserIdUseCase()
 
     private val nameReferral
-        get() = _referralState.value.name
+        get() = _referralState.value?.name?:""
     private val emailReferral
-        get() = _referralState.value.email
+        get() = _referralState.value?.email?:""
     private val numberPhoneReferral
-        get() = _referralState.value.numberPhone
+        get() = _referralState.value?.numberPhone?:""
 
     init {
         launchCatching {
@@ -70,16 +71,22 @@ class ReferralViewModel @Inject constructor(
 
     fun loadReferralInformation(referralId: String){
         loadJob?.cancel()
+        _isLoading.value = true
         loadJob = launchCatching {
-            val referral = getReferralById(referralId)
-            if(referral != null){
-                _referralState.value = referral
-                val clientDeferred = async { getUser(referral.clientId) }
-                val providerDeferred = async { getUser(referral.providerId) }
-                clientWhoReferred = clientDeferred.await()
-                providerThatReceived = providerDeferred.await()
-            } else {
-                _referralState.value = Referral()
+            fetchData(referralId) //al ser suspend se obliga a loadJob a esperar que se ejecute esta func
+            _isLoading.value = false
+        }
+    }
+
+    private suspend fun fetchData(referralId: String) {
+        val referral = getReferralById(referralId)
+        if (referral != null) {
+            _referralState.value = referral
+            coroutineScope {
+                val clientDef = async { getUser(referral.clientId) }
+                val providerDef = async { getUser(referral.providerId) }
+                clientWhoReferred = clientDef.await()
+                providerThatReceived = providerDef.await()
             }
         }
     }
@@ -97,30 +104,33 @@ class ReferralViewModel @Inject constructor(
     }
 
     fun onAcceptReferral(subject:String, content:String, openScreen: (String) -> Unit){
+        val referralId = _referralState.value?.id?:return
+        val clientId = _referralState.value?.clientId?:return
         launchCatching {
             _isLoading.value = true
             val updates = mapOf(
                 "status" to ReferralStatus.PROCESSING.name
             )
-            updateReferralFields(_referralState.value.id, updates)
+
+            updateReferralFields(referralId, updates)
 
             val systemMessage = Message(
-                referralId = _referralState.value.id,
+                referralId = referralId,
                 senderId = currentUserId,
-                receiverId = _referralState.value.clientId,
-                subject = "$subject ${_referralState.value.name}",
+                receiverId = clientId,
+                subject = "$subject $nameReferral",
                 content = content,
                 createdAt = System.currentTimeMillis()
             )
             saveMessage(systemMessage)
-            loadReferralInformation(_referralState.value.id)
+            fetchData(referralId)
             //openScreen(NavRoutes.MESSAGES_SCREEN.replace("{id}", _referralState.value.id))
             _isLoading.value = false
         }
     }
 
     fun onProcessReferral(openScreen: (String) -> Unit){
-        val referralId = _referralState.value.id
+        val referralId = _referralState.value?.id?:""
         val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referralId)
         openScreen(route)
     }
@@ -133,7 +143,7 @@ class ReferralViewModel @Inject constructor(
             .filter { it.isLetter() || it.isDigit() || it.isWhitespace() || allowedSymbols.contains(it) }
             .take(MAX_LENGTH_NAME)
 
-        _referralState.value = _referralState.value.copy(name = filteredName)
+        _referralState.value = _referralState.value?.copy(name = filteredName)
     }
 
     fun onSaveName(popUp: () -> Unit) {
@@ -145,14 +155,14 @@ class ReferralViewModel @Inject constructor(
                 "name" to nameReferral,
                 "nameLowercase" to nameReferral.normalizeName()
             )
-            val referralId = _referralState.value.id
+            val referralId = _referralState.value?.id?:""
             updateReferralFields(referralId, updates)
             popUp()
         }
     }
 
     fun updateEmail(newEmail: String){
-        _referralState.value = _referralState.value.copy(email = newEmail)
+        _referralState.value = _referralState.value?.copy(email = newEmail)
     }
 
     fun onSaveEmail(popUp: () -> Unit) {
@@ -164,7 +174,7 @@ class ReferralViewModel @Inject constructor(
             val updates = mapOf(
                 "email" to emailReferral
             )
-            val referralId = _referralState.value.id
+            val referralId = _referralState.value?.id?:""
             updateReferralFields(referralId, updates)
             popUp()
         }
@@ -172,7 +182,7 @@ class ReferralViewModel @Inject constructor(
 
     fun updateNumberPhone(newNumberPhone: String){
         val filtered = newNumberPhone.filter { it.isDigit() }.take(MIN_PASS_LENGTH_PHONE_ECUADOR)
-        _referralState.value = _referralState.value.copy(numberPhone = filtered)
+        _referralState.value = _referralState.value?.copy(numberPhone = filtered)
     }
 
     fun onSaveNumberPhone(popUp: () -> Unit) {
@@ -184,7 +194,7 @@ class ReferralViewModel @Inject constructor(
             val updates = mapOf(
                 "numberPhone" to numberPhoneReferral
             )
-            val referralId = _referralState.value.id
+            val referralId = _referralState.value?.id?:""
             updateReferralFields(referralId, updates)
             popUp()
         }

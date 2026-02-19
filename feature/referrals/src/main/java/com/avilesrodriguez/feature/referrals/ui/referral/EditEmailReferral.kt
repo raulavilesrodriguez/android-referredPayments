@@ -51,7 +51,7 @@ fun EditEmailReferral(
 
 @Composable
 private fun EditEmailReferralContent(
-    referral: Referral,
+    referral: Referral?,
     onBackClick: () -> Unit,
     updateEmail: (String) -> Unit,
     onSaveClick: () -> Unit
@@ -77,7 +77,7 @@ private fun EditEmailReferralContent(
 
 @Composable
 private fun EmailContent(
-    referral: Referral,
+    referral: Referral?,
     updateEmail: (String) -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -110,7 +110,7 @@ private fun EmailContent(
 
 @Composable
 private fun PortraitEmailContent(
-    referral: Referral,
+    referral: Referral?,
     updateEmail: (String) -> Unit,
     onSaveClick: () -> Unit,
     focusRequester: FocusRequester,
@@ -125,7 +125,7 @@ private fun PortraitEmailContent(
             horizontalAlignment = Alignment.End
         ) {
             EmailFieldCursor(
-                value = referral.email,
+                value = referral?.email?:"",
                 onNewValue = updateEmail,
                 focusRequester = focusRequester,
                 modifier = Modifier
@@ -143,7 +143,7 @@ private fun PortraitEmailContent(
         }
         SaveButton(
             onClick = onSaveClick,
-            isFieldValid = referral.email.isNotBlank(),
+            isFieldValid = referral?.email?.isNotBlank()?:false,
             text = R.string.save,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -155,7 +155,7 @@ private fun PortraitEmailContent(
 
 @Composable
 private fun LandscapeEmailContent(
-    referral: Referral,
+    referral: Referral?,
     updateEmail: (String) -> Unit,
     onSaveClick: () -> Unit,
     focusRequester: FocusRequester,
@@ -175,7 +175,7 @@ private fun LandscapeEmailContent(
             horizontalArrangement = Arrangement.Center
         ){
             EmailFieldCursor(
-                value = referral.email,
+                value = referral?.email?:"",
                 onNewValue = updateEmail,
                 focusRequester = focusRequester,
                 modifier = Modifier
@@ -184,7 +184,7 @@ private fun LandscapeEmailContent(
             Spacer(modifier = Modifier.width(16.dp))
             SaveButton(
                 onClick = onSaveClick,
-                isFieldValid = referral.email.isNotBlank(),
+                isFieldValid = referral?.email?.isNotBlank()?:false,
                 text = R.string.save,
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 16.dp)
