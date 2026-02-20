@@ -2,7 +2,6 @@ package com.avilesrodriguez.feature.referrals.ui.referrals
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,17 +39,16 @@ import com.avilesrodriguez.presentation.time.formatTimestamp
 @Composable
 fun ReferralItem(
     referral: Referral,
-    providerThatReceived: UserData?,
-    clientWhoReferred: UserData?,
+    otherPartyName: String,
     user: UserData?,
 ){
     val nameUserToShow = when(user){
         is UserData.Client -> {
-            val nameProvider = providerThatReceived?.name?.truncate(30)?:""
+            val nameProvider = otherPartyName.truncate(30)
             stringResource(R.string.referring_to, nameProvider)
         }
         is UserData.Provider -> {
-            val nameClient = clientWhoReferred?.name?.truncate(30)?:""
+            val nameClient = otherPartyName.truncate(30)
             stringResource(R.string.referred_from, nameClient)
         }
         else -> ""
@@ -118,8 +116,7 @@ fun ReferralItemClientPreview(){
     MaterialTheme {
         ReferralItem(
             referral = referral,
-            providerThatReceived = userProvider,
-            clientWhoReferred = userClient,
+            otherPartyName = userClient.name?:"",
             user = userProvider
         )
     }

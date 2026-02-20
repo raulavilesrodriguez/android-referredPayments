@@ -1,10 +1,8 @@
 package com.avilesrodriguez.feature.referrals.ui.referrals
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.referral.Referral
+import com.avilesrodriguez.domain.model.referral.ReferralWithNames
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetReferralsByClient
@@ -33,17 +31,15 @@ class ReferralsViewModel @Inject constructor(
     private val getReferralsByClient: GetReferralsByClient,
     private val getReferralsByProvider: GetReferralsByProvider
 ) : BaseViewModel(){
-    private val _allReferrals = MutableStateFlow<List<Referral>>(emptyList())
-    private val _uiState = MutableStateFlow<List<Referral>>(emptyList())
-    val uiState: StateFlow<List<Referral>> = _uiState.asStateFlow()
+    private val _allReferrals = MutableStateFlow<List<ReferralWithNames>>(emptyList())
+    private val _uiState = MutableStateFlow<List<ReferralWithNames>>(emptyList())
+    val uiState: StateFlow<List<ReferralWithNames>> = _uiState.asStateFlow()
     private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
-    var clientWhoReferred by mutableStateOf<UserData?>(null)
-    var providerThatReceived by mutableStateOf<UserData?>(null)
 
     private var referralsJob: Job? = null
 
@@ -81,7 +77,15 @@ class ReferralsViewModel @Inject constructor(
             }
 
             flow?.collect { referrals ->
-                _allReferrals.value = referrals
+                val referralsWithNames = referrals.map { referral ->
+                    val otherId = if (userData is UserData.Client) referral.providerId else referral.clientId
+                    val otherUser = getUser(otherId) // Obtenemos el usuario (puedes usar cache en el Repository)
+                    ReferralWithNames(
+                        referral = referral,
+                        otherPartyName = otherUser?.name ?: ""
+                    )
+                }
+                _allReferrals.value = referralsWithNames
                 //si habia algo escrito
                 filterReferralsLocally(_searchText.value)
                 _isLoading.value = false
@@ -92,12 +96,13 @@ class ReferralsViewModel @Inject constructor(
 
     private fun filterReferralsLocally(query: String) {
         val queryNormalized = query.normalizeName()
+        val allEnriched = _allReferrals.value
         if (queryNormalized.isEmpty()) {
-            _uiState.value = _allReferrals.value
+            _uiState.value = allEnriched
         } else {
             // Busca en cualquier parte del nombre (contains)
-            _uiState.value = _allReferrals.value.filter { referral ->
-                referral.nameLowercase.contains(queryNormalized)
+            _uiState.value = _allReferrals.value.filter { item ->
+                item.referral.nameLowercase.contains(queryNormalized)
             }
         }
     }
@@ -129,10 +134,6 @@ class ReferralsViewModel @Inject constructor(
     } */
 
     fun onReferralClick(referral: Referral, openScreen: (String) -> Unit) {
-        launchCatching {
-            clientWhoReferred = getUser(referral.clientId)
-            providerThatReceived = getUser(referral.providerId)
-        }
         val route = NavRoutes.REFERRAL_DETAIL.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
         openScreen(route)
     }

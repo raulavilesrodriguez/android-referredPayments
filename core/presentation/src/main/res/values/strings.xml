@@ -81,6 +81,7 @@
     <string name="settings_count_number_bank_provider">Count number bank to pay"</string>
     <string name="no_information">There is no information</string>
     <string name="required_field">Required fields cannot be empty</string>
+    <string name="error_webSite">Please enter a valid URL for the webpage</string>
 
     <!-- User Details -->
     <string name="rating">Rating</string>
@@ -175,6 +176,8 @@
     <string name="status">Status</string>
 
     <!-- Banks -->
+    <string name="bank">Bank</string>
+    <string name="account">Account</string>
     <string name="beneficiary">Beneficiary: </string>
     <string name="identity_card">Identity card: </string>
     <string name="bank_name">Bank name: </string>
@@ -196,6 +199,8 @@
     <string name="bank_bolivariano">Bank Bolivariano</string>
     <string name="bank_international">Bank International</string>
     <string name="bank_austro">Bank of the Austro</string>
+    <string name="savings">Savings</string>
+    <string name="checking">Checking</string>
 
 
     <!-- Policies Screen -->

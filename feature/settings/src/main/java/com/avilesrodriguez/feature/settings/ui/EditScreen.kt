@@ -7,19 +7,25 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,16 +36,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.avatar.DEFAULT_AVATAR_USER
 import com.avilesrodriguez.presentation.banksPays.BanksEcuador
+import com.avilesrodriguez.presentation.banksPays.label
 import com.avilesrodriguez.presentation.banksPays.options
 import com.avilesrodriguez.presentation.composables.FormButtons
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
@@ -52,6 +62,10 @@ import com.avilesrodriguez.presentation.ext.fieldModifier
 import com.avilesrodriguez.presentation.industries.options
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
 import com.avilesrodriguez.presentation.composables.MenuDropdownBoxLeadIcon
+import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COMPANY_DESCRIPTION
+import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
+import com.avilesrodriguez.presentation.fakeData.userClient
+import com.avilesrodriguez.presentation.fakeData.userProvider
 import com.avilesrodriguez.presentation.industries.label
 import com.avilesrodriguez.presentation.photo.pickImageLauncher
 
@@ -63,9 +77,8 @@ fun EditScreen(
     val isSaving by viewModel.isSaving.collectAsState()
     val userData by viewModel.uiState.collectAsState()
     val isEntryValid by viewModel.isEntryValid.collectAsState()
-    val industryOptions = IndustriesType.options(false)
     val selectedOption by viewModel.selectedOption.collectAsState()
-
+    val industryOptions = IndustriesType.options(false)
 
     val imagePicker = pickImageLauncher(
         context = LocalContext.current,
@@ -104,6 +117,9 @@ fun EditScreen(
                 isEntryValid = isEntryValid,
                 selectedOption = selectedOption?.label,
                 onBankChange = viewModel::onBankChange,
+                onAccountTypeChange = viewModel::updateAccountType,
+                updateDescription = { viewModel.updateDescriptionProvider(it) },
+                updateWebsite = { viewModel.updateWebsiteProvider(it) },
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -125,9 +141,14 @@ fun EditScreenContent(
     isEntryValid: Boolean,
     selectedOption: Int?,
     onBankChange: (Int) -> Unit,
+    onAccountTypeChange: (Int) -> Unit,
+    updateDescription:(String) -> Unit,
+    updateWebsite:(String) -> Unit,
     modifier: Modifier = Modifier
 ){
     val banksOptions = BanksEcuador.options()
+    val accountTypeOptions = AccountType.options()
+
     Column(
         modifier = modifier
                 .fillMaxWidth()
@@ -146,7 +167,7 @@ fun EditScreenContent(
         ){
             Avatar(
                 photoUri = if(userData?.photoUrl.isNullOrBlank()) DEFAULT_AVATAR_USER else userData.photoUrl,
-                size = 80.dp,
+                size = 100.dp,
                 modifier = Modifier.align(Alignment.Center)
             )
             Icon(
@@ -177,7 +198,7 @@ fun EditScreenContent(
                     value = userData.identityCard?:"",
                     onNewValue = onIdentityCardChange,
                     maxLength = MAX_LENGTH_IDENTITY_CARD,
-                    icon = R.drawable.identity_card,
+                    icon = R.drawable.id_card,
                     title = R.string.settings_identity_card_client,
                     Modifier.fieldModifier()
                 )
@@ -185,16 +206,23 @@ fun EditScreenContent(
                     options = banksOptions,
                     selectedOption = selectedOption?:R.string.choose_your_bank,
                     onClick = onBankChange,
+                    title = R.string.bank,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .fieldModifier()
+                )
+                MenuDropdownBox(
+                    options = accountTypeOptions,
+                    selectedOption = userData.accountType.label(),
+                    title = R.string.settings_account_type,
+                    onClick = onAccountTypeChange,
+                    modifier = Modifier.fieldModifier()
                 )
                 TextFieldProfile(
                     value = userData.countNumberPay?:"",
                     onNewValue = onCountNumberBankChange,
                     maxLength = MAX_LENGTH_COUNT_NUMBER_BANK,
-                    icon = R.drawable.bank,
-                    title = R.string.settings_count_number_bank_client,
+                    icon = R.drawable.account,
+                    title = R.string.account,
                     modifier = Modifier.fieldModifier()
                 )
             }
@@ -203,7 +231,7 @@ fun EditScreenContent(
                     value = userData.ciOrRuc?: "",
                     onNewValue = onIdentityCardChange,
                     maxLength = MAX_LENGTH_RUC,
-                    icon = R.drawable.identity_card,
+                    icon = R.drawable.id_card,
                     title = R.string.settings_identity_card_provider,
                     modifier = Modifier.fieldModifier()
                 )
@@ -214,6 +242,40 @@ fun EditScreenContent(
                     onClick = onIndustryChange,
                     modifier = Modifier.fieldModifier()
                 )
+                Column{
+                    OutlinedTextField(
+                        value = userData.companyDescription?:"",
+                        onValueChange = updateDescription,
+                        label = { Text(text = stringResource(R.string.company_description)) },
+                        placeholder = { Text(text = stringResource(R.string.company_description)) },
+                        leadingIcon = { Icon(painter = painterResource(R.drawable.description), contentDescription = "Description")},
+                        textStyle = LocalTextStyle.current.copy(
+                            textAlign = TextAlign.Justify
+                        ),
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier
+                            .heightIn(min = 140.dp)
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 4.dp)
+                    )
+                    Text(
+                        text = "${userData.companyDescription?.length}/$MAX_LENGTH_COMPANY_DESCRIPTION",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fieldModifier(),
+                        textAlign = TextAlign.End,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                OutlinedTextField(
+                    value = userData.website?:"",
+                    onValueChange = updateWebsite,
+                    placeholder = { Text(text = stringResource(R.string.website)) },
+                    label = { Text(text = stringResource(R.string.website)) },
+                    leadingIcon = { Icon(painter = painterResource(R.drawable.website), contentDescription = "Website")},
+                    shape = RoundedCornerShape(16.dp),
+                    maxLines = 1,
+                    modifier = Modifier.fieldModifier()
+                )
             }
             else -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -221,6 +283,7 @@ fun EditScreenContent(
                 }
             }
         }
+        Spacer(Modifier.height(16.dp))
         FormButtons(R.string.save, R.string.cancel, onSaveClick, onCancel, isSaving, isEntryValid)
         if(!isEntryValid){
             Text(
@@ -238,11 +301,7 @@ fun EditScreenContent(
 fun EditScreenContenPreview(){
     MaterialTheme {
         EditScreenContent(
-            userData = UserData.Client(
-                name = "Raúl Avilés Rodríguez",
-                identityCard = "",
-                countNumberPay = ""
-            ),
+            userData = userClient,
             isSaving = false,
             onNameChange = {},
             industryOptions = IndustriesType.options(false),
@@ -255,6 +314,9 @@ fun EditScreenContenPreview(){
             selectedOption = null,
             onBankChange = {},
             isEntryValid = true,
+            onAccountTypeChange = {},
+            updateDescription = {},
+            updateWebsite = {}
         )
     }
 }

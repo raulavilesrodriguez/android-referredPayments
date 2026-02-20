@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
@@ -388,7 +389,7 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             identityCard = "1098765432",
             countNumberPay = "12223440455",
             bankName = "Produbanco",
-            accountType = "Ahorros",
+            accountType = AccountType.SAVINGS,
             moneyEarned = 1000.0
         ),
         referralMetrics = ReferralMetrics(
@@ -411,7 +412,7 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             identityCard = "1249765432",
             countNumberPay = "12223440466",
             bankName = "Pichincha",
-            accountType = "Ahorros",
+            accountType = AccountType.SAVINGS,
             moneyEarned = 1500.0
         ),
         referralMetrics = ReferralMetrics(
@@ -434,7 +435,7 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             identityCard = "0015765439",
             countNumberPay = "12223440498",
             bankName = "Banco de Guayaquil",
-            accountType = "Ahorros",
+            accountType = AccountType.CHECKING,
             moneyEarned = 4000.0
         ),
         referralMetrics = ReferralMetrics(
@@ -457,7 +458,7 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             identityCard = "1495765430",
             countNumberPay = "10273440456",
             bankName = "Austro",
-            accountType = "Ahorros",
+            accountType = AccountType.CHECKING,
             moneyEarned = 2000.0
         ),
         referralMetrics = ReferralMetrics(

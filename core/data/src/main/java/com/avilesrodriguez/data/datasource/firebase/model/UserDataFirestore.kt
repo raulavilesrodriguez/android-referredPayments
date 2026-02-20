@@ -1,6 +1,7 @@
 package com.avilesrodriguez.data.datasource.firebase.model
 
 import android.util.Log
+import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
@@ -69,7 +70,7 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
             identityCard = identityCard,
             countNumberPay = countNumberPay,
             bankName = bankName,
-            accountType = accountType,
+            accountType = accountType.name,
             moneyEarned = moneyEarned
         )
         is UserData.Provider -> UserDataFirestore.Provider(
@@ -96,20 +97,29 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
 
 fun UserDataFirestore.toUserDataDomain(): UserData? {
     return when (this) {
-        is UserDataFirestore.Client -> UserData.Client(
-            uid = uid ?: "",
-            name = name,
-            email = email ?: "",
-            photoUrl = photoUrl ?: "",
-            fcmToken = fcmToken,
-            type = UserType.CLIENT,
-            nameLowercase = nameLowercase,
-            identityCard = identityCard,
-            countNumberPay = countNumberPay,
-            bankName = bankName,
-            accountType = accountType,
-            moneyEarned = moneyEarned?:0.0
-        )
+        is UserDataFirestore.Client -> {
+            val domainAccountType = try {
+                AccountType.valueOf(accountType?.uppercase() ?: "SAVINGS")
+            } catch (e: Exception){
+                Log.e("UserDataFirestore", "Error al convertir el tipo de cuenta: ${e.message}")
+                AccountType.SAVINGS
+            }
+
+            UserData.Client(
+                uid = uid ?: "",
+                name = name,
+                email = email ?: "",
+                photoUrl = photoUrl ?: "",
+                fcmToken = fcmToken,
+                type = UserType.CLIENT,
+                nameLowercase = nameLowercase,
+                identityCard = identityCard,
+                countNumberPay = countNumberPay,
+                bankName = bankName,
+                accountType = domainAccountType,
+                moneyEarned = moneyEarned?:0.0
+            )
+        }
         is UserDataFirestore.Provider -> {
             val domainIndustriesType = try {
                 IndustriesType.valueOf(industry?.uppercase() ?: "OTHER")

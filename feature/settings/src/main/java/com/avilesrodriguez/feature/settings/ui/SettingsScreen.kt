@@ -145,7 +145,7 @@ fun Profile(
                     ItemProfile(
                         icon = R.drawable.account_type,
                         title = R.string.settings_account_type,
-                        data = userData.accountType?:stringResource(R.string.no_information)
+                        data = userData.accountType.name
                     )
                 }
                 is UserData.Provider -> {

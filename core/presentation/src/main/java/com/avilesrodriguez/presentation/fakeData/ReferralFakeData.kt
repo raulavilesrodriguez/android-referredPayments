@@ -1,5 +1,6 @@
 package com.avilesrodriguez.presentation.fakeData
 
+import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
@@ -81,7 +82,7 @@ val userClient = UserData.Client(
     identityCard = "1098765432",
     countNumberPay = "12223440455",
     bankName = "Produbanco",
-    accountType = "Ahorros",
+    accountType = AccountType.SAVINGS,
     moneyEarned = 1000.0
 )
 

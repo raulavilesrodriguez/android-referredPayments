@@ -9,6 +9,7 @@ const val MAX_LENGTH_CONTENT = 500
 const val MAX_LENGTH_IDENTITY_CARD = 10
 const val MAX_LENGTH_RUC = 13
 const val MAX_LENGTH_COUNT_NUMBER_BANK = 20
+const val MAX_LENGTH_COMPANY_DESCRIPTION = 200
 
 private const val MIN_PASS_LENGTH = 6
 private const val PASS_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{$MIN_PASS_LENGTH,}$"
@@ -39,6 +40,18 @@ fun String.isValidNumber(): Boolean {
             Pattern.compile(ECUADOR_MOBILE_PATTERN).matcher(this).matches()
 }
 
+fun String.truncate(maxLength: Int): String {
+    return if (this.length > maxLength) {
+        this.substring(0, maxLength) + "..."
+    } else {
+        this
+    }
+}
+
+fun String.isValidUrl(): Boolean {
+    return Patterns.WEB_URL.matcher(this).matches()
+}
+
 fun String.isValidName(): Boolean {
     return this.isNotBlank()
             && this.length <= MAX_LENGTH_NAME &&
@@ -48,12 +61,4 @@ fun String.isValidName(): Boolean {
 
 fun String.isOnlyNumbers(): Boolean {
     return Pattern.compile(ONLY_NUMBERS_PATTERN).matcher(this).matches()
-}
-
-fun String.truncate(maxLength: Int): String {
-    return if (this.length > maxLength) {
-        this.substring(0, maxLength) + "..."
-    } else {
-        this
-    }
 }

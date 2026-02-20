@@ -34,6 +34,7 @@ import com.avilesrodriguez.presentation.banksPays.options
 import com.avilesrodriguez.presentation.composables.MenuDropdownBoxLeadIcon
 import com.avilesrodriguez.presentation.attachment.AttachmentPreviews
 import com.avilesrodriguez.presentation.banksPays.copyClientData
+import com.avilesrodriguez.presentation.banksPays.label
 import com.avilesrodriguez.presentation.banksPays.openBankApp
 import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.viewmodel.SharedAttachmentViewModel
@@ -130,7 +131,7 @@ fun BankDetailsCard(
         )
         Spacer(Modifier.height(8.dp))
         DetailRow(label = R.string.bank_name, value = client.bankName ?: "")
-        DetailRow(label = R.string.account_type, value = client.accountType ?: "")
+        DetailRow(label = R.string.account_type, value = stringResource(client.accountType.label()))
         DetailRowCopy(label = R.string.count_number_pay, value = client.countNumberPay ?: ""){onCopyClick(it)}
         DetailRowCopy(label = R.string.identity_card, value = client.identityCard ?: ""){onCopyClick(it)}
         

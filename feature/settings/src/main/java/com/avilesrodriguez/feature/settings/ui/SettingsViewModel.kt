@@ -2,6 +2,7 @@ package com.avilesrodriguez.feature.settings.ui
 
 import android.content.Context
 import com.avilesrodriguez.domain.ext.normalizeName
+import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
@@ -11,14 +12,18 @@ import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SaveUser
 import com.avilesrodriguez.domain.usecases.SecureDeleteAccount
 import com.avilesrodriguez.domain.usecases.UploadPhoto
+import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.banksPays.BanksEcuador
 import com.avilesrodriguez.presentation.banksPays.getById
+import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COMPANY_DESCRIPTION
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COUNT_NUMBER_BANK
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_IDENTITY_CARD
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_RUC
+import com.avilesrodriguez.presentation.ext.isValidUrl
 import com.avilesrodriguez.presentation.industries.getById
 import com.avilesrodriguez.presentation.navigation.NavRoutes
+import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -126,6 +131,14 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun updateAccountType(accountType: Int){
+        val filteredAccountType = AccountType.getById(accountType)
+        val currentState = _uiState.value
+        if(currentState is UserData.Client){
+            _uiState.value = currentState.copy(accountType = filteredAccountType)
+        }
+    }
+
     fun updateIdentityCard(identityCard: String){
         val currentState = _uiState.value
         if(currentState != null){
@@ -163,10 +176,29 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun updateWebsiteProvider(website: String){
+        val currentState = _uiState.value
+        if(currentState is UserData.Provider){
+            _uiState.value = currentState.copy(website = website)
+        }
+    }
+
+    fun updateDescriptionProvider(description: String){
+        val currentState = _uiState.value
+        if(currentState is UserData.Provider){
+            val filteredDescription = description.take(MAX_LENGTH_COMPANY_DESCRIPTION)
+            _uiState.value = currentState.copy(companyDescription = filteredDescription)
+        }
+    }
+
     fun onSaveClick(popUp: () -> Unit) {
         val currentState = _uiState.value ?: return
         if(!validateInput(currentState)){
             _isEntryValid.value = false
+            return
+        }
+        if(currentState is UserData.Provider && currentState.website?.isValidUrl()!=true && currentState.website?.isNotBlank()==true){
+            SnackbarManager.showMessage(R.string.error_webSite)
             return
         }
         launchCatching {

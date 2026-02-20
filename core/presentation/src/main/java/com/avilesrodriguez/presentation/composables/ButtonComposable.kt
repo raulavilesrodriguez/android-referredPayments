@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -71,21 +72,34 @@ fun FormButtons(
     ) {
         OutlinedButton(
             onClick = onCancel,
+            modifier = Modifier
+                .weight(1f)
+                .height(56.dp)
         ) {
-            Text(text = stringResource(cancelText))
+            Text(
+                text = stringResource(cancelText),
+                style = MaterialTheme.typography.titleMedium
+            )
         }
+        Spacer(Modifier.width(16.dp))
         Button(
             onClick = onConfirm,
-            enabled = enabled
+            enabled = enabled,
+            modifier = Modifier
+                .weight(1f)
+                .height(56.dp)
         ) {
             if(isSaving){
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(22.dp),
                     strokeWidth = 2.dp
                 )
             }else{
-                Text(text = stringResource(confirmText))
+                Text(
+                    text = stringResource(confirmText),
+                    style = MaterialTheme.typography.titleMedium
+                    )
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.avilesrodriguez.domain.model.user
 
 import com.avilesrodriguez.domain.ext.normalizeName
+import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 
 sealed class UserData {
@@ -25,7 +26,7 @@ sealed class UserData {
         val identityCard: String? = null, // identity
         val countNumberPay: String? = null, // cuenta para recibir pagos
         val bankName: String? = null,
-        val accountType: String? = null, // Ahorros y corriente
+        val accountType: AccountType = AccountType.SAVINGS, // Ahorros y corriente
         val moneyEarned: Double = 0.0
     ) : UserData()
 

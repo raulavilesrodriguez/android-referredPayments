@@ -18,12 +18,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.referral.Referral
+import com.avilesrodriguez.domain.model.referral.ReferralWithNames
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.SearchFieldBasic
-import com.avilesrodriguez.presentation.fakeData.generateFakeReferrals
 import com.avilesrodriguez.presentation.fakeData.userClient
-import com.avilesrodriguez.presentation.fakeData.userProvider
 
 @Composable
 fun ReferralsScreen(
@@ -34,8 +33,6 @@ fun ReferralsScreen(
     val searchText by viewModel.searchText.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val user by viewModel.userDataStore.collectAsState()
-    val clientWhoReferred = viewModel.clientWhoReferred
-    val providerThatReceived = viewModel.providerThatReceived
 
     ReferralsScreenContent(
         searchText = searchText,
@@ -44,9 +41,7 @@ fun ReferralsScreen(
             viewModel.onReferralClick(referral, openScreen) },
         referrals = uiState,
         user = user,
-        isLoading = isLoading,
-        clientWhoReferred = clientWhoReferred,
-        providerThatReceived = providerThatReceived
+        isLoading = isLoading
     )
 }
 
@@ -55,11 +50,9 @@ private fun ReferralsScreenContent(
     searchText: String,
     onValueChange: (String) -> Unit,
     onReferralClick: (Referral) -> Unit,
-    referrals: List<Referral>,
+    referrals: List<ReferralWithNames>,
     user: UserData?,
-    isLoading: Boolean,
-    clientWhoReferred: UserData?,
-    providerThatReceived: UserData?
+    isLoading: Boolean
 ){
     Column(modifier = Modifier.fillMaxSize()){
         Text(
@@ -83,8 +76,6 @@ private fun ReferralsScreenContent(
                         onReferralClick = onReferralClick,
                         referrals = referrals,
                         user = user,
-                        clientWhoReferred = clientWhoReferred,
-                        providerThatReceived = providerThatReceived,
                         modifier = Modifier
                             .padding(horizontal = 16.dp, vertical = 16.dp)
                     )
@@ -110,11 +101,9 @@ fun ReferralsScreenPreview(){
             searchText = "",
             onValueChange = {},
             onReferralClick = {},
-            referrals = generateFakeReferrals(),
+            referrals = listOf(),
             user = userClient,
-            isLoading = false,
-            clientWhoReferred = userClient,
-            providerThatReceived = userProvider
+            isLoading = false
         )
     }
 }
