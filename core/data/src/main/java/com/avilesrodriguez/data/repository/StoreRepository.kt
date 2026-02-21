@@ -66,4 +66,8 @@ class StoreRepository @Inject constructor(
     ): Flow<List<UserData>> {
         return data.searchUsersClient(namePrefix, currentUserId)
     }
+
+    override suspend fun getUserFlow(uid: String): Flow<UserData?> {
+        return data.getUserFlow(uid)
+    }
 }

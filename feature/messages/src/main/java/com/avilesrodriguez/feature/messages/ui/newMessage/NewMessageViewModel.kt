@@ -1,6 +1,7 @@
 package com.avilesrodriguez.feature.messages.ui.newMessage
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -27,6 +28,7 @@ import javax.inject.Inject
 import androidx.core.net.toUri
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
+import com.avilesrodriguez.domain.usecases.GetUserFlow
 import com.avilesrodriguez.domain.usecases.UpdateReferralFields
 import com.avilesrodriguez.domain.usecases.UpdateUserClientMetrics
 import com.avilesrodriguez.domain.usecases.UpdateUserProviderMetrics
@@ -36,6 +38,7 @@ import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_SUBJECT
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 @HiltViewModel
@@ -50,7 +53,8 @@ class NewMessageViewModel @Inject constructor(
     private val updateReferralFields: UpdateReferralFields,
     private val getReferralsByProvider: GetReferralsByProvider,
     private val updateUserClientMetrics: UpdateUserClientMetrics,
-    private val updateUserProviderMetrics: UpdateUserProviderMetrics
+    private val updateUserProviderMetrics: UpdateUserProviderMetrics,
+    private val getUserFlow: GetUserFlow
 ) : BaseViewModel() {
     private val _newMessageState = MutableStateFlow(Message())
     val newMessageState: StateFlow<Message> = _newMessageState.asStateFlow()
@@ -77,7 +81,9 @@ class NewMessageViewModel @Inject constructor(
     init {
         launchCatching {
             if(hasUser()){
-                _userDataStore.value = getUser(currentUserId)
+                getUserFlow(currentUserId).collect {
+                    _userDataStore.value = it
+                }
             }
         }
     }
@@ -89,10 +95,16 @@ class NewMessageViewModel @Inject constructor(
             if(referral != null){
                 _referralState.value = referral
                 _initialStatus.value = referral.status
-                val clientDeferred = async { getUser(referral.clientId) }
-                val providerDeferred = async { getUser(referral.providerId) }
-                clientWhoReferred = clientDeferred.await()
-                providerThatReceived = providerDeferred.await()
+                launch {
+                    getUserFlow(referral.clientId).collect {
+                        clientWhoReferred = it
+                    }
+                }
+                launch {
+                    getUserFlow(referral.providerId).collect {
+                        providerThatReceived = it
+                    }
+                }
             } else {
                 _referralState.value = Referral()
             }
@@ -208,58 +220,66 @@ class NewMessageViewModel @Inject constructor(
 
     fun onSendPay(subjectPaid:String, contentPaid: String, openAndPopUp: (String, String) -> Unit){
         launchCatching {
-            _isLoading.value = true
-            val referral = _referralState.value
-            val amountPaid = _amountUsdState.value.toDoubleOrNull() ?: 0.0
+            try{
+                _isLoading.value = true
+                val referral = _referralState.value
+                val amountPaid = _amountUsdState.value.toDoubleOrNull() ?: 0.0
 
-            // 1. Subir el voucher (tomamos el primero de localFiles)
-            val localVoucherUri = _localFiles.value.firstOrNull() ?: return@launchCatching
-            val extension = getExtensionFromUri(context.contentResolver, localVoucherUri.toUri())
-            val remotePath = "vouchers/${referral.id}_${System.currentTimeMillis()}.$extension"
-            val voucherUrl = uploadFile(localVoucherUri, remotePath)
+                // 1. Subir el voucher (tomamos el primero de localFiles)
+                val localVoucherUri = _localFiles.value.firstOrNull() ?: return@launchCatching
+                val extension = getExtensionFromUri(context.contentResolver, localVoucherUri.toUri())
+                val remotePath = "vouchers/${referral.id}_${System.currentTimeMillis()}.$extension"
+                val voucherUrl = uploadFile(localVoucherUri, remotePath)
 
-            // 2. Actualizar Referido a PAID con la URL del voucher
-            val referralUpdates = mapOf(
-                "status" to ReferralStatus.PAID.name,
-                "voucherUrl" to voucherUrl,
-                "amountPaid" to amountPaid,
-                "createdAt" to System.currentTimeMillis()
-            )
-            updateReferralFields(referral.id, referralUpdates)
+                // 2. Actualizar Referido a PAID con la URL del voucher
+                val referralUpdates = mapOf(
+                    "status" to ReferralStatus.PAID.name,
+                    "voucherUrl" to voucherUrl,
+                    "amountPaid" to amountPaid,
+                    "createdAt" to System.currentTimeMillis()
+                )
+                updateReferralFields(referral.id, referralUpdates)
 
-            // 3. Crear Mensaje de Confirmación
-            val confirmationMessage = Message(
-                referralId = referral.id,
-                senderId = currentUserId,
-                receiverId = referral.clientId,
-                subject = subjectPaid,
-                content = contentPaid,
-                attachmentsUrl = listOf(voucherUrl),
-                createdAt = System.currentTimeMillis()
-            )
-            saveMessage(confirmationMessage)
+                // 3. Crear Mensaje de Confirmación
+                val confirmationMessage = Message(
+                    referralId = referral.id,
+                    senderId = currentUserId,
+                    receiverId = referral.clientId,
+                    subject = subjectPaid,
+                    content = contentPaid,
+                    attachmentsUrl = listOf(voucherUrl),
+                    createdAt = System.currentTimeMillis()
+                )
+                saveMessage(confirmationMessage)
 
-            // metricas client
-            updateUserClientMetrics(referral.clientId, amountPaid)
+                // metricas client
+                updateUserClientMetrics(referral.clientId, amountPaid)
 
-            // metricas provider
-            val provider = providerThatReceived as? UserData.Provider
-            val allReferralsList = getReferralsByProvider(referral.providerId).first()
-            val newTotalPayouts = (provider?.totalPayouts ?: 0) + 1
-            val conversion = if (allReferralsList.isNotEmpty()) {
-                newTotalPayouts.toDouble() / allReferralsList.size
-            } else 0.0
+                // metricas provider
+                val provider = providerThatReceived as? UserData.Provider
+                val allReferralsList = getReferralsByProvider(referral.providerId).first()
+                val newTotalPayouts = (provider?.totalPayouts ?: 0) + 1
+                val conversion = if (allReferralsList.isNotEmpty()) {
+                    newTotalPayouts.toDouble() / allReferralsList.size
+                } else 0.0
 
-            updateUserProviderMetrics(
-                uid = referral.providerId,
-                moneyPaid = amountPaid,
-                referralsConversion = String.format(Locale.US, "%.2f", conversion)
-            )
+                updateUserProviderMetrics(
+                    uid = referral.providerId,
+                    moneyPaid = amountPaid,
+                    referralsConversion = String.format(Locale.US, "%.2f", conversion)
+                )
 
-            _isLoading.value = false
-            // Navegation
-            val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
-            openAndPopUp(route, NavRoutes.PAY_REFERRAL_ROUTE)
+                // Navegation
+                val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
+                openAndPopUp(route, NavRoutes.PAY_REFERRAL_ROUTE)
+            } catch (e:Exception){
+                _isLoading.value = false
+                Log.e("NewMessageViewModel", "Error al subir el voucher", e)
+            }
+            finally {
+                _isLoading.value = false
+            }
+
         }
     }
 

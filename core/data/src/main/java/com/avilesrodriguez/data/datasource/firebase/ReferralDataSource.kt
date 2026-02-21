@@ -4,6 +4,7 @@ import com.avilesrodriguez.data.datasource.firebase.model.ReferralFirestore
 import com.avilesrodriguez.data.datasource.firebase.model.toReferralDomain
 import com.avilesrodriguez.data.datasource.firebase.model.toReferralFirestore
 import com.avilesrodriguez.domain.model.referral.Referral
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -12,6 +13,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import java.util.Date
 import javax.inject.Inject
 
 class ReferralDataSource @Inject constructor(
@@ -30,9 +32,18 @@ class ReferralDataSource @Inject constructor(
 
     suspend fun updateReferralFields(referralId: String, updates: Map<String, Any>) {
         if (referralId.isEmpty()) return
+
+        val firestoreUpdates = updates.mapValues { entry ->
+            if (entry.key == CREATED_AT_FIELD && entry.value is Long) {
+                Timestamp(Date(entry.value as Long))
+            } else {
+                entry.value
+            }
+        }
+
         firestore.collection(REFERRALS_COLLECTION)
             .document(referralId)
-            .update(updates)
+            .update(firestoreUpdates)
             .await()
     }
 

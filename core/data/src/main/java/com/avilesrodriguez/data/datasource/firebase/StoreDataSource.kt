@@ -259,6 +259,33 @@ class StoreDataSource @Inject constructor(
         awaitClose { listenerRegistration.remove() }
     }
 
+    fun getUserFlow(uid: String): Flow<UserData?> = callbackFlow {
+        if (uid.isEmpty()) {trySend(null).isSuccess
+            close()
+            return@callbackFlow
+        }
+
+        val listener = firestore.collection(USERS_COLLECTION)
+            .document(uid)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                val type = snapshot?.getString("type")
+                val firestoreUser = when (type) {
+                    "CLIENT" -> snapshot.toObject(UserDataFirestore.Client::class.java)
+                    "PROVIDER" -> snapshot.toObject(UserDataFirestore.Provider::class.java)
+                    else -> null
+                }
+
+                trySend(firestoreUser?.toUserDataDomain()).isSuccess
+            }
+
+        awaitClose { listener.remove() }
+    }
+
 
     companion object{
         private const val USERS_COLLECTION = "users"

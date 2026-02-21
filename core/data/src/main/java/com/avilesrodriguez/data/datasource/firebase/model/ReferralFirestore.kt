@@ -4,7 +4,6 @@ import android.util.Log
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.google.firebase.Timestamp
-
 import java.util.Date
 
 data class ReferralFirestore(

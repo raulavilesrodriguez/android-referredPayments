@@ -275,7 +275,9 @@ private fun NewEmail(
                         val isSelected = referral.status == status
                         FilterChip(
                             selected = isSelected,
-                            onClick = { onStatusChange(status) },
+                            onClick = { onStatusChange(status)
+                                if(status == ReferralStatus.PAID) onStatusPay()
+                                      },
                             label = { Text(stringResource(status.toDisplayName())) },
                             leadingIcon = {
                                 Icon(
@@ -289,9 +291,6 @@ private fun NewEmail(
                         )
                     }
                 }
-            }
-            if(referral.status == ReferralStatus.PAID){
-                onStatusPay()
             }
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         }

@@ -11,6 +11,7 @@ import com.avilesrodriguez.domain.usecases.GetReferralsByClient
 import com.avilesrodriguez.domain.usecases.GetReferralsByClientByProvider
 import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
 import com.avilesrodriguez.domain.usecases.GetUser
+import com.avilesrodriguez.domain.usecases.GetUserFlow
 import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SearchUsersClient
 import com.avilesrodriguez.domain.usecases.SearchUsersProvider
@@ -30,9 +31,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -45,7 +49,8 @@ class HomeViewModel @Inject constructor(
     private val searchUsersClient: SearchUsersClient,
     private val getReferralsByProvider: GetReferralsByProvider,
     private val getReferralsByClientByProvider: GetReferralsByClientByProvider,
-    private val getReferralsByClient: GetReferralsByClient
+    private val getReferralsByClient: GetReferralsByClient,
+    private val getUserFlow: GetUserFlow
 ) : BaseViewModel() {
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
@@ -76,8 +81,12 @@ class HomeViewModel @Inject constructor(
     init{
         launchCatching {
             if(hasUser()){
-                val user = getUser(currentUserId)
-                _userDataStore.value = user
+                launch {
+                    getUserFlow(currentUserId).collect {
+                        _userDataStore.value = it
+                    }
+                }
+                val user = _userDataStore.filterNotNull().first()
                 when(user){
                     is UserData.Provider ->{
                         loadReferralsByProvider()
@@ -86,7 +95,6 @@ class HomeViewModel @Inject constructor(
                     is UserData.Client -> {
                         loadReferralsByClient()
                     }
-                    else -> {}
                 }
             }
             combine(_searchText, _selectedIndustry){ text, industry ->
