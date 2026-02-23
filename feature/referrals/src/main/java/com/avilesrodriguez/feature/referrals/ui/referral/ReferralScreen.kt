@@ -103,7 +103,7 @@ fun ReferralScreenContent(
         topBar = {
             ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
-                title = R.string.information_referral,
+                title = stringResource(R.string.information_referral),
                 backClick = { onBackClick() }
             )
         },

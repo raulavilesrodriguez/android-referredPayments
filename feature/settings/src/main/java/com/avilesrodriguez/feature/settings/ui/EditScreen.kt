@@ -94,7 +94,7 @@ fun EditScreen(
         topBar = {
             ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
-                title = R.string.edit_profile,
+                title = stringResource(R.string.edit_profile),
                 backClick = popUp
             )
         },

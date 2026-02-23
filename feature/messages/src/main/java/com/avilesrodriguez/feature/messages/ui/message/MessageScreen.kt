@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.message.Message
@@ -98,7 +99,13 @@ private fun MessageScreenContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {Text(text = referral.name)},
+                title = {
+                    Text(
+                        text = referral.name,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                        },
                 navigationIcon = {
                     IconButton(
                         onClick = { onBackClick() }

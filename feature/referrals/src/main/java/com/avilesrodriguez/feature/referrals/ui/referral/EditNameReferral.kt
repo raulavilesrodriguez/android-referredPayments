@@ -64,7 +64,7 @@ private fun EditNameReferralContent(
         topBar = {
             ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
-                title = R.string.name_referred,
+                title = stringResource(R.string.name_referred),
                 backClick = { onBackClick() }
             )
         },

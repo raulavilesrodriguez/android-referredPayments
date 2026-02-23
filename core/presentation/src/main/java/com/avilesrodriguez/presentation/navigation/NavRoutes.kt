@@ -36,9 +36,9 @@ object NavRoutes {
     object MessageArgs {
         const val ID = "id"
     }
-    const val PAY_REFERRAL = "pay_referral"
-    const val PAY_REFERRAL_ROUTE = "pay_referral?sharedUri={sharedUri}"
+    const val PAY_REFERRAL = "pay_referral/{id}" //id del referral
 
+    const val PAY_REFERRAL_ROUTE = "pay_referral?sharedUri={sharedUri}"
     fun buildPayReferralRoute(uri: String): String {
         // CODIFICAR la URI para que sea segura en la ruta
         val encodedUri = java.net.URLEncoder.encode(uri, "UTF-8")

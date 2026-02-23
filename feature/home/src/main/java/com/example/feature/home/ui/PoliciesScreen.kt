@@ -31,7 +31,7 @@ fun PoliciesScreen(
         topBar = {
             ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
-                title = R.string.policies,
+                title = stringResource(R.string.policies),
                 backClick = popUp
             )
         },

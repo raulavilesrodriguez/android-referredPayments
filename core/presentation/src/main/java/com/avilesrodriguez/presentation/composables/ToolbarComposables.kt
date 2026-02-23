@@ -23,31 +23,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun BasicToolbar(@StringRes title: Int) {
-    TopAppBar(
-        title = {
-            Text(stringResource(title))
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-            titleContentColor = MaterialTheme.colorScheme.onSurface,
-            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-            actionIconContentColor = MaterialTheme.colorScheme.onSurface
-        )
-    )
-}
 
 @Composable
 fun ToolBarWithIcon(
     @DrawableRes iconBack: Int,
-    @StringRes title: Int,
+    title: String,
     backClick: () -> Unit,
     modifier: Modifier = Modifier,
-    argument: String? = null
 ){
     Row(
         modifier = modifier
@@ -66,13 +51,38 @@ fun ToolBarWithIcon(
         }
         Spacer(modifier = Modifier.width(16.dp))
         Text(
-            text = stringResource(id = title, argument?:""),
-            style = MaterialTheme.typography.titleLarge,
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
                 .padding(start = 4.dp)
-                .fillMaxWidth(0.80f)
+                .fillMaxWidth(0.80f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BasicToolbar(@StringRes title: Int) {
+    TopAppBar(
+        title = {
+            Text(
+                text= stringResource(title),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .padding(start = 4.dp)
+                    .fillMaxWidth(0.80f),
+            )
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurface
+        )
+    )
 }
 
 @Composable
@@ -104,7 +114,9 @@ fun ToolBarDetails(
             color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .padding(start = 4.dp)
-                .fillMaxWidth(0.80f)
+                .fillMaxWidth(0.80f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

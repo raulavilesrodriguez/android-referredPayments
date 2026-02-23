@@ -60,7 +60,7 @@ private fun EditPhoneReferralContent(
         topBar = {
             ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
-                title = R.string.phone_number_referred,
+                title = stringResource(R.string.phone_number_referred),
                 backClick = { onBackClick() }
             )
         },

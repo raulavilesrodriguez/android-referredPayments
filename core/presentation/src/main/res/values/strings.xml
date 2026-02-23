@@ -14,6 +14,7 @@
     <string name="reply">Reply</string>
     <string name="downloading">Downloading</string>
     <string name="download_error">Download error</string>
+    <string name="name">"Name: "</string>
     <!-- Photo -->
     <string name="cancel_crooper">Cancel</string>
     <string name="confirm_crooper">Crop</string>
@@ -148,6 +149,10 @@
     <string name="client_bank_details">Client Bank Details</string>
     <string name="no_open_file_attachment">Install an application that allows you to open this file.</string>
     <string name="open_with">Open with</string>
+    <string name="process">Process</string>
+    <string name="reject">Reject</string>
+    <string name="pay">Pay</string>
+    <string name="reason">Reason</string>
 
     <!-- Referral Metrics -->
     <string name="all_referrals">All Referrals</string>
@@ -191,6 +196,7 @@
     <string name="content_payment">The payment of USD %1$s has been made successfully by the referred user: %2$s </string>
     <string name="proof_of_payment_attach">Proof of Payment Attach</string>
     <string name="no_files_attached">No files attached</string>
+    <string name="rejected_referral">Rejected Referral, %s</string>
     <string name="choose_your_bank">Choose your bank</string>
     <string name="bank_of_pichincha">Bank Pichincha</string>
     <string name="bank_of_guayaquil">Bank Guayaquil</string>

@@ -1,6 +1,8 @@
 package com.avilesrodriguez.winapp.ui.navigation
 
 import android.content.res.Resources
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,7 +34,6 @@ import com.avilesrodriguez.feature.auth.ui.splash.SplashScreen
 import com.avilesrodriguez.feature.messages.ui.message.MessageScreen
 import com.avilesrodriguez.feature.messages.ui.messages.MessagesScreen
 import com.avilesrodriguez.feature.messages.ui.newMessage.NewMessage
-import com.avilesrodriguez.feature.messages.ui.newMessage.NewMessageViewModel
 import com.avilesrodriguez.feature.messages.ui.newMessage.PayReferral
 import com.avilesrodriguez.feature.referrals.ui.addReferral.AddReferralScreen
 import com.avilesrodriguez.feature.referrals.ui.referral.EditEmailReferral
@@ -52,6 +53,7 @@ import com.example.feature.home.ui.details.DetailScreenUser
 import kotlinx.coroutines.CoroutineScope
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MainNavigation(){
     WinAppTheme {
@@ -88,7 +90,8 @@ fun MainNavigation(){
                     addDetailUser(appState)
                     addNewReferral(appState)
                     addMessages(appState)
-                    newMessageGraph(appState)
+                    newMessageNavigation(appState)
+                    payReferralNavigation(appState)
                     viewMessage(appState)
                 }
             }
@@ -272,53 +275,35 @@ private fun NavGraphBuilder.addMessages(appState: AppState){
     }
 }
 
-private fun NavGraphBuilder.newMessageGraph(appState: AppState){
-    navigation(
-        startDestination = NavRoutes.NEW_MESSAGE,
-        route = NavRoutes.NEW_MESSAGE_GRAPH
-    ){
-        composable(
-            route = NavRoutes.NEW_MESSAGE,
-            arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID) { type = NavType.StringType }),
-        ){ backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                appState.navController.getBackStackEntry(NavRoutes.NEW_MESSAGE_GRAPH)
-            }
-            val viewModel: NewMessageViewModel = hiltViewModel(parentEntry)
-            val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
-            NewMessage(
-                referralId = referralId,
-                onBackClick = { appState.popUp() },
-                openScreen = { route -> appState.navigate(route) },
-                viewModel = viewModel
-            )
-        }
-        composable(
-            route = NavRoutes.PAY_REFERRAL_ROUTE,
-            arguments = listOf(
-                navArgument("sharedUri") {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                }
-            )
-        ){ backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                appState.navController.getBackStackEntry(NavRoutes.NEW_MESSAGE_GRAPH)
-            }
-            val viewModel: NewMessageViewModel = hiltViewModel(parentEntry)
-            // Extraer la URI de los argumentos
-            val sharedUri = backStackEntry.arguments?.getString("sharedUri")
-            PayReferral(
-                sharedUri = sharedUri,
-                onBackClick = { appState.popUp() },
-                openAndPopUp = {route, popUp -> appState.navigateAndPopUp(route, popUp)},
-                viewModel = viewModel
-            )
-        }
+private fun NavGraphBuilder.newMessageNavigation(appState: AppState){
+    composable(
+        route = NavRoutes.NEW_MESSAGE,
+        arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID) { type = NavType.StringType }),
+    ){ backStackEntry ->
+        val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
+        NewMessage(
+            referralId = referralId,
+            onBackClick = { appState.popUp() },
+            openScreen = { route -> appState.navigate(route) }
+        )
     }
 }
 
+private fun NavGraphBuilder.payReferralNavigation(appState: AppState){
+    composable(
+        route = NavRoutes.PAY_REFERRAL,
+        arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID) { type = NavType.StringType }),
+    ){ backStackEntry ->
+        val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
+        PayReferral(
+            referralId = referralId,
+            onBackClick = { appState.popUp() },
+            openAndPopUp = {route, popUp -> appState.navigateAndPopUp(route, popUp)}
+        )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun NavGraphBuilder.viewMessage(appState: AppState){
     composable(
         route = NavRoutes.MESSAGE_SCREEN,

@@ -200,12 +200,7 @@ class NewMessageViewModel @Inject constructor(
         _selectedOption.value = filteredBank
     }
 
-    fun onStatusPay(openScreen: (String) -> Unit){
-        resetValues()
-        openScreen(NavRoutes.PAY_REFERRAL)
-    }
-
-    private fun resetValues(){
+    fun resetValues(){
         _localFiles.value = emptyList()
         _newMessageState.value = Message()
         _amountUsdState.value = ""
@@ -215,7 +210,7 @@ class NewMessageViewModel @Inject constructor(
     fun onCancelPay(openAndPopUp: (String, String) -> Unit){
         val referral = _referralState.value
         val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
-        openAndPopUp(route, NavRoutes.NEW_MESSAGE_GRAPH)
+        openAndPopUp(route, NavRoutes.PAY_REFERRAL)
     }
 
     fun onSendPay(subjectPaid:String, contentPaid: String, openAndPopUp: (String, String) -> Unit){
@@ -271,7 +266,7 @@ class NewMessageViewModel @Inject constructor(
 
                 // Navegation
                 val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
-                openAndPopUp(route, NavRoutes.PAY_REFERRAL_ROUTE)
+                openAndPopUp(route, NavRoutes.PAY_REFERRAL)
             } catch (e:Exception){
                 _isLoading.value = false
                 Log.e("NewMessageViewModel", "Error al subir el voucher", e)
@@ -279,6 +274,12 @@ class NewMessageViewModel @Inject constructor(
             finally {
                 _isLoading.value = false
             }
+
+        }
+    }
+
+    fun onSendReject(subjectReject:String, openAndPopUp: (String, String) -> Unit){
+        launchCatching {
 
         }
     }

@@ -60,7 +60,7 @@ private fun EditEmailReferralContent(
         topBar = {
             ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
-                title = R.string.email_referred,
+                title = stringResource(R.string.email_referred),
                 backClick = { onBackClick() }
             )
         },

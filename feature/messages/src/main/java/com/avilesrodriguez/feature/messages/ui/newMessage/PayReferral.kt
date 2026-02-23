@@ -42,15 +42,18 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun PayReferral(
-    sharedUri: String?,
+    referralId: String?,
     onBackClick: () -> Unit,
     openAndPopUp: (String, String) -> Unit,
     viewModel: NewMessageViewModel = hiltViewModel(),
     sharedAttachmentViewModel: SharedAttachmentViewModel = hiltViewModel(LocalActivity.current as ComponentActivity)
 ){
+    LaunchedEffect(Unit) {
+        viewModel.loadReferralInformation(referralId.orEmpty())
+    }
+
     // Observamos el archivo del ViewModel compartido
     val sharedFileFromActivity = sharedAttachmentViewModel.currentFileUri
-
     LaunchedEffect(sharedFileFromActivity) {
         if(sharedFileFromActivity != null){
             viewModel.onAttachFiles(listOf(sharedFileFromActivity))
@@ -101,7 +104,7 @@ fun PayReferral(
 }
 
 @Composable
-fun BankDetailsCard(
+private fun BankDetailsCard(
     client: UserData.Client,
     amountUsd: String,
     onAmountChange: (String) -> Unit,
@@ -124,12 +127,13 @@ fun BankDetailsCard(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.client_bank_details),
-            style = MaterialTheme.typography.titleMedium,
+            text = stringResource(R.string.pay),
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSecondaryContainer
         )
         Spacer(Modifier.height(8.dp))
+        DetailRow(label = R.string.name, value = client.name ?: "")
         DetailRow(label = R.string.bank_name, value = client.bankName ?: "")
         DetailRow(label = R.string.account_type, value = stringResource(client.accountType.label()))
         DetailRowCopy(label = R.string.count_number_pay, value = client.countNumberPay ?: ""){onCopyClick(it)}

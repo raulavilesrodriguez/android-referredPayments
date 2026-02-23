@@ -22,6 +22,15 @@ fun ReferralStatus.toDisplayName(): Int {
     }
 }
 
+fun ReferralStatus.nameSelect(): Int {
+    return when (this) {
+        ReferralStatus.PROCESSING -> R.string.process
+        ReferralStatus.REJECTED -> R.string.reject
+        ReferralStatus.PAID -> R.string.pay
+        else -> R.string.pending
+    }
+}
+
 fun ReferralStatus.toDisplayIcon(): Int {
     return when (this) {
         ReferralStatus.PENDING -> R.drawable.sentiment_pending

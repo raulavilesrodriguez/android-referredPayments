@@ -14,6 +14,7 @@
     <string name="reply">Responder</string>
     <string name="downloading">Descargando</string>
     <string name="download_error">Error en la descarga</string>
+    <string name="name">"Nombre: "</string>
     <string name="cancel_crooper">Cancelar</string>
     <string name="confirm_crooper">Recortar</string>
     <string name="error_cropping">Error al recortar la imagen</string>
@@ -90,7 +91,7 @@
     <string name="referred_from">Referido desde: %s</string>
     <string name="referral">Referrido de</string>
     <string name="created">Creado: %s</string>
-    <string name="referred">Referrido:</string>
+    <string name="referred">Referrido: %s</string>
     <string name="phone_number_referred">Número Telefónico Referido</string>
     <string name="all_status">Todos</string>
     <string name="paid">Pagado</string>
@@ -130,7 +131,7 @@
     <string name="travel">Viajes</string>
     <string name="retail">Retail</string>
     <string name="all_industries">Todas</string>
-    <string name="status">Estados</string>
+    <string name="status">Estado</string>
     <string name="bank">Banco</string>
     <string name="account">Cuenta</string>
     <string name="beneficiary">Beneficiario:</string>
@@ -162,6 +163,8 @@
     <string name="client_bank_details">Datos Bancarios del Cliente</string>
     <string name="no_open_file_attachment">Instala una aplicación que permita abrir este archivo</string>
     <string name="open_with">Abrir con</string>
+    <string name="pay">Pagar</string>
+    <string name="reason">Motivo</string>
     <string name="all_referrals">Todos los Referidos</string>
     <string name="pending">Pendiente</string>
     <string name="processing">Procesando</string>
@@ -182,6 +185,7 @@
     <string name="content_payment">"El pago de USD %1$s se ha realizado con éxito por el referido: %2$s "</string>
     <string name="proof_of_payment_attach">Comprobante de Pago Adjunto</string>
     <string name="no_files_attached">No hay archivos adjuntos</string>
+    <string name="rejected_referral">Referido Rechazado, %s</string>
     <string name="choose_your_bank">Escoge tu banco</string>
     <string name="bank_of_pichincha">Banco Pichincha</string>
     <string name="bank_of_guayaquil">Banco Guayaquil</string>
@@ -190,4 +194,6 @@
     <string name="bank_bolivariano">Banco Bolivariano</string>
     <string name="bank_international">Banco Internacional</string>
     <string name="savings">Ahorros</string>
+    <string name="process">Procesar</string>
+    <string name="reject">Rechazar</string>
 </resources>
