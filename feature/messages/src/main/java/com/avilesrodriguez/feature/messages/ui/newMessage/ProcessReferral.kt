@@ -34,23 +34,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.avilesrodriguez.domain.model.message.Message
-import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.attachment.AttachmentPreviews
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
+import com.avilesrodriguez.presentation.ext.MAX_LENGTH_SUBJECT
 
 @Composable
-fun RejectReferral(
+fun ProcessReferral(
     newMessageState: Message,
     from: String,
     to: String,
-    referral: Referral,
     loading: Boolean,
     localFiles: List<String>,
+    onSubjectChange: (String) -> Unit,
     onContentChange: (String) -> Unit,
     onAttachFiles: (List<String>) -> Unit,
     onRemoveFile: (String) -> Unit,
-    onRejectMessage: () -> Unit
+    onSaveMessage: () -> Unit
 ){
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
@@ -66,11 +66,27 @@ fun RejectReferral(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val subjectReject = stringResource(R.string.rejected_referral, referral.name)
-
         InfoHeadMessage(label = stringResource(R.string.from), value = from)
         InfoHeadMessage(label = stringResource(R.string.to), value = to)
-        InfoHeadMessage(label = stringResource(R.string.subject), value = subjectReject)
+
+        Column {
+            OutlinedTextField(
+                value = newMessageState.subject,
+                onValueChange = onSubjectChange,
+                label = { Text(stringResource(R.string.subject)) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp)
+            )
+            Text(
+                text = "${newMessageState.subject.length}/$MAX_LENGTH_SUBJECT",
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.End,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
         // --- 3. CONTENIDO DEL MENSAJE ---
@@ -120,10 +136,12 @@ fun RejectReferral(
                 Text(stringResource(R.string.attach))
             }
 
-            val canSend = !loading && newMessageState.content.isNotBlank()
+            val canSend = !loading &&
+                    newMessageState.subject.isNotBlank() &&
+                    newMessageState.content.isNotBlank()
 
             Button(
-                onClick = onRejectMessage,
+                onClick = onSaveMessage,
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp),
                 enabled = canSend
@@ -133,7 +151,7 @@ fun RejectReferral(
                 } else {
                     Icon(Icons.AutoMirrored.Filled.Send, null)
                     Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.reject))
+                    Text(stringResource(R.string.send))
                 }
             }
         }

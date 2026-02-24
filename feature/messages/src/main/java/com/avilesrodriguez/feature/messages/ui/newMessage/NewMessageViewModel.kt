@@ -36,7 +36,6 @@ import com.avilesrodriguez.presentation.banksPays.BanksEcuador
 import com.avilesrodriguez.presentation.banksPays.getById
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_SUBJECT
-import com.avilesrodriguez.presentation.navigation.NavRoutes
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -129,24 +128,12 @@ class NewMessageViewModel @Inject constructor(
         _localFiles.value -= uri
     }
 
-    fun onStatusChange(newStatus: ReferralStatus){
-        _referralState.value = _referralState.value.copy(status = newStatus)
-    }
-
     fun onSaveMessage(popUp: () -> Unit){
         val referral = _referralState.value
         if(referral.id.isEmpty()) return
 
         launchCatching {
             _isLoading.value = true
-
-            val newStatus = _referralState.value.status
-            if(_initialStatus.value != newStatus){
-                val updates = mapOf(
-                    "status" to newStatus.name
-                )
-                updateReferralFields(_referralState.value.id, updates)
-            }
 
             val receiverId = if (currentUserId == referral.clientId) {
                 referral.providerId
@@ -207,29 +194,27 @@ class NewMessageViewModel @Inject constructor(
         _selectedOption.value = null
     }
 
-    fun onCancelPay(openAndPopUp: (String, String) -> Unit){
-        val referral = _referralState.value
-        val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
-        openAndPopUp(route, NavRoutes.PAY_REFERRAL)
-    }
-
-    fun onSendPay(subjectPaid:String, contentPaid: String, openAndPopUp: (String, String) -> Unit){
+    fun onSendPay(subjectPaid:String, contentPaid: String, popUp: () -> Unit){
         launchCatching {
             try{
                 _isLoading.value = true
                 val referral = _referralState.value
                 val amountPaid = _amountUsdState.value.toDoubleOrNull() ?: 0.0
 
-                // 1. Subir el voucher (tomamos el primero de localFiles)
-                val localVoucherUri = _localFiles.value.firstOrNull() ?: return@launchCatching
-                val extension = getExtensionFromUri(context.contentResolver, localVoucherUri.toUri())
-                val remotePath = "vouchers/${referral.id}_${System.currentTimeMillis()}.$extension"
-                val voucherUrl = uploadFile(localVoucherUri, remotePath)
+                val remoteUrls = _localFiles.value.mapIndexed { index, localUriString ->
+                    async {
+                        val uri = localUriString.toUri()
+                        // para obtener la extensión real (.pdf, .jpg, etc.)
+                        val extension = getExtensionFromUri(context.contentResolver, uri)
+
+                        val remotePath = "messages/${referral.id}/${System.currentTimeMillis()}_$index.$extension"
+                        uploadFile(localUriString, remotePath)
+                    }
+                }.awaitAll()
 
                 // 2. Actualizar Referido a PAID con la URL del voucher
                 val referralUpdates = mapOf(
                     "status" to ReferralStatus.PAID.name,
-                    "voucherUrl" to voucherUrl,
                     "amountPaid" to amountPaid,
                     "createdAt" to System.currentTimeMillis()
                 )
@@ -242,7 +227,7 @@ class NewMessageViewModel @Inject constructor(
                     receiverId = referral.clientId,
                     subject = subjectPaid,
                     content = contentPaid,
-                    attachmentsUrl = listOf(voucherUrl),
+                    attachmentsUrl = remoteUrls,
                     createdAt = System.currentTimeMillis()
                 )
                 saveMessage(confirmationMessage)
@@ -264,9 +249,8 @@ class NewMessageViewModel @Inject constructor(
                     referralsConversion = String.format(Locale.US, "%.2f", conversion)
                 )
 
-                // Navegation
-                val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
-                openAndPopUp(route, NavRoutes.PAY_REFERRAL)
+                // Navigation
+                popUp()
             } catch (e:Exception){
                 _isLoading.value = false
                 Log.e("NewMessageViewModel", "Error al subir el voucher", e)
@@ -278,9 +262,51 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun onSendReject(subjectReject:String, openAndPopUp: (String, String) -> Unit){
+    fun onRejectReferral(subjectReject:String, popUp: () -> Unit){
         launchCatching {
+            try {
+                _isLoading.value = true
+                val referral = _referralState.value
 
+                val updates = mapOf(
+                    "status" to ReferralStatus.REJECTED.name,
+                    "createdAt" to System.currentTimeMillis()
+                )
+                updateReferralFields(referral.id, updates)
+
+                val remoteUrls = _localFiles.value.mapIndexed { index, localUriString ->
+                    async {
+                        val uri = localUriString.toUri()
+                        // para obtener la extensión real (.pdf, .jpg, etc.)
+                        val extension = getExtensionFromUri(context.contentResolver, uri)
+
+                        val remotePath = "messages/${referral.id}/${System.currentTimeMillis()}_$index.$extension"
+                        uploadFile(localUriString, remotePath)
+                    }
+                }.awaitAll()
+
+                val message = _newMessageState.value.copy(
+                    referralId = referral.id,
+                    senderId = currentUserId,
+                    receiverId = referral.clientId,
+                    subject = subjectReject,
+                    attachmentsUrl = remoteUrls,
+                    createdAt = System.currentTimeMillis()
+                )
+
+                saveMessage(message)
+
+                // metricas provider
+                val provider = providerThatReceived as? UserData.Provider
+                val allReferralsList = getReferralsByProvider(referral.providerId).first()
+
+                // Navigation
+                popUp()
+            } catch (e:Exception){
+                Log.e("NewMessageViewModel", "Error al rechazar el Referido", e)
+            } finally {
+            _isLoading.value = false
+            }
         }
     }
 

@@ -34,7 +34,6 @@ import com.avilesrodriguez.feature.auth.ui.splash.SplashScreen
 import com.avilesrodriguez.feature.messages.ui.message.MessageScreen
 import com.avilesrodriguez.feature.messages.ui.messages.MessagesScreen
 import com.avilesrodriguez.feature.messages.ui.newMessage.NewMessage
-import com.avilesrodriguez.feature.messages.ui.newMessage.PayReferral
 import com.avilesrodriguez.feature.referrals.ui.addReferral.AddReferralScreen
 import com.avilesrodriguez.feature.referrals.ui.referral.EditEmailReferral
 import com.avilesrodriguez.feature.referrals.ui.referral.EditNameReferral
@@ -91,7 +90,6 @@ fun MainNavigation(){
                     addNewReferral(appState)
                     addMessages(appState)
                     newMessageNavigation(appState)
-                    payReferralNavigation(appState)
                     viewMessage(appState)
                 }
             }
@@ -285,20 +283,6 @@ private fun NavGraphBuilder.newMessageNavigation(appState: AppState){
             referralId = referralId,
             onBackClick = { appState.popUp() },
             openScreen = { route -> appState.navigate(route) }
-        )
-    }
-}
-
-private fun NavGraphBuilder.payReferralNavigation(appState: AppState){
-    composable(
-        route = NavRoutes.PAY_REFERRAL,
-        arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID) { type = NavType.StringType }),
-    ){ backStackEntry ->
-        val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
-        PayReferral(
-            referralId = referralId,
-            onBackClick = { appState.popUp() },
-            openAndPopUp = {route, popUp -> appState.navigateAndPopUp(route, popUp)}
         )
     }
 }

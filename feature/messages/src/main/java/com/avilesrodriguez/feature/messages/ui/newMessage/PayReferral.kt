@@ -1,7 +1,5 @@
 package com.avilesrodriguez.feature.messages.ui.newMessage
 
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -20,119 +18,57 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.banksPays.BanksEcuador
 import com.avilesrodriguez.presentation.banksPays.options
 import com.avilesrodriguez.presentation.composables.MenuDropdownBoxLeadIcon
 import com.avilesrodriguez.presentation.attachment.AttachmentPreviews
-import com.avilesrodriguez.presentation.banksPays.copyClientData
 import com.avilesrodriguez.presentation.banksPays.label
-import com.avilesrodriguez.presentation.banksPays.openBankApp
+import com.avilesrodriguez.presentation.fakeData.referral
 import com.avilesrodriguez.presentation.fakeData.userClient
-import com.avilesrodriguez.presentation.viewmodel.SharedAttachmentViewModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun PayReferral(
-    referralId: String?,
-    onBackClick: () -> Unit,
-    openAndPopUp: (String, String) -> Unit,
-    viewModel: NewMessageViewModel = hiltViewModel(),
-    sharedAttachmentViewModel: SharedAttachmentViewModel = hiltViewModel(LocalActivity.current as ComponentActivity)
-){
-    LaunchedEffect(Unit) {
-        viewModel.loadReferralInformation(referralId.orEmpty())
-    }
-
-    // Observamos el archivo del ViewModel compartido
-    val sharedFileFromActivity = sharedAttachmentViewModel.currentFileUri
-    LaunchedEffect(sharedFileFromActivity) {
-        if(sharedFileFromActivity != null){
-            viewModel.onAttachFiles(listOf(sharedFileFromActivity))
-            sharedAttachmentViewModel.consumeFile()
-        }
-    }
-
-    val referral by viewModel.referralState.collectAsState()
-    val loading by viewModel.isLoading.collectAsState()
-    val localFiles by viewModel.localFiles.collectAsState()
-    val clientWhoReferred = viewModel.clientWhoReferred
-    val amountUsdState by viewModel.amountUsdState.collectAsState()
-    val selectedOption by viewModel.selectedOption.collectAsState()
-
-    val context = LocalContext.current
-
-    val subjectPaid = stringResource(R.string.proof_of_payment, referral.name)
-    val contentPaid = stringResource(R.string.content_payment, amountUsdState, referral.name)
-    val selectedBankPackage = selectedOption?.packageName ?:""
-
-
-    if(clientWhoReferred != null){
-        val client = clientWhoReferred as UserData.Client
-        BankDetailsCard(
-            client = client,
-            amountUsd = amountUsdState,
-            onAmountChange = viewModel::onAmountChange,
-            onPayClick = {
-                if(selectedBankPackage.isNotBlank()) openBankApp(selectedBankPackage, context)
-                },
-            onCancelButton = {viewModel.onCancelPay(openAndPopUp)},
-            onCopyClick = {infoUser -> copyClientData(context, infoUser)},
-            selectedOption = selectedOption?.label,
-            onBankChange = viewModel::onBankChange,
-            onSendPay = {viewModel.onSendPay(subjectPaid, contentPaid, openAndPopUp)},
-            loading = loading,
-            localFiles = localFiles,
-            onRemoveFile = viewModel::onRemoveFile
-        )
-    } else {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(8.dp)
-            )
-        }
-    }
-}
-
-@Composable
-private fun BankDetailsCard(
-    client: UserData.Client,
+    referral: Referral,
+    from: String,
+    to: String,
+    clientWhoReferred: UserData?,
     amountUsd: String,
     onAmountChange: (String) -> Unit,
     onPayClick: () -> Unit,
-    onCancelButton: () -> Unit,
+    onCancelPay: () -> Unit,
     onCopyClick: (String) -> Unit,
     selectedOption: Int?,
     onBankChange: (Int) -> Unit,
     onSendPay: () -> Unit,
     loading: Boolean,
     localFiles: List<String>,
-    onRemoveFile: (String) -> Unit,
+    onRemoveFile: (String) -> Unit
 ) {
     val banksOptions = BanksEcuador.options()
-    Column(modifier = Modifier
+    val client = clientWhoReferred as UserData.Client
+    val subjectPaid = stringResource(R.string.proof_of_payment, referral.name)
+
+    Column(
+        modifier = Modifier
         .fillMaxSize()
-        .padding(16.dp)
+        .padding(4.dp)
         .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = stringResource(R.string.pay),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSecondaryContainer
-        )
-        Spacer(Modifier.height(8.dp))
+        InfoHeadMessage(label = stringResource(R.string.from), value = from)
+        InfoHeadMessage(label = stringResource(R.string.to), value = to)
+        InfoHeadMessage(label= stringResource(R.string.subject), value = subjectPaid)
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         DetailRow(label = R.string.name, value = client.name ?: "")
         DetailRow(label = R.string.bank_name, value = client.bankName ?: "")
         DetailRow(label = R.string.account_type, value = stringResource(client.accountType.label()))
@@ -183,7 +119,7 @@ private fun BankDetailsCard(
             horizontalArrangement = Arrangement.Center
         ){
             OutlinedButton(
-                onClick = { onCancelButton() },
+                onClick = { onCancelPay() },
                 modifier = Modifier.padding(vertical = 4.dp),
             ) {
                 Icon(Icons.Default.Cancel, null, modifier = Modifier.size(18.dp))
@@ -328,12 +264,15 @@ private fun DetailRowCopy(@StringRes label: Int, value: String, onCopyClick: (St
 @Composable
 fun PayReferralPreview(){
     MaterialTheme {
-        BankDetailsCard(
-            client = userClient,
-            amountUsd = "",
+        PayReferral(
+            referral = referral,
+            from = "Seguros Atlantida",
+            to = "Brayan Muelas",
+            clientWhoReferred = userClient,
+            amountUsd = "10",
             onAmountChange = {},
             onPayClick = {},
-            onCancelButton = {},
+            onCancelPay = {},
             onCopyClick = {},
             selectedOption = null,
             onBankChange = {},

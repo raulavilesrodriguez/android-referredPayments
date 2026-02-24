@@ -1,24 +1,16 @@
 package com.avilesrodriguez.feature.messages.ui.messages
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,18 +20,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.message.Message
 import com.avilesrodriguez.domain.model.referral.Referral
-import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.SearchFieldBasic
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
-import com.avilesrodriguez.presentation.ext.nameSelect
-import com.avilesrodriguez.presentation.ext.toColor
 
 @Composable
 fun MessagesScreen(
@@ -71,8 +59,7 @@ fun MessagesScreen(
         clientWhoReferred = clientWhoReferred,
         providerThatReceived = providerThatReceived,
         referral = referralState,
-        onNewMessageClick = { viewModel.onNewMessageClick(openScreen) },
-        onStatusChange = {status -> viewModel.onStatusChange(status, openScreen)}
+        onNewMessageClick = { viewModel.onNewMessageClick(openScreen) }
     )
 }
 
@@ -88,8 +75,7 @@ private fun MessagesScreenContent(
     clientWhoReferred: UserData?,
     providerThatReceived: UserData?,
     referral: Referral,
-    onNewMessageClick: () -> Unit,
-    onStatusChange: (ReferralStatus) -> Unit
+    onNewMessageClick: () -> Unit
 ){
     Scaffold(
         topBar = {
@@ -100,17 +86,15 @@ private fun MessagesScreenContent(
             )
         },
         floatingActionButton = {
-            if(user is UserData.Client || user is UserData.Provider && referral.status != ReferralStatus.PROCESSING){
-                FloatingActionButton(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    onClick = onNewMessageClick
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
+            FloatingActionButton(
+                containerColor = MaterialTheme.colorScheme.primary,
+                onClick = onNewMessageClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             }
         },
         content = { innerPadding ->
@@ -123,8 +107,6 @@ private fun MessagesScreenContent(
                 clientWhoReferred = clientWhoReferred,
                 providerThatReceived = providerThatReceived,
                 isLoading = isLoading,
-                onStatusChange = onStatusChange,
-                referral = referral,
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -141,14 +123,9 @@ fun InBox(
     clientWhoReferred: UserData?,
     providerThatReceived: UserData?,
     isLoading: Boolean,
-    onStatusChange: (ReferralStatus) -> Unit,
-    referral: Referral,
     modifier: Modifier = Modifier
 ){
     Column(modifier = modifier.fillMaxSize()){
-        if(user is UserData.Provider && referral.status == ReferralStatus.PROCESSING){
-            StatusProcess(onStatusChange = onStatusChange)
-        }
         SearchFieldBasic(
             value = searchText,
             onValueChange = onValueChange,
@@ -180,52 +157,5 @@ fun InBox(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun StatusProcess(
-    onStatusChange: (ReferralStatus) -> Unit
-) {
-    val statusOptions = listOf(
-        ReferralStatus.PROCESSING,
-        ReferralStatus.REJECTED,
-        ReferralStatus.PAID
-    )
-    ElevatedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
-            contentPadding = PaddingValues(16.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(statusOptions) { status ->
-                OutlinedButton(
-                    onClick = { onStatusChange(status) },
-                    shape = RoundedCornerShape(12.dp),
-                ) {
-                    Text(
-                        text = stringResource(status.nameSelect()),
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun StatusPreview(){
-    MaterialTheme {
-        StatusProcess(onStatusChange = {})
     }
 }

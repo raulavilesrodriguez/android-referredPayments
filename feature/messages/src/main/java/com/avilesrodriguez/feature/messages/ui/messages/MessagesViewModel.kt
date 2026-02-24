@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.message.Message
 import com.avilesrodriguez.domain.model.referral.Referral
-import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetMessagesByReferral
@@ -149,25 +148,6 @@ class MessagesViewModel @Inject constructor(
             markAsReadMessage(message.id)
         }
         openScreen(NavRoutes.MESSAGE_SCREEN.replace("{${NavRoutes.MessageArgs.ID}}", message.id))
-    }
-
-    fun onStatusChange(status: ReferralStatus, openScreen: (String) -> Unit){
-        val referral = referralState.value
-        when(status){
-            ReferralStatus.PROCESSING -> {
-                val route = NavRoutes.NEW_MESSAGE.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
-                openScreen(route)
-            }
-            ReferralStatus.REJECTED -> {
-                val route = NavRoutes.NEW_MESSAGE.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
-                openScreen(route)
-            }
-            ReferralStatus.PAID -> {
-                val route = NavRoutes.PAY_REFERRAL.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
-                openScreen(route)
-            }
-            else -> {}
-        }
     }
 
 }
