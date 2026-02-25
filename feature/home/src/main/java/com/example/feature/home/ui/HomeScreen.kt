@@ -40,6 +40,7 @@ import com.avilesrodriguez.presentation.industries.options
 import com.example.feature.home.models.StartListTab
 import com.example.feature.home.models.UserAndReferralMetrics
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @Composable
 fun HomeScreen(
@@ -54,9 +55,12 @@ fun HomeScreen(
     val selectedIndustry by viewModel.selectedIndustry.collectAsState()
     val referralsMetrics by viewModel.uiStateReferralsMetrics.collectAsState()
     val usersAndMetrics by viewModel.usersAndMetrics.collectAsState()
+    val referralsConversionViewModel by viewModel.referralsConversion.collectAsState()
 
     val options = ActionOptionsHome.getOptions()
     val industryOptions = IndustriesType.options(true)
+    val referralsConversion = String.format(Locale.US, "%.2f", referralsConversionViewModel)
+
 
     HomeScreenContent(
         user = userData,
@@ -76,7 +80,8 @@ fun HomeScreen(
         industryOptions = industryOptions,
         onUserClick = { uId -> viewModel.navigationUserDetails(uId, openScreen)},
         referralsMetrics = referralsMetrics,
-        usersAndMetrics = usersAndMetrics
+        usersAndMetrics = usersAndMetrics,
+        referralsConversion = referralsConversion
     )
 }
 
@@ -98,7 +103,8 @@ fun HomeScreenContent(
     industryOptions: List<Int>,
     onUserClick: (String) -> Unit,
     referralsMetrics: ReferralMetrics,
-    usersAndMetrics: List<UserAndReferralMetrics>
+    usersAndMetrics: List<UserAndReferralMetrics>,
+    referralsConversion: String
 ){
     val tabs = generateTabs()
     val pagerState = rememberPagerState(1){tabs.size}
@@ -179,7 +185,8 @@ fun HomeScreenContent(
                             industryOptions = industryOptions,
                             onUserClick = onUserClick,
                             referralsMetrics = referralsMetrics,
-                            usersAndMetrics = usersAndMetrics
+                            usersAndMetrics = usersAndMetrics,
+                            referralsConversion = referralsConversion
                         )
                     }
                     2 -> {
@@ -206,7 +213,8 @@ fun HomeMainContent(
     industryOptions: List<Int>,
     onUserClick: (String) -> Unit,
     referralsMetrics: ReferralMetrics,
-    usersAndMetrics: List<UserAndReferralMetrics>
+    usersAndMetrics: List<UserAndReferralMetrics>,
+    referralsConversion: String
 ) {
     if (user != null) {
         when (user.type) {
@@ -229,7 +237,8 @@ fun HomeMainContent(
                 updateSearchText = updateSearchText,
                 referralsMetrics = referralsMetrics,
                 onUserClick = onUserClick,
-                usersAndMetrics = usersAndMetrics
+                usersAndMetrics = usersAndMetrics,
+                referralsConversion = referralsConversion
             )
         }
     } else {

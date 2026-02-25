@@ -67,7 +67,8 @@ fun HomeScreenProvider(
     updateSearchText: (String) -> Unit,
     referralsMetrics: ReferralMetrics,
     onUserClick: (String) -> Unit,
-    usersAndMetrics: List<UserAndReferralMetrics>
+    usersAndMetrics: List<UserAndReferralMetrics>,
+    referralsConversion: String
 ){
     val provider = user as UserData.Provider
 
@@ -79,7 +80,7 @@ fun HomeScreenProvider(
         item {
             BalanceCardProvider(
                 totalReferrals = referralsMetrics.totalReferrals.toString(),
-                referralsConversion = provider.referralsConversion
+                referralsConversion = referralsConversion
             )
         }
         item {
@@ -152,7 +153,7 @@ fun HomeScreenProvider(
 }
 
 @Composable
-private fun BalanceCardProvider(totalReferrals: String, referralsConversion: String? = null) {
+private fun BalanceCardProvider(totalReferrals: String, referralsConversion: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -182,7 +183,7 @@ private fun BalanceCardProvider(totalReferrals: String, referralsConversion: Str
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Text(
-                text = referralsConversion?: "0.00",
+                text = referralsConversion,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color= MaterialTheme.colorScheme.onPrimary
@@ -371,7 +372,8 @@ fun HomeScreenProviderPreview(){
                 paidReferrals = 10
             ),
             onUserClick = {},
-            usersAndMetrics = generateFakeUserAndReferralMetrics()
+            usersAndMetrics = generateFakeUserAndReferralMetrics(),
+            referralsConversion = "10.00"
         )
     }
 }

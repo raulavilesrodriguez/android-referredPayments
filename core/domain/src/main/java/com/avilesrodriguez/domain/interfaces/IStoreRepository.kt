@@ -7,7 +7,7 @@ interface IStoreRepository {
     suspend fun saveUser(user: UserData)
     suspend fun updateUser(uid: String, updates: Map<String, Any>)
     suspend fun updateUserClientMetrics(uid: String, amountPaid: Double)
-    suspend fun updateUserProviderMetrics(uid: String, moneyPaid: Double, referralsConversion: String)
+    suspend fun updateUserProviderMetrics(uid: String, moneyPaid: Double)
     suspend fun getUser(uid: String): UserData?
     suspend fun deactivateUser(uid: String)
     suspend fun reactivateUser(uid: String)

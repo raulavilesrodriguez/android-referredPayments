@@ -21,10 +21,9 @@ class StoreRepository @Inject constructor(
 
     override suspend fun updateUserProviderMetrics(
         uid: String,
-        moneyPaid: Double,
-        referralsConversion: String
+        moneyPaid: Double
     ) {
-        data.updateUserProviderMetrics(uid, moneyPaid, referralsConversion)
+        data.updateUserProviderMetrics(uid, moneyPaid)
     }
 
     override suspend fun getUser(uid: String): UserData? {

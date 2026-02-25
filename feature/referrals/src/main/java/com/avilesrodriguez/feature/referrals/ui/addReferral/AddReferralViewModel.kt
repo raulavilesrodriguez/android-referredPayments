@@ -16,8 +16,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.text.SimpleDateFormat
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -81,14 +79,13 @@ class AddReferralViewModel @Inject constructor(
         launchCatching {
             _addReferralState.value = _addReferralState.value.copy(isSaving = true)
             // save referral
-            val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-            val formattedTimestampForUI = sdf.format(java.util.Date(System.currentTimeMillis()))
+            //val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+            //val formattedTimestampForUI = sdf.format(java.util.Date(System.currentTimeMillis()))
             val currentState = _addReferralState.value
             val referral = currentState.toReferral(
                 clientId = currentUserId,
                 providerId = providerId,
-                createdAt = System.currentTimeMillis(),
-                null
+                createdAt = System.currentTimeMillis()
             )
             saveReferral(referral)
 

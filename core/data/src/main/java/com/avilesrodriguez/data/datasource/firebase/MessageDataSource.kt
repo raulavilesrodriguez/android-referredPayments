@@ -31,7 +31,7 @@ class MessageDataSource @Inject constructor(
     fun getMessagesByReferral(referralId: String): Flow<List<Message>> = callbackFlow {
         val query = firestore.collection(MESSAGES_COLLECTION)
             .whereEqualTo(REFERRAL_ID_FIELD, referralId)
-            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING) //mas nuevos al inicio
+            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING) //more nuevos al inicio
 
         val listener: ListenerRegistration = query.addSnapshotListener { snapshot, error ->
             if (error != null) {

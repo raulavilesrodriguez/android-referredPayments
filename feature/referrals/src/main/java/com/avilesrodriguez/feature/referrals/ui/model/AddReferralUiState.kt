@@ -15,8 +15,7 @@ data class AddReferralUiState(
 fun AddReferralUiState.toReferral(
     clientId: String,
     providerId: String,
-    createdAt: Long,
-    voucherUrl: String?
+    createdAt: Long
 ): Referral {
     return Referral(
         clientId = clientId,
@@ -26,8 +25,7 @@ fun AddReferralUiState.toReferral(
         email = email,
         numberPhone = numberPhone,
         status = ReferralStatus.PENDING,
-        createdAt = createdAt,
-        voucherUrl = voucherUrl
+        createdAt = createdAt
     )
 }
 

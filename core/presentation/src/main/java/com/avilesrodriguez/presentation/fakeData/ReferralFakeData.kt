@@ -17,8 +17,7 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         email = "john.hessin.clarke@examplepetstore.com",
         numberPhone = "0987654321",
         status = ReferralStatus.PENDING,
-        createdAt = System.currentTimeMillis(),
-        voucherUrl = ""
+        createdAt = System.currentTimeMillis()
     ),
     Referral(
         id = "2",
@@ -29,8 +28,7 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         email = "juana.liceo@petstore.com",
         numberPhone = "0999654321",
         status = ReferralStatus.PAID,
-        createdAt = System.currentTimeMillis(),
-        voucherUrl = ""
+        createdAt = System.currentTimeMillis()
     ),
     Referral(
         id = "3",
@@ -41,8 +39,7 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         email = "mariam12@google.com",
         numberPhone = "0989678503",
         status = ReferralStatus.PROCESSING,
-        createdAt = System.currentTimeMillis(),
-        voucherUrl = ""
+        createdAt = System.currentTimeMillis()
     ),
     Referral(
         id = "4",
@@ -53,8 +50,7 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         email = "cuero.gina@google.com",
         numberPhone = "0985478901",
         status = ReferralStatus.REJECTED,
-        createdAt = System.currentTimeMillis(),
-        voucherUrl = ""
+        createdAt = System.currentTimeMillis()
     )
 )
 
@@ -67,8 +63,7 @@ val referral = Referral(
     email = "juana.liceo@petstore.com",
     numberPhone = "0999654321",
     status = ReferralStatus.PROCESSING,
-    createdAt = System.currentTimeMillis(),
-    voucherUrl = ""
+    createdAt = System.currentTimeMillis()
 )
 
 val userClient = UserData.Client(
@@ -96,7 +91,6 @@ val userProvider = UserData.Provider(
     nameLowercase = "seguros atlantida",
     ciOrRuc = "1234567890123",
     moneyPaid = 15000.0,
-    referralsConversion = "0.80",
     industry = IndustriesType.INSURANCE,
     companyDescription = "Seguros Atlantida, a insurance company",
     paymentRating = 4.5,
@@ -115,7 +109,6 @@ val usersProviders = listOf(
         nameLowercase = "seguros atlantida",
         ciOrRuc = "1234567890123",
         moneyPaid = 15000.0,
-        referralsConversion = "0.80",
         industry = IndustriesType.INSURANCE,
         companyDescription = "Seguros Atlantida, a insurance company",
         paymentRating = 4.5,
@@ -132,7 +125,6 @@ val usersProviders = listOf(
         nameLowercase = "optica el ojo",
         ciOrRuc = "1234567890199",
         moneyPaid = 8000.0,
-        referralsConversion = "0.85",
         industry = IndustriesType.OPTICS,
         companyDescription = "Optica el Ojo, a optics company",
         paymentRating = 4.7,
@@ -149,7 +141,6 @@ val usersProviders = listOf(
         nameLowercase = "inversiones sp500",
         ciOrRuc = "1234566990199",
         moneyPaid = 21000.0,
-        referralsConversion = "0.9",
         industry = IndustriesType.FINANCIAL,
         companyDescription = "Inversiones SP500, a financial company",
         paymentRating = 4.7,
@@ -166,7 +157,6 @@ val usersProviders = listOf(
         nameLowercase = "remax agente",
         ciOrRuc = "1234566990003",
         moneyPaid = 5000.0,
-        referralsConversion = "0.75",
         industry = IndustriesType.REAL_ESTATE,
         companyDescription = "Remax Agente, a real estate company",
         paymentRating = 4.2,

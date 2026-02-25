@@ -42,7 +42,6 @@ sealed class UserData {
         val ciOrRuc: String? = null, // Datos fiscales
         val countNumber: String? = null, // cuenta para pagar
         val moneyPaid: Double = 0.0,
-        val referralsConversion: String? = null,
         val industry: IndustriesType = IndustriesType.OTHER,
         val companyDescription: String? = null,
         val paymentRating: Double = 0.0,

@@ -55,12 +55,11 @@ class StoreDataSource @Inject constructor(
             .await()
     }
 
-    suspend fun updateUserProviderMetrics(uid: String, moneyPaid: Double, referralsConversion: String){
+    suspend fun updateUserProviderMetrics(uid: String, moneyPaid: Double){
         if(uid.isEmpty()) return
         val updates = mapOf(
             "moneyPaid" to FieldValue.increment(moneyPaid),
-            "totalPayouts" to FieldValue.increment(1),
-            "referralsConversion" to referralsConversion
+            "totalPayouts" to FieldValue.increment(1)
         )
         firestore.collection(USERS_COLLECTION)
             .document(uid)

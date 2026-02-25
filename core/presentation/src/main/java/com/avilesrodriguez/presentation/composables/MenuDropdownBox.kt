@@ -119,7 +119,7 @@ fun MenuDropdownBoxLeadIcon(
                             painter = painterResource(id = selectionOption.second),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp),
-                            tint = Color.Unspecified // <--- CLAVE: Muestra los colores reales
+                            tint = Color.Unspecified // <--- Muestra los colores reales
                         )
                     },
                     text = { Text(stringResource(selectionOption.first)) },

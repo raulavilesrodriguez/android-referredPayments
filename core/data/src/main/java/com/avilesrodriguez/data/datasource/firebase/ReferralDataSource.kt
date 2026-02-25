@@ -67,7 +67,7 @@ class ReferralDataSource @Inject constructor(
         val query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(CLIENT_ID_FIELD, clientId)
             .whereEqualTo(PROVIDER_ID_FIELD, providerId)
-            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING) //los mas nuevos primero
+            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING) //the more nuevos primero
 
         return createReferralFlow(query)
     }

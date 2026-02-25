@@ -1,6 +1,7 @@
 package com.avilesrodriguez.feature.messages.ui.newMessage
 
 import android.content.Context
+import android.provider.OpenableColumns
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,7 +11,6 @@ import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetReferralById
-import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SaveMessage
 import com.avilesrodriguez.domain.usecases.UploadFile
@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import androidx.core.net.toUri
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
-import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
 import com.avilesrodriguez.domain.usecases.GetUserFlow
 import com.avilesrodriguez.domain.usecases.UpdateReferralFields
 import com.avilesrodriguez.domain.usecases.UpdateUserClientMetrics
@@ -36,21 +35,18 @@ import com.avilesrodriguez.presentation.banksPays.BanksEcuador
 import com.avilesrodriguez.presentation.banksPays.getById
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_SUBJECT
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.Locale
+import java.net.URLDecoder
 
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
     private val saveMessage: SaveMessage,
     private val currentUserIdUseCase: CurrentUserId,
     private val hasUser: HasUser,
-    private val getUser: GetUser,
     private val getReferralById: GetReferralById,
     private val uploadFile: UploadFile,
     @param:ApplicationContext private val context: Context,
     private val updateReferralFields: UpdateReferralFields,
-    private val getReferralsByProvider: GetReferralsByProvider,
     private val updateUserClientMetrics: UpdateUserClientMetrics,
     private val updateUserProviderMetrics: UpdateUserProviderMetrics,
     private val getUserFlow: GetUserFlow
@@ -128,6 +124,33 @@ class NewMessageViewModel @Inject constructor(
         _localFiles.value -= uri
     }
 
+    private fun getFileNameFromUri(uriString: String): String {
+        val uri = uriString.toUri()
+        var name: String? = null
+        if (uri.scheme == "content") {
+            try {
+                context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (nameIndex != -1 && cursor.moveToFirst()) {
+                        name = cursor.getString(nameIndex)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("NewMessageViewModel", "Error querying content resolver: $e")
+            }
+        }
+        name = name?.// Quitamos la extensión si ya la tiene para controlarla nosotros después
+        substringBeforeLast(".")
+            ?: try {
+                val decoded = URLDecoder.decode(uriString.substringBefore("?"), "UTF-8")
+                decoded.substringAfterLast("/").substringBeforeLast(".")
+            } catch (e: Exception) {
+                Log.e("NewMessageViewModel", "Error to extract file name: $e")
+                "file"
+            }
+        return name
+    }
+
     fun onSaveMessage(popUp: () -> Unit){
         val referral = _referralState.value
         if(referral.id.isEmpty()) return
@@ -143,11 +166,12 @@ class NewMessageViewModel @Inject constructor(
 
             val remoteUrls = _localFiles.value.mapIndexed { index, localUriString ->
                 async {
-                val uri = localUriString.toUri()
-                    // para obtener la extensión real (.pdf, .jpg, etc.)
+                    val uri = localUriString.toUri()
+                    val originalName = getFileNameFromUri(localUriString)
                     val extension = getExtensionFromUri(context.contentResolver, uri)
+                    val timestamp = System.currentTimeMillis()
 
-                    val remotePath = "messages/${referral.id}/${System.currentTimeMillis()}_$index.$extension"
+                    val remotePath = "messages/${referral.id}/${originalName}_${timestamp}_$index.$extension"
                     uploadFile(localUriString, remotePath)
                 }
             }.awaitAll()
@@ -204,15 +228,15 @@ class NewMessageViewModel @Inject constructor(
                 val remoteUrls = _localFiles.value.mapIndexed { index, localUriString ->
                     async {
                         val uri = localUriString.toUri()
-                        // para obtener la extensión real (.pdf, .jpg, etc.)
+                        val originalName = getFileNameFromUri(localUriString)
                         val extension = getExtensionFromUri(context.contentResolver, uri)
+                        val timestamp = System.currentTimeMillis()
 
-                        val remotePath = "messages/${referral.id}/${System.currentTimeMillis()}_$index.$extension"
+                        val remotePath = "messages/${referral.id}/${originalName}_${timestamp}_$index.$extension"
                         uploadFile(localUriString, remotePath)
                     }
                 }.awaitAll()
 
-                // 2. Actualizar Referido a PAID con la URL del voucher
                 val referralUpdates = mapOf(
                     "status" to ReferralStatus.PAID.name,
                     "amountPaid" to amountPaid,
@@ -220,7 +244,6 @@ class NewMessageViewModel @Inject constructor(
                 )
                 updateReferralFields(referral.id, referralUpdates)
 
-                // 3. Crear Mensaje de Confirmación
                 val confirmationMessage = Message(
                     referralId = referral.id,
                     senderId = currentUserId,
@@ -232,22 +255,8 @@ class NewMessageViewModel @Inject constructor(
                 )
                 saveMessage(confirmationMessage)
 
-                // metricas client
-                updateUserClientMetrics(referral.clientId, amountPaid)
-
-                // metricas provider
-                val provider = providerThatReceived as? UserData.Provider
-                val allReferralsList = getReferralsByProvider(referral.providerId).first()
-                val newTotalPayouts = (provider?.totalPayouts ?: 0) + 1
-                val conversion = if (allReferralsList.isNotEmpty()) {
-                    newTotalPayouts.toDouble() / allReferralsList.size
-                } else 0.0
-
-                updateUserProviderMetrics(
-                    uid = referral.providerId,
-                    moneyPaid = amountPaid,
-                    referralsConversion = String.format(Locale.US, "%.2f", conversion)
-                )
+                updateUserClientMetrics(uid = referral.clientId, amountPaid = amountPaid)
+                updateUserProviderMetrics(uid = referral.providerId, moneyPaid = amountPaid)
 
                 // Navigation
                 popUp()
@@ -277,10 +286,11 @@ class NewMessageViewModel @Inject constructor(
                 val remoteUrls = _localFiles.value.mapIndexed { index, localUriString ->
                     async {
                         val uri = localUriString.toUri()
-                        // para obtener la extensión real (.pdf, .jpg, etc.)
+                        val originalName = getFileNameFromUri(localUriString)
                         val extension = getExtensionFromUri(context.contentResolver, uri)
+                        val timestamp = System.currentTimeMillis()
 
-                        val remotePath = "messages/${referral.id}/${System.currentTimeMillis()}_$index.$extension"
+                        val remotePath = "messages/${referral.id}/${originalName}_${timestamp}_$index.$extension"
                         uploadFile(localUriString, remotePath)
                     }
                 }.awaitAll()
@@ -295,10 +305,6 @@ class NewMessageViewModel @Inject constructor(
                 )
 
                 saveMessage(message)
-
-                // metricas provider
-                val provider = providerThatReceived as? UserData.Provider
-                val allReferralsList = getReferralsByProvider(referral.providerId).first()
 
                 // Navigation
                 popUp()

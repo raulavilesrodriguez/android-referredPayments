@@ -12,6 +12,5 @@ data class Referral(
     val numberPhone: String = "",
     val status: ReferralStatus = ReferralStatus.PENDING,
     val createdAt: Long = System.currentTimeMillis(),
-    val voucherUrl: String? = null,  // la foto del pago que sube el Provider
     val amountPaid: Double = 0.0,    // monto pagado por el provider a client por referir este referral
 )

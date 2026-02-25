@@ -9,6 +9,7 @@ import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
+import com.avilesrodriguez.domain.usecases.GetMessagesByReferral
 import com.avilesrodriguez.domain.usecases.GetReferralById
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
@@ -38,7 +39,8 @@ class ReferralViewModel @Inject constructor(
     private val getUser: GetUser,
     private val getReferralById: GetReferralById,
     private val updateReferralFields: UpdateReferralFields,
-    private val saveMessage: SaveMessage
+    private val saveMessage: SaveMessage,
+    private val getMessagesByReferral: GetMessagesByReferral
 ) : BaseViewModel() {
     private val _referralState = MutableStateFlow<Referral?>(null)
     val referralState: StateFlow<Referral?> = _referralState.asStateFlow()
@@ -50,6 +52,7 @@ class ReferralViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     private var loadJob: Job? = null
+    private var messagesJob: Job? = null
 
     val currentUserId
         get() = currentUserIdUseCase()
@@ -133,6 +136,15 @@ class ReferralViewModel @Inject constructor(
         val referralId = _referralState.value?.id?:""
         val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referralId)
         openScreen(route)
+    }
+
+    private fun fetchAllMessages(){
+        _isLoading.value = true
+        messagesJob?.cancel()
+        val referralId = _referralState.value?.id?:""
+        messagesJob = launchCatching {
+
+        }
     }
 
     fun updateName(newName: String){

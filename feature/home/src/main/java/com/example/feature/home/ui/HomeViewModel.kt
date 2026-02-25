@@ -1,5 +1,6 @@
 package com.example.feature.home.ui
 
+import androidx.lifecycle.viewModelScope
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.referral.Referral
@@ -10,7 +11,6 @@ import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetReferralsByClient
 import com.avilesrodriguez.domain.usecases.GetReferralsByClientByProvider
 import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
-import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.GetUserFlow
 import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SearchUsersClient
@@ -26,6 +26,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
@@ -43,7 +45,6 @@ import kotlinx.coroutines.launch
 class HomeViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
     private val hasUser: HasUser,
-    private val getUser: GetUser,
     private val signOut: SignOut,
     private val searchUsersProvider: SearchUsersProvider,
     private val searchUsersClient: SearchUsersClient,
@@ -70,6 +71,19 @@ class HomeViewModel @Inject constructor(
     val uiStateReferralsMetrics: StateFlow<ReferralMetrics> = _uiStateReferralsMetrics.asStateFlow()
     private val _usersAndMetrics = MutableStateFlow<List<UserAndReferralMetrics>>(emptyList())
     val usersAndMetrics: StateFlow<List<UserAndReferralMetrics>> = _usersAndMetrics.asStateFlow()
+    private val _referralsProvider = MutableStateFlow<List<Referral>>(emptyList())
+    val referralsConversion: StateFlow<Double> = combine(
+        _userDataStore,
+        _referralsProvider
+    ) { user, referrals ->
+        val provider = user as? UserData.Provider
+        if (provider != null && referrals.isNotEmpty()) {
+            provider.totalPayouts.toDouble() / referrals.size
+        } else {
+            0.0
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)  //5000 retraso de 5seg
+
 
     private var searchJob: Job? = null
     private var referralsJob: Job? = null
@@ -178,6 +192,7 @@ class HomeViewModel @Inject constructor(
             getReferralsByProvider(currentUserId)
                 .collect { referrals ->
                     updateMetrics(referrals)
+                    _referralsProvider.value = referrals
                     _isLoading.value = false
                 }
         }

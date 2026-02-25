@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -166,10 +169,22 @@ fun ProfileReferral(
                 )
                 val nameProvider = providerThatReceived?.name?.truncate(30)?:""
                 ItemProfile(R.drawable.step, title = R.string.referring, data = nameProvider)
-                BasicButton(
-                    text = R.string.review_payment_process,
-                    modifier = Modifier.basicButton()
-                ) { onProcessClick() }
+                IconButton(
+                    onClick = {onProcessClick()},
+                    modifier = Modifier.size(80.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.email_fill),
+                        contentDescription = "emails_inbox",
+                        modifier = Modifier.size(80.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.review_payment_process),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                )
             }
             is UserData.Provider -> {
                 val isPending = referral?.status == ReferralStatus.PENDING
@@ -197,10 +212,22 @@ fun ProfileReferral(
                         modifier = Modifier.basicButton()
                     ) { onAcceptReferral() }
                 } else {
-                    BasicButton(
-                        text = R.string.process_referral,
-                        modifier = Modifier.basicButton(),
-                    ) { onProcessClick() }
+                    IconButton(
+                        onClick = {onProcessClick()},
+                        modifier = Modifier.size(80.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.email_fill),
+                            contentDescription = "emails_inbox",
+                            modifier = Modifier.size(80.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Text(
+                        text=stringResource(R.string.process_referral),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                    )
                 }
             }
             else -> {}
