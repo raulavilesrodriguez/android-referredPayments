@@ -3,6 +3,7 @@ package com.avilesrodriguez.feature.referrals.ui.referral
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.message.Message
 import com.avilesrodriguez.domain.model.referral.Referral
@@ -25,12 +26,18 @@ import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
 class ReferralViewModel @Inject constructor(
@@ -52,7 +59,16 @@ class ReferralViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     private var loadJob: Job? = null
-    private var messagesJob: Job? = null
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val unReadMessages: StateFlow<Int> = _referralState
+        .filterNotNull()
+        .flatMapLatest { referral ->
+            getMessagesByReferral(referral.id).map { messages ->
+                messages.count { it.receiverId == currentUserId && !it.isRead }
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
     val currentUserId
         get() = currentUserIdUseCase()
@@ -127,7 +143,6 @@ class ReferralViewModel @Inject constructor(
             )
             saveMessage(systemMessage)
             fetchData(referralId)
-            //openScreen(NavRoutes.MESSAGES_SCREEN.replace("{id}", _referralState.value.id))
             _isLoading.value = false
         }
     }
@@ -136,15 +151,6 @@ class ReferralViewModel @Inject constructor(
         val referralId = _referralState.value?.id?:""
         val route = NavRoutes.MESSAGES_SCREEN.replace("{${NavRoutes.ReferralArgs.ID}}", referralId)
         openScreen(route)
-    }
-
-    private fun fetchAllMessages(){
-        _isLoading.value = true
-        messagesJob?.cancel()
-        val referralId = _referralState.value?.id?:""
-        messagesJob = launchCatching {
-
-        }
     }
 
     fun updateName(newName: String){
@@ -211,5 +217,4 @@ class ReferralViewModel @Inject constructor(
             popUp()
         }
     }
-
 }

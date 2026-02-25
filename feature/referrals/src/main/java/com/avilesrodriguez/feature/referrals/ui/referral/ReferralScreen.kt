@@ -1,9 +1,11 @@
 package com.avilesrodriguez.feature.referrals.ui.referral
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -12,13 +14,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,6 +30,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -67,6 +71,7 @@ fun ReferralScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val clientWhoReferred = viewModel.clientWhoReferred
     val providerThatReceived = viewModel.providerThatReceived
+    val unReadMessages by viewModel.unReadMessages.collectAsState()
 
     val subjectAccept = stringResource(R.string.subject_referral_accepted)
     val contentAccept = stringResource(R.string.content_referral_accepted)
@@ -83,7 +88,8 @@ fun ReferralScreen(
         onEmailClick = { viewModel.onEmailReferral(openScreen)},
         onPhoneClick = { viewModel.onPhoneReferral(openScreen)},
         onAcceptReferral = { viewModel.onAcceptReferral(subjectAccept, contentAccept, openScreen)},
-        onProcessClick = { viewModel.onProcessReferral(openScreen)}
+        onProcessClick = { viewModel.onProcessReferral(openScreen)},
+        unReadMessages = unReadMessages.toString()
     )
 }
 
@@ -99,7 +105,8 @@ fun ReferralScreenContent(
     onEmailClick: () -> Unit,
     onPhoneClick: () -> Unit,
     onAcceptReferral: () -> Unit,
-    onProcessClick: () -> Unit
+    onProcessClick: () -> Unit,
+    unReadMessages: String
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -122,6 +129,7 @@ fun ReferralScreenContent(
                     onPhoneClick = onPhoneClick,
                     onAcceptReferral = onAcceptReferral,
                     onProcessClick = onProcessClick,
+                    unReadMessages = unReadMessages,
                     modifier = Modifier.padding(paddingValues)
                 )
             } else{
@@ -144,6 +152,7 @@ fun ProfileReferral(
     onPhoneClick: () -> Unit,
     onAcceptReferral: () -> Unit,
     onProcessClick: () -> Unit,
+    unReadMessages: String,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -169,16 +178,36 @@ fun ProfileReferral(
                 )
                 val nameProvider = providerThatReceived?.name?.truncate(30)?:""
                 ItemProfile(R.drawable.step, title = R.string.referring, data = nameProvider)
-                IconButton(
-                    onClick = {onProcessClick()},
-                    modifier = Modifier.size(80.dp)
-                ) {
+                Box(
+                    modifier = Modifier
+                        .size(90.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable{onProcessClick()}
+                ){
                     Icon(
                         painter = painterResource(R.drawable.email_fill),
                         contentDescription = "emails_inbox",
                         modifier = Modifier.size(80.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
+                    if(unReadMessages.toInt()>0){
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(36.dp)
+                                .background(
+                                    Color.Red,
+                                    RoundedCornerShape(16.dp)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = if(unReadMessages.toInt() > 99) "99+" else unReadMessages,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                            )
+                        }
+                    }
                 }
                 Text(
                     text = stringResource(R.string.review_payment_process),
@@ -212,17 +241,38 @@ fun ProfileReferral(
                         modifier = Modifier.basicButton()
                     ) { onAcceptReferral() }
                 } else {
-                    IconButton(
-                        onClick = {onProcessClick()},
-                        modifier = Modifier.size(80.dp)
-                    ) {
+                    Box(
+                        modifier = Modifier
+                            .size(90.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable{onProcessClick()}
+                    ){
                         Icon(
                             painter = painterResource(R.drawable.email_fill),
                             contentDescription = "emails_inbox",
                             modifier = Modifier.size(80.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
+                        if(unReadMessages.toInt()>0){
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .size(36.dp)
+                                    .background(
+                                        Color.Red,
+                                        RoundedCornerShape(16.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ){
+                                Text(
+                                    text = if(unReadMessages.toInt() > 99) "99+" else unReadMessages,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                )
+                            }
+                        }
                     }
+
                     Text(
                         text=stringResource(R.string.process_referral),
                         style = MaterialTheme.typography.titleMedium,
@@ -283,7 +333,8 @@ fun ProfileReferralPreview(){
             onEmailClick = {},
             onPhoneClick = {},
             onAcceptReferral = {},
-            onProcessClick = {}
+            onProcessClick = {},
+            unReadMessages = "100"
         )
     }
 }

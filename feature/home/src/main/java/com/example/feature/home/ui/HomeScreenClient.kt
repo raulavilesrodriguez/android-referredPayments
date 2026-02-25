@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -23,12 +24,18 @@ import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -64,6 +71,24 @@ fun HomeScreenClient(
 ) {
     val client = user as? UserData.Client
 
+    // Bloqueador de scroll para el Pager
+    val noPagerScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                // Consumimos cualquier scroll horizontal restante para que no llegue al Pager
+                return if (source == NestedScrollSource.UserInput) {
+                    Offset(x = available.x, y = 0f)
+                } else {
+                    Offset.Zero
+                }
+            }
+        }
+    }
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize(),
@@ -78,24 +103,48 @@ fun HomeScreenClient(
         }
         //Statics
         item(span = { GridItemSpan(maxLineSpan) }) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .nestedScroll(noPagerScrollConnection), // Aplicamos el bloqueador aquí
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                StatItem(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.referrals),
-                    value = "${referralsMetrics.totalReferrals}",
-                    icon = Icons.Default.People,
-                    color = MaterialTheme.colorScheme.primaryContainer
-                )
-                StatItem(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.pending_payments),
-                    value = "${referralsMetrics.pendingReferrals}",
-                    icon = Icons.Default.AccountBalanceWallet,
-                    color = MaterialTheme.colorScheme.secondaryContainer
-                )
+                item {
+                    StatItem(
+                        modifier = Modifier,
+                        title = stringResource(R.string.referrals),
+                        value = "${referralsMetrics.totalReferrals}",
+                        icon = Icons.Default.People,
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+                item {
+                    StatItem(
+                        modifier = Modifier,
+                        title = stringResource(R.string.pending),
+                        value = "${referralsMetrics.pendingReferrals}",
+                        icon = Icons.Default.AccountBalanceWallet,
+                        color = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                }
+                item{
+                    StatItem(
+                        modifier = Modifier,
+                        title = stringResource(R.string.processing),
+                        value = "${referralsMetrics.processingReferrals}",
+                        icon = Icons.Default.AccountBalanceWallet,
+                        color = MaterialTheme.colorScheme.tertiaryContainer
+                    )
+                }
+                item {
+                    StatItem(
+                        modifier = Modifier,
+                        title = stringResource(R.string.rejected),
+                        value = "${referralsMetrics.rejectedReferrals}",
+                        icon = Icons.Default.AccountBalanceWallet,
+                        color = MaterialTheme.colorScheme.errorContainer
+                    )
+                }
             }
         }
         item(span = { GridItemSpan(maxLineSpan)}){
@@ -150,10 +199,13 @@ fun HomeScreenClient(
 
 @Composable
 fun BalanceCard(balance: String, received: String? = null) {
-    Card(
+    ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.secondary
+        )
     ) {
         Column(
             modifier = Modifier
@@ -162,14 +214,13 @@ fun BalanceCard(balance: String, received: String? = null) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = stringResource(R.string.total_profits),
-                color = MaterialTheme.colorScheme.onPrimary
+            Text(
+                text = stringResource(R.string.total_profits)
             )
             Text(
                 text = "$$balance",
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.height(16.dp))
 
