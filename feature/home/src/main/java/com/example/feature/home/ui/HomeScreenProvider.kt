@@ -1,6 +1,5 @@
 package com.example.feature.home.ui
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,11 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.BuildCircle
 import androidx.compose.material.icons.filled.CheckCircle
@@ -36,17 +37,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
@@ -72,6 +76,24 @@ fun HomeScreenProvider(
 ){
     val provider = user as UserData.Provider
 
+    // Bloqueador de scroll para el Pager
+    val noPagerScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                // Consumimos cualquier scroll horizontal restante para que no llegue al Pager
+                return if (source == NestedScrollSource.UserInput) {
+                    Offset(x = available.x, y = 0f)
+                } else {
+                    Offset.Zero
+                }
+            }
+        }
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -79,43 +101,82 @@ fun HomeScreenProvider(
     ) {
         item {
             BalanceCardProvider(
-                totalReferrals = referralsMetrics.totalReferrals.toString(),
-                referralsConversion = referralsConversion
+                paidReferrals = referralsMetrics.paidReferrals.toString(),
+                iconPaidReferrals = Icons.Default.People,
+                moneyPaid = provider.moneyPaid.toString(),
+                iconMoneyPaid = Icons.Default.AccountBalanceWallet
             )
         }
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                StatItem(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.total_payout),
-                    value = "${provider.totalPayouts}",
-                    icon = Icons.Outlined.Payment,
-                    color = MaterialTheme.colorScheme.primaryContainer
-                )
-                StatItem(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.payment_rating),
-                    value = "${provider.paymentRating}",
-                    icon = Icons.Default.Star,
-                    color = MaterialTheme.colorScheme.secondaryContainer
-                )
-            }
-            Row(
+            LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.Center
+                    .padding(vertical = 8.dp)
+                    .nestedScroll(noPagerScrollConnection),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(imageVector = Icons.Default.AccountBalanceWallet,contentDescription = null, modifier = Modifier.size(24.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Column {
-                    Text(text = "$${provider.moneyPaid}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    Text(text = stringResource(R.string.money_paid), fontSize = 12.sp, maxLines = 1)
+                item{
+                    StatItem(
+                        modifier = Modifier,
+                        title = stringResource(R.string.total_payout),
+                        value = "${provider.totalPayouts}",
+                        icon = Icons.Outlined.Payment,
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+                item{
+                    StatItem(
+                        modifier = Modifier,
+                        title = stringResource(R.string.payment_rating),
+                        value = "${provider.paymentRating}",
+                        icon = Icons.Default.Star,
+                        color = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                }
+                item{
+                    StatItem(
+                        modifier = Modifier,
+                        title = stringResource(R.string.referrals_conversion),
+                        value = referralsConversion,
+                        icon = Icons.Default.AutoAwesome,
+                        color = MaterialTheme.colorScheme.tertiaryContainer
+                    )
+                }
+                item{
+                    StatItem(
+                        modifier = Modifier,
+                        title = stringResource(R.string.total_referrals),
+                        value = "${referralsMetrics.totalReferrals}",
+                        icon = Icons.Default.People,
+                        color = MaterialTheme.colorScheme.inversePrimary
+                    )
+                }
+                item{
+                    StatItem(
+                        modifier = Modifier,
+                        title = stringResource(R.string.pending),
+                        value = "${referralsMetrics.pendingReferrals}",
+                        icon = Icons.Default.Alarm,
+                        color = MaterialTheme.colorScheme.surfaceDim
+                    )
+                }
+                item {
+                    StatItem(
+                        modifier = Modifier,
+                        title = stringResource(R.string.processing),
+                        value = "${referralsMetrics.processingReferrals}",
+                        icon = Icons.Default.BuildCircle,
+                        color = MaterialTheme.colorScheme.tertiaryContainer
+                    )
+                }
+                item {
+                    StatItem(
+                        modifier = Modifier,
+                        title = stringResource(R.string.rejected),
+                        value = "${referralsMetrics.rejectedReferrals}",
+                        icon = Icons.Default.Block,
+                        color = MaterialTheme.colorScheme.errorContainer
+                    )
                 }
             }
         }
@@ -153,7 +214,7 @@ fun HomeScreenProvider(
 }
 
 @Composable
-private fun BalanceCardProvider(totalReferrals: String, referralsConversion: String) {
+private fun BalanceCardProvider(paidReferrals: String, iconPaidReferrals: ImageVector, moneyPaid: String, iconMoneyPaid: ImageVector) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -166,29 +227,55 @@ private fun BalanceCardProvider(totalReferrals: String, referralsConversion: Str
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = stringResource(R.string.total_referrals),
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-            Text(
-                text = totalReferrals,
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text=stringResource(R.string.referrals_conversion),
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-            Text(
-                text = referralsConversion,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color= MaterialTheme.colorScheme.onPrimary
-            )
-
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ){
+                Icon(imageVector = iconPaidReferrals, contentDescription = null, modifier = Modifier.size(24.dp))
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ){
+                    Text(
+                        text = stringResource(R.string.paid_referreds),
+                        style = MaterialTheme.typography.labelMedium,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = paidReferrals,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.headlineLarge,
+                        maxLines = 1,
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(
+                modifier = Modifier.padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ){
+                Icon(imageVector = iconMoneyPaid, contentDescription = null, modifier = Modifier.size(24.dp))
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ){
+                    Text(
+                        text = stringResource(R.string.money_paid),
+                        style = MaterialTheme.typography.labelMedium,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = "$${moneyPaid}",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.headlineMedium,
+                        maxLines = 1
+                    )
+                }
+            }
         }
     }
 }
@@ -275,85 +362,7 @@ fun ClientRow(clientMetrics: UserAndReferralMetrics, onClientClick: (String) -> 
     }
 }
 
-@Composable
-fun ClientCard(clientMetrics: UserAndReferralMetrics, onClientClick: (String) -> Unit){
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable{onClientClick(clientMetrics.user.uid)},
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ){
-                Avatar(
-                    photoUri = clientMetrics.user.photoUrl,
-                    size = 40.dp
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = clientMetrics.user.name ?:""
-                )
-            }
-            InfoMetric(
-                icon= R.drawable.people,
-                title = stringResource(R.string.total_referrals),
-                value = clientMetrics.referralMetrics.totalReferrals.toString(),
-                color = MaterialTheme.colorScheme.primary
-            )
-            InfoMetric(
-                icon = R.drawable.sentiment_pending,
-                title = stringResource(R.string.pending),
-                value = clientMetrics.referralMetrics.pendingReferrals.toString(),
-                color = Color(0xFFF5AD18)
-            )
-            InfoMetric(
-                icon = R.drawable.sentiment_processing,
-                title = stringResource(R.string.processing),
-                value = clientMetrics.referralMetrics.processingReferrals.toString(),
-                color = Color(0xFF6594B1)
-            )
-            InfoMetric(
-                icon = R.drawable.sentiment_rejected,
-                title = stringResource(R.string.rejected),
-                value = clientMetrics.referralMetrics.rejectedReferrals.toString(),
-                color = Color(0XFFDC0E0E)
-            )
-            InfoMetric(
-                icon = R.drawable.sentiment_paid,
-                title = stringResource(R.string.paid),
-                value = clientMetrics.referralMetrics.paidReferrals.toString(),
-                color = Color(0xFF08CB00)
-            )
-        }
-    }
-}
 
-@Composable
-private fun InfoMetric(@DrawableRes icon: Int, title: String, value: String, color: Color){
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 8.dp)){
-        Icon(
-            painter = painterResource(id = icon),
-            contentDescription = null,
-            tint = color
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Column{
-            Text(text = title, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-            Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = color)
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

@@ -143,6 +143,7 @@
     <string name="name_referred">Nombre referido</string>
     <string name="email_referred">Correo electrónico Referido</string>
     <string name="total_referrals">Total Referidos</string>
+    <string name="paid_referreds">Referidos Pagados</string>
     <string name="comment_save_name_referred">Por favor, revisa que este nombre sea el correcto</string>
     <string name="comment_save_phone_number_referred">Por favor verifica que este número de teléfono móvil sea correcto</string>
     <string name="review_payment_process">Revisar Proceso de Pago</string>

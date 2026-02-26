@@ -20,6 +20,9 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.BuildCircle
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -123,7 +126,7 @@ fun HomeScreenClient(
                         modifier = Modifier,
                         title = stringResource(R.string.pending),
                         value = "${referralsMetrics.pendingReferrals}",
-                        icon = Icons.Default.AccountBalanceWallet,
+                        icon = Icons.Default.Alarm,
                         color = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }
@@ -132,7 +135,7 @@ fun HomeScreenClient(
                         modifier = Modifier,
                         title = stringResource(R.string.processing),
                         value = "${referralsMetrics.processingReferrals}",
-                        icon = Icons.Default.AccountBalanceWallet,
+                        icon = Icons.Default.BuildCircle,
                         color = MaterialTheme.colorScheme.tertiaryContainer
                     )
                 }
@@ -141,7 +144,7 @@ fun HomeScreenClient(
                         modifier = Modifier,
                         title = stringResource(R.string.rejected),
                         value = "${referralsMetrics.rejectedReferrals}",
-                        icon = Icons.Default.AccountBalanceWallet,
+                        icon = Icons.Default.Block,
                         color = MaterialTheme.colorScheme.errorContainer
                     )
                 }
@@ -204,7 +207,7 @@ fun BalanceCard(balance: String, received: String? = null) {
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.secondary
+            containerColor = MaterialTheme.colorScheme.primary
         )
     ) {
         Column(
