@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.BuildCircle
@@ -70,7 +69,8 @@ fun HomeScreenClient(
     onIndustryChange: (Int) -> Unit,
     industryOptions: List<Int>,
     onUserClick: (String) -> Unit,
-    referralsMetrics: ReferralMetrics
+    referralsMetrics: ReferralMetrics,
+    onPaymentView: () -> Unit
 ) {
     val client = user as? UserData.Client
 
@@ -101,7 +101,8 @@ fun HomeScreenClient(
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             BalanceCard(
-                balance = client?.moneyEarned.toString()
+                balance = client?.moneyEarned.toString(),
+                onPaymentView = onPaymentView
             )
         }
         //Statics
@@ -201,9 +202,9 @@ fun HomeScreenClient(
 }
 
 @Composable
-fun BalanceCard(balance: String, received: String? = null) {
+fun BalanceCard(balance: String, received: String? = null, onPaymentView: () -> Unit) {
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onPaymentView() },
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.elevatedCardColors(
@@ -300,7 +301,8 @@ fun HomeScreenClientPreview() {
                 processingReferrals = 3,
                 rejectedReferrals = 2,
                 paidReferrals = 10
-            )
+            ),
+            onPaymentView = {}
         )
     }
 }

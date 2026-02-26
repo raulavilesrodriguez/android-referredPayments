@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -21,6 +22,7 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,6 +35,7 @@ fun ToolBarWithIcon(
     title: String,
     backClick: () -> Unit,
     modifier: Modifier = Modifier,
+    tintIcon: Color? = null,
 ){
     Row(
         modifier = modifier
@@ -46,7 +49,8 @@ fun ToolBarWithIcon(
         ) {
             Icon(
                 painter = painterResource(id = iconBack),
-                contentDescription = null
+                contentDescription = null,
+                tint = tintIcon ?: LocalContentColor.current
             )
         }
         Spacer(modifier = Modifier.width(16.dp))

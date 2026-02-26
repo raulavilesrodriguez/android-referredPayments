@@ -240,7 +240,7 @@ class NewMessageViewModel @Inject constructor(
                 val referralUpdates = mapOf(
                     "status" to ReferralStatus.PAID.name,
                     "amountPaid" to amountPaid,
-                    "createdAt" to System.currentTimeMillis()
+                    "paidAt" to System.currentTimeMillis()
                 )
                 updateReferralFields(referral.id, referralUpdates)
 
@@ -279,7 +279,7 @@ class NewMessageViewModel @Inject constructor(
 
                 val updates = mapOf(
                     "status" to ReferralStatus.REJECTED.name,
-                    "createdAt" to System.currentTimeMillis()
+                    "paidAt" to System.currentTimeMillis()
                 )
                 updateReferralFields(referral.id, updates)
 

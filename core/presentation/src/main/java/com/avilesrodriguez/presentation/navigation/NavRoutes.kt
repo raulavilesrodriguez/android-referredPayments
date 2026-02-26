@@ -12,6 +12,7 @@ object NavRoutes {
     const val POLICIES = "policies"
 
     const val HOME = "home"
+    const val PAYMENTS_MOVEMENT = "payments_movement"
 
     const val NEW_REFERRAL = "new_referral/{id}"  //id del user provider
 

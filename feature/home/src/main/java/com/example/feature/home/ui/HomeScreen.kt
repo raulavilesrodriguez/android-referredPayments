@@ -81,7 +81,8 @@ fun HomeScreen(
         onUserClick = { uId -> viewModel.navigationUserDetails(uId, openScreen)},
         referralsMetrics = referralsMetrics,
         usersAndMetrics = usersAndMetrics,
-        referralsConversion = referralsConversion
+        referralsConversion = referralsConversion,
+        onPaymentView = { viewModel.onPaymentView(openScreen) }
     )
 }
 
@@ -104,7 +105,8 @@ fun HomeScreenContent(
     onUserClick: (String) -> Unit,
     referralsMetrics: ReferralMetrics,
     usersAndMetrics: List<UserAndReferralMetrics>,
-    referralsConversion: String
+    referralsConversion: String,
+    onPaymentView: () -> Unit
 ){
     val tabs = generateTabs()
     val pagerState = rememberPagerState(1){tabs.size}
@@ -186,7 +188,8 @@ fun HomeScreenContent(
                             onUserClick = onUserClick,
                             referralsMetrics = referralsMetrics,
                             usersAndMetrics = usersAndMetrics,
-                            referralsConversion = referralsConversion
+                            referralsConversion = referralsConversion,
+                            onPaymentView = onPaymentView
                         )
                     }
                     2 -> {
@@ -214,7 +217,8 @@ fun HomeMainContent(
     onUserClick: (String) -> Unit,
     referralsMetrics: ReferralMetrics,
     usersAndMetrics: List<UserAndReferralMetrics>,
-    referralsConversion: String
+    referralsConversion: String,
+    onPaymentView: () -> Unit
 ) {
     if (user != null) {
         when (user.type) {
@@ -228,7 +232,8 @@ fun HomeMainContent(
                 onIndustryChange = onIndustryChange,
                 industryOptions = industryOptions,
                 onUserClick = onUserClick,
-                referralsMetrics = referralsMetrics
+                referralsMetrics = referralsMetrics,
+                onPaymentView = onPaymentView
             )
             UserType.PROVIDER -> HomeScreenProvider(
                 user = user,
@@ -238,7 +243,8 @@ fun HomeMainContent(
                 referralsMetrics = referralsMetrics,
                 onUserClick = onUserClick,
                 usersAndMetrics = usersAndMetrics,
-                referralsConversion = referralsConversion
+                referralsConversion = referralsConversion,
+                onPaymentView = onPaymentView
             )
         }
     } else {

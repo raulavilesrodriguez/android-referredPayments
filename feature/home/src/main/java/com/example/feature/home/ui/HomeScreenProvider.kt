@@ -72,7 +72,8 @@ fun HomeScreenProvider(
     referralsMetrics: ReferralMetrics,
     onUserClick: (String) -> Unit,
     usersAndMetrics: List<UserAndReferralMetrics>,
-    referralsConversion: String
+    referralsConversion: String,
+    onPaymentView: () -> Unit
 ){
     val provider = user as UserData.Provider
 
@@ -104,7 +105,8 @@ fun HomeScreenProvider(
                 paidReferrals = referralsMetrics.paidReferrals.toString(),
                 iconPaidReferrals = Icons.Default.People,
                 moneyPaid = provider.moneyPaid.toString(),
-                iconMoneyPaid = Icons.Default.AccountBalanceWallet
+                iconMoneyPaid = Icons.Default.AccountBalanceWallet,
+                onPaymentView = onPaymentView
             )
         }
         item {
@@ -214,9 +216,15 @@ fun HomeScreenProvider(
 }
 
 @Composable
-private fun BalanceCardProvider(paidReferrals: String, iconPaidReferrals: ImageVector, moneyPaid: String, iconMoneyPaid: ImageVector) {
+private fun BalanceCardProvider(
+    paidReferrals: String,
+    iconPaidReferrals: ImageVector,
+    moneyPaid: String,
+    iconMoneyPaid: ImageVector,
+    onPaymentView: () -> Unit
+    ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onPaymentView() },
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
     ) {
@@ -382,7 +390,8 @@ fun HomeScreenProviderPreview(){
             ),
             onUserClick = {},
             usersAndMetrics = generateFakeUserAndReferralMetrics(),
-            referralsConversion = "10.00"
+            referralsConversion = "10.00",
+            onPaymentView = {}
         )
     }
 }

@@ -49,6 +49,7 @@ import com.avilesrodriguez.winapp.ui.theme.WinAppTheme
 import com.example.feature.home.ui.HomeScreen
 import com.example.feature.home.ui.PoliciesScreen
 import com.example.feature.home.ui.details.DetailScreenUser
+import com.example.feature.home.ui.paymentsMovement.PaymentsMovement
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -83,6 +84,7 @@ fun MainNavigation(){
                     addSignUp(appState)
                     addLogin(appState)
                     addHome(appState)
+                    paymentsMovement(appState)
                     addPolicies(appState)
                     addEditUser(appState)
                     referralGraph(appState)
@@ -145,6 +147,14 @@ private fun NavGraphBuilder.addHome(appState: AppState){
         HomeScreen(
             openScreen = {route -> appState.navigate(route)},
             restartApp = {route -> appState.clearAndNavigate(route)}
+        )
+    }
+}
+
+private fun NavGraphBuilder.paymentsMovement(appState: AppState) {
+    composable(NavRoutes.PAYMENTS_MOVEMENT){
+        PaymentsMovement(
+            popUp = {appState.popUp()}
         )
     }
 }

@@ -17,7 +17,9 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         email = "john.hessin.clarke@examplepetstore.com",
         numberPhone = "0987654321",
         status = ReferralStatus.PENDING,
-        createdAt = System.currentTimeMillis()
+        createdAt = System.currentTimeMillis(),
+        amountPaid = 55.0,
+        paidAt = System.currentTimeMillis()
     ),
     Referral(
         id = "2",
@@ -28,7 +30,9 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         email = "juana.liceo@petstore.com",
         numberPhone = "0999654321",
         status = ReferralStatus.PAID,
-        createdAt = System.currentTimeMillis()
+        createdAt = System.currentTimeMillis(),
+        amountPaid = 108.0,
+        paidAt = System.currentTimeMillis()
     ),
     Referral(
         id = "3",
@@ -39,7 +43,9 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         email = "mariam12@google.com",
         numberPhone = "0989678503",
         status = ReferralStatus.PROCESSING,
-        createdAt = System.currentTimeMillis()
+        createdAt = System.currentTimeMillis(),
+        amountPaid = 36.5,
+        paidAt = System.currentTimeMillis()
     ),
     Referral(
         id = "4",
@@ -50,7 +56,9 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         email = "cuero.gina@google.com",
         numberPhone = "0985478901",
         status = ReferralStatus.REJECTED,
-        createdAt = System.currentTimeMillis()
+        createdAt = System.currentTimeMillis(),
+        amountPaid = 100.0,
+        paidAt = System.currentTimeMillis()
     )
 )
 
@@ -63,7 +71,9 @@ val referral = Referral(
     email = "juana.liceo@petstore.com",
     numberPhone = "0999654321",
     status = ReferralStatus.PROCESSING,
-    createdAt = System.currentTimeMillis()
+    createdAt = System.currentTimeMillis(),
+    amountPaid = 100.0,
+    paidAt = System.currentTimeMillis()
 )
 
 val userClient = UserData.Client(

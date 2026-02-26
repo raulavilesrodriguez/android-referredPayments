@@ -242,4 +242,8 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun onPaymentView(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.PAYMENTS_MOVEMENT)
+    }
+
 }

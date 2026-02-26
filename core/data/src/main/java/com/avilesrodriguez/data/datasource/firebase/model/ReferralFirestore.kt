@@ -16,7 +16,8 @@ data class ReferralFirestore(
     val numberPhone: String? = null,
     val status: String? = null,
     val createdAt: Timestamp? = null,
-    val amountPaid: Double? = null
+    val amountPaid: Double? = null,
+    val paidAt: Timestamp? = null
 )
 
 fun Referral.toReferralFirestore(): ReferralFirestore {
@@ -30,7 +31,8 @@ fun Referral.toReferralFirestore(): ReferralFirestore {
         numberPhone = numberPhone,
         status = status.name, // "PENDING", "PAID", etc.
         createdAt = Timestamp(Date(createdAt)),
-        amountPaid = amountPaid
+        amountPaid = amountPaid,
+        paidAt = Timestamp(Date(paidAt))
     )
 }
 
@@ -51,6 +53,7 @@ fun ReferralFirestore.toReferralDomain(): Referral{
         numberPhone = numberPhone ?: "",
         status = referralStatusType,
         createdAt = createdAt?.toDate()?.time ?: System.currentTimeMillis(),
-        amountPaid = amountPaid ?: 0.0
+        amountPaid = amountPaid ?: 0.0,
+        paidAt = paidAt?.toDate()?.time ?: System.currentTimeMillis()
     )
 }

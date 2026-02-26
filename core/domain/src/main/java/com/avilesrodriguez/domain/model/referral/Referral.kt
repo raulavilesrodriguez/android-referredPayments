@@ -13,4 +13,5 @@ data class Referral(
     val status: ReferralStatus = ReferralStatus.PENDING,
     val createdAt: Long = System.currentTimeMillis(),
     val amountPaid: Double = 0.0,    // monto pagado por el provider a client por referir este referral
+    val paidAt: Long = System.currentTimeMillis(),
 )
