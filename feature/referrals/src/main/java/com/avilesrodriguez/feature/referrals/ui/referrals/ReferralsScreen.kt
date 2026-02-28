@@ -68,7 +68,7 @@ private fun ReferralsScreenContent(
             placeholder = R.string.select_referred,
             trailingIcon = R.drawable.search,
             modifier = Modifier
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 4.dp)
         )
         Box(modifier = Modifier.weight(1f).fillMaxWidth()){
             if(!isLoading){
@@ -78,7 +78,7 @@ private fun ReferralsScreenContent(
                         referrals = referrals,
                         user = user,
                         modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 16.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                 } else {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

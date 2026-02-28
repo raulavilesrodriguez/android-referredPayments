@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.androidx.material3.adaptive.navigation.suite)
     implementation(libs.androidx.material3.adaptive.layout)
     implementation(libs.androidx.material3.adaptive.navigation)
+    implementation(libs.androidx.compose.foundation)
 }
 
 tasks.withType<KotlinJvmCompile>().configureEach {

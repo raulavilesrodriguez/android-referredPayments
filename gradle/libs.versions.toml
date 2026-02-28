@@ -23,7 +23,7 @@ foundation = "1.10.4"
 datastore = "1.2.0"
 uiGraphics = "1.10.4"
 material3 = "1.4.0"
-vico = "3.0.1"
+vico = "2.4.3"
 material3Adaptive = "1.2.0"
 material3AdaptiveNavSuite = "1.4.0"
 

@@ -21,6 +21,7 @@ fun DetailScreenUser(
     uId: String?,
     popUp: () -> Unit,
     openScreen: (String) -> Unit,
+    showTopBar: Boolean = true, // Nuevo parámetro
     viewModel: DetailViewModel = hiltViewModel()
 ){
     LaunchedEffect(uId) {
@@ -46,7 +47,8 @@ fun DetailScreenUser(
                 DetailScreenProvider(
                     provider = userData as UserData.Provider,
                     onBackClick = popUp,
-                    onAddReferClick = {uid -> viewModel.onAddReferClick(uid, openScreen)}
+                    onAddReferClick = {uid -> viewModel.onAddReferClick(uid, openScreen)},
+                    showTopBar = showTopBar // Pasamos a la pantalla interna
                 )
             }
             is UserData.Client -> {
@@ -58,7 +60,8 @@ fun DetailScreenUser(
                     filterReferralsByStatus = viewModel::filterReferralsByStatus,
                     statusOptions = statusOptions,
                     onBackClick = popUp,
-                    onReferClick = {id -> viewModel.onReferClick(id, openScreen)}
+                    onReferClick = {id -> viewModel.onReferClick(id, openScreen)},
+                    showTopBar = showTopBar // Pasamos a la pantalla interna
                 )
             }
             else -> {
@@ -67,4 +70,3 @@ fun DetailScreenUser(
         }
     }
 }
-

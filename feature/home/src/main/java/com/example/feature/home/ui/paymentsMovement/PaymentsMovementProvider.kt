@@ -30,15 +30,18 @@ fun PaymentsScreenProvider(
     provider: UserData.Provider,
     onBackClick: () -> Unit,
     referrals: List<Referral>,
-    isLoading: Boolean
+    isLoading: Boolean,
+    showTopBar: Boolean = true // Añadido para soporte adaptativo
 ){
     Scaffold(
         topBar = {
-            ToolBarWithIcon(
-                iconBack = R.drawable.arrow_back,
-                title = stringResource(R.string.payments),
-                backClick = { onBackClick() }
-            )
+            if (showTopBar) {
+                ToolBarWithIcon(
+                    iconBack = R.drawable.arrow_back,
+                    title = stringResource(R.string.payments),
+                    backClick = { onBackClick() }
+                )
+            }
         },
         content = { innerPadding ->
             if(isLoading){

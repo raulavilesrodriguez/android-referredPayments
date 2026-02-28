@@ -16,6 +16,7 @@ import com.avilesrodriguez.domain.model.user.UserData
 @Composable
 fun PaymentsMovement(
     popUp: () -> Unit,
+    showTopBar: Boolean = true, // Nuevo parámetro
     viewModel: PaymentsMovementViewModel = hiltViewModel()
 ) {
     val user by viewModel.userDataStore.collectAsState()
@@ -37,7 +38,8 @@ fun PaymentsMovement(
                     provider = user as UserData.Provider,
                     onBackClick = popUp,
                     referrals = referralsProvider,
-                    isLoading = isLoading
+                    isLoading = isLoading,
+                    showTopBar = showTopBar // Lo pasamos a la pantalla interna
                 )
             }
             is UserData.Client -> {
@@ -45,7 +47,8 @@ fun PaymentsMovement(
                     client = user as UserData.Client,
                     onBackClick = popUp,
                     referrals = referralsClient,
-                    isLoading = isLoading
+                    isLoading = isLoading,
+                    showTopBar = showTopBar // Lo pasamos a la pantalla interna
                 )
             }
             else -> {

@@ -72,18 +72,21 @@ fun DetailScreenClient(
     filterReferralsByStatus: (Int) -> Unit,
     statusOptions: List<Int>,
     onBackClick: () -> Unit,
-    onReferClick: (String) -> Unit
+    onReferClick: (String) -> Unit,
+    showTopBar: Boolean = true // Añadido
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
-            ToolBarDetails(
-                title = R.string.information_client,
-                backClick = { onBackClick() },
-                modifier = Modifier.background(
-                    MaterialTheme.colorScheme.secondary
+            if (showTopBar) {
+                ToolBarDetails(
+                    title = R.string.information_client,
+                    backClick = { onBackClick() },
+                    modifier = Modifier.background(
+                        MaterialTheme.colorScheme.secondary
+                    )
                 )
-            )
+            }
         },
         content = { innerPadding ->
             ProfileClient(

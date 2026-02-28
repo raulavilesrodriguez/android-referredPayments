@@ -58,17 +58,20 @@ fun DetailScreenProvider(
     provider: UserData.Provider,
     onBackClick: () -> Unit,
     onAddReferClick: (String) -> Unit,
+    showTopBar: Boolean = true // Añadido
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
-            ToolBarDetails(
-                title = R.string.information_provider,
-                backClick = { onBackClick() },
-                modifier = Modifier.background(
-                    MaterialTheme.colorScheme.secondary
+            if (showTopBar) {
+                ToolBarDetails(
+                    title = R.string.information_provider,
+                    backClick = { onBackClick() },
+                    modifier = Modifier.background(
+                        MaterialTheme.colorScheme.secondary
+                    )
                 )
-            )
+            }
         },
         bottomBar = {ButtonToRefer(onReferClick = onAddReferClick, provider = provider)},
         content = { innerPadding ->
