@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -40,9 +39,11 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
+import androidx.compose.material3.adaptive.layout.rememberPaneExpansionState
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigationsuite.ExperimentalMaterial3AdaptiveNavigationSuiteApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -101,24 +102,31 @@ fun HomeScreen(
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val coroutineScope = rememberCoroutineScope()
 
-    // DETECCION PRECISA: Solo es Tablet en Horizontal si el ancho es >= 840dp y el alto >= 480dp
-    // Esto evita que celulares "grandes" en horizontal activen el modo tablet y se vea mal.
     val isTabletLandscape = adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(840) &&
             adaptiveInfo.windowSizeClass.isHeightAtLeastBreakpoint(480)
 
-    // PERSONALIZACIÓN DE LA DIRECTIVA PARA EL BALANCE DE PANELES
     val customDirective = calculatePaneScaffoldDirective(adaptiveInfo).copy(
         maxHorizontalPartitions = if (isTabletLandscape) 2 else 1,
         horizontalPartitionSpacerSize = 24.dp
     )
 
-    val navigator = rememberListDetailPaneScaffoldNavigator<Nothing>(
+    val navigator = rememberListDetailPaneScaffoldNavigator<HomeDetailContent>(
         scaffoldDirective = customDirective
     )
-
+    
     var detailContent by remember { mutableStateOf<HomeDetailContent?>(null) }
 
+    // 1. ESTADO DE EXPANSIÓN PARA CONTROLAR EL REPARTO
+    val paneExpansionState = rememberPaneExpansionState()
+    
     val isShowingBothPanels = isTabletLandscape && navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded
+
+    // 2. FIJAMOS EL REPARTO AL 60% (0.6f) PARA EL LIST PANE (HOME)
+    LaunchedEffect(isShowingBothPanels) {
+        if (isShowingBothPanels) {
+            paneExpansionState.setFirstPaneProportion(0.6f)
+        }
+    }
 
     BackHandler(navigator.canNavigateBack()) {
         coroutineScope.launch { navigator.navigateBack() }
@@ -127,13 +135,9 @@ fun HomeScreen(
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
+        paneExpansionState = paneExpansionState,
         listPane = {
-            AnimatedPane(
-                // Forzamos un peso de 1f para que intente ocupar el 50% si el detalle también lo hace
-                modifier = Modifier.fillMaxSize().then(
-                    if (isTabletLandscape) Modifier.fillMaxWidth(0.5f) else Modifier
-                )
-            ) {
+            AnimatedPane {
                 HomeScreenContent(
                     user = userData,
                     options = options,
@@ -171,9 +175,7 @@ fun HomeScreen(
             }
         },
         detailPane = {
-            AnimatedPane(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            AnimatedPane {
                 when (val content = detailContent) {
                     is HomeDetailContent.Policies -> {
                         PoliciesScreen(
@@ -257,6 +259,7 @@ fun HomeScreenContent(
         }
 
         Scaffold(
+            modifier = Modifier.weight(1f),
             topBar = {
                 TopAppBar(
                     title = {
@@ -362,11 +365,11 @@ fun HomeScreenContent(
                             selectedIndustry = selectedIndustry,
                             onIndustryChange = onIndustryChange,
                             industryOptions = industryOptions,
-                            onUserClick = onUserClick,
+                            onUserClick = { uId -> onUserClick(uId) },
                             referralsMetrics = referralsMetrics,
                             usersAndMetrics = usersAndMetrics,
                             referralsConversion = referralsConversion,
-                            onPaymentView = onPaymentView
+                            onPaymentView = { onPaymentView() }
                         )
                         2 -> SettingsScreen(openScreen = openScreen, restartApp = restartApp)
                     }
