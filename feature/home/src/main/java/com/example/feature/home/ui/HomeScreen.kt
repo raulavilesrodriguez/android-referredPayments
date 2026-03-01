@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -116,12 +117,10 @@ fun HomeScreen(
     
     var detailContent by remember { mutableStateOf<HomeDetailContent?>(null) }
 
-    // 1. ESTADO DE EXPANSIÓN PARA CONTROLAR EL REPARTO
     val paneExpansionState = rememberPaneExpansionState()
     
     val isShowingBothPanels = isTabletLandscape && navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded
 
-    // 2. FIJAMOS EL REPARTO AL 60% (0.6f) PARA EL LIST PANE (HOME)
     LaunchedEffect(isShowingBothPanels) {
         if (isShowingBothPanels) {
             paneExpansionState.setFirstPaneProportion(0.6f)
@@ -235,7 +234,7 @@ fun HomeScreenContent(
         if (isBigLandscape) {
             NavigationRail(
                 modifier = Modifier
-                    .width(72.dp)
+                    .width(84.dp) // ANCHO AUMENTADO
                     .fillMaxHeight(),
                 containerColor = MaterialTheme.colorScheme.surface
             ) {
@@ -251,7 +250,7 @@ fun HomeScreenContent(
                         onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
                         icon = { Icon(icon, null) },
                         label = { Text(stringResource(tab.title)) },
-                        alwaysShowLabel = false
+                        alwaysShowLabel = true // MOSTRAR SIEMPRE EL TEXTO
                     )
                 }
                 Spacer(Modifier.weight(1f))
