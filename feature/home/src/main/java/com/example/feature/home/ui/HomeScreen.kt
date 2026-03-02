@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -47,12 +48,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -103,139 +107,33 @@ fun HomeScreen(
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val coroutineScope = rememberCoroutineScope()
 
+    val tabs = generateTabs()
+    
+    // 1. FUENTE DE VERDAD: Estado de la pestaña actual
+    var selectedTabIndex by rememberSaveable { mutableIntStateOf(1) }
+    val pagerState = rememberPagerState(initialPage = 1) { tabs.size }
+
+    // Sincronización Pager -> Estado (Gesto swipe en móvil)
+    LaunchedEffect(pagerState.currentPage) {
+        selectedTabIndex = pagerState.currentPage
+    }
+
+    // Sincronización Estado -> Pager (Clic in Rail/BottomBar)
+    LaunchedEffect(selectedTabIndex) {
+        if (pagerState.currentPage != selectedTabIndex) {
+            try { pagerState.scrollToPage(selectedTabIndex) } catch (e: Exception) {}
+        }
+    }
+
     val isTabletLandscape = adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(840) &&
             adaptiveInfo.windowSizeClass.isHeightAtLeastBreakpoint(480)
 
-    val customDirective = calculatePaneScaffoldDirective(adaptiveInfo).copy(
-        maxHorizontalPartitions = if (isTabletLandscape) 2 else 1,
-        horizontalPartitionSpacerSize = 24.dp
-    )
+    val isHomeTab = selectedTabIndex == 1
 
-    val navigator = rememberListDetailPaneScaffoldNavigator<HomeDetailContent>(
-        scaffoldDirective = customDirective
-    )
-    
-    var detailContent by remember { mutableStateOf<HomeDetailContent?>(null) }
-
-    val paneExpansionState = rememberPaneExpansionState()
-    
-    val isShowingBothPanels = isTabletLandscape && navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded
-
-    LaunchedEffect(isShowingBothPanels) {
-        if (isShowingBothPanels) {
-            paneExpansionState.setFirstPaneProportion(0.6f)
-        }
-    }
-
-    BackHandler(navigator.canNavigateBack()) {
-        coroutineScope.launch { navigator.navigateBack() }
-    }
-
-    ListDetailPaneScaffold(
-        directive = navigator.scaffoldDirective,
-        value = navigator.scaffoldValue,
-        paneExpansionState = paneExpansionState,
-        listPane = {
-            AnimatedPane {
-                HomeScreenContent(
-                    user = userData,
-                    options = options,
-                    onActionClick = { action ->
-                        if (ActionOptionsHome.getById(action) == ActionOptionsHome.POLICIES) {
-                            detailContent = HomeDetailContent.Policies
-                            coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
-                        } else {
-                            viewModel.onActionClick(openScreen, restartApp, action)
-                        }
-                    },
-                    openScreen = openScreen,
-                    restartApp = restartApp,
-                    onEditClick = { viewModel.editUser(openScreen) },
-                    users = users,
-                    isLoading = isLoading,
-                    searchText = searchText,
-                    updateSearchText = viewModel::updateSearchText,
-                    selectedIndustry = selectedIndustry?.label(),
-                    onIndustryChange = viewModel::onIndustryChange,
-                    industryOptions = industryOptions,
-                    onUserClick = { uId -> 
-                        detailContent = HomeDetailContent.UserDetail(uId)
-                        coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
-                    },
-                    referralsMetrics = referralsMetrics,
-                    usersAndMetrics = usersAndMetrics,
-                    referralsConversion = referralsConversion,
-                    onPaymentView = { 
-                        detailContent = HomeDetailContent.Payments
-                        coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
-                    },
-                    isBigLandscape = isTabletLandscape
-                )
-            }
-        },
-        detailPane = {
-            AnimatedPane {
-                when (val content = detailContent) {
-                    is HomeDetailContent.Policies -> {
-                        PoliciesScreen(
-                            popUp = { coroutineScope.launch { navigator.navigateBack() } },
-                            showTopBar = !isShowingBothPanels
-                        )
-                    }
-                    is HomeDetailContent.Payments -> {
-                        PaymentsMovement(
-                            popUp = { coroutineScope.launch { navigator.navigateBack() } },
-                            showTopBar = !isShowingBothPanels
-                        )
-                    }
-                    is HomeDetailContent.UserDetail -> {
-                        DetailScreenUser(
-                            uId = content.userId,
-                            popUp = { coroutineScope.launch { navigator.navigateBack() } },
-                            openScreen = openScreen,
-                            showTopBar = !isShowingBothPanels
-                        )
-                    }
-                    null -> {}
-                }
-            }
-        }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveNavigationSuiteApi::class)
-@Composable
-fun HomeScreenContent(
-    user: UserData?,
-    options: List<Int>,
-    onActionClick: (Int) -> Unit,
-    openScreen: (String) -> Unit,
-    restartApp: (String) -> Unit,
-    onEditClick: () -> Unit,
-    users: List<UserData>,
-    isLoading: Boolean,
-    searchText: String,
-    updateSearchText: (String) -> Unit,
-    selectedIndustry: Int?,
-    onIndustryChange: (Int) -> Unit,
-    industryOptions: List<Int>,
-    onUserClick: (String) -> Unit,
-    referralsMetrics: ReferralMetrics,
-    usersAndMetrics: List<UserAndReferralMetrics>,
-    referralsConversion: String,
-    onPaymentView: () -> Unit,
-    isBigLandscape: Boolean
-){
-    val tabs = generateTabs()
-    val pagerState = rememberPagerState(1){tabs.size}
-    val coroutineScope = rememberCoroutineScope()
-
-    Row(Modifier.fillMaxSize()){
-        if (isBigLandscape) {
+    Row(Modifier.fillMaxSize()) {
+        if (isTabletLandscape) {
             NavigationRail(
-                modifier = Modifier
-                    .width(84.dp) // ANCHO AUMENTADO
-                    .fillMaxHeight(),
+                modifier = Modifier.width(84.dp).fillMaxHeight(),
                 containerColor = MaterialTheme.colorScheme.surface
             ) {
                 Spacer(Modifier.weight(1f))
@@ -246,135 +144,243 @@ fun HomeScreenContent(
                         else -> Icons.Default.Person
                     }
                     NavigationRailItem(
-                        selected = pagerState.currentPage == index,
-                        onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
+                        selected = selectedTabIndex == index,
+                        onClick = { selectedTabIndex = index },
                         icon = { Icon(icon, null) },
                         label = { Text(stringResource(tab.title)) },
-                        alwaysShowLabel = true // MOSTRAR SIEMPRE EL TEXTO
+                        alwaysShowLabel = false
                     )
                 }
                 Spacer(Modifier.weight(1f))
             }
         }
 
-        Scaffold(
+        val customDirective = calculatePaneScaffoldDirective(adaptiveInfo).copy(
+            maxHorizontalPartitions = if (isTabletLandscape && isHomeTab) 2 else 1,
+            horizontalPartitionSpacerSize = 24.dp
+        )
+
+        val navigator = rememberListDetailPaneScaffoldNavigator<HomeDetailContent>(
+            scaffoldDirective = customDirective
+        )
+        
+        var detailContent by remember { mutableStateOf<HomeDetailContent?>(null) }
+        val paneExpansionState = rememberPaneExpansionState()
+        
+        val isShowingBothPanels = isTabletLandscape && isHomeTab && navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded
+
+        LaunchedEffect(isShowingBothPanels) {
+            if (isShowingBothPanels) {
+                paneExpansionState.setFirstPaneProportion(0.6f)
+            }
+        }
+
+        LaunchedEffect(selectedTabIndex) {
+            if (selectedTabIndex != 1) {
+                coroutineScope.launch { 
+                    if (navigator.canNavigateBack()) navigator.navigateBack()
+                    detailContent = null
+                }
+            }
+        }
+
+        BackHandler(navigator.canNavigateBack()) {
+            coroutineScope.launch { navigator.navigateBack() }
+        }
+
+        ListDetailPaneScaffold(
             modifier = Modifier.weight(1f),
-            topBar = {
-                TopAppBar(
-                    title = {
-                        when (pagerState.currentPage) {
-                            0 -> { Text(stringResource(R.string.referrals)) }
-                            1 -> { Text(stringResource(R.string.app_name_presentation)) }
-                            2 -> { Text(stringResource(R.string.profile)) }
-                        }
-                    },
-                    actions = {
-                        DropdownContextMenu(
-                            options = options,
-                            modifier = Modifier
-                        ) { action -> onActionClick(action) }
-                    }
-                )
-            },
-            bottomBar = {
-                if (!isBigLandscape) {
-                    BottomAppBar(
-                        modifier = Modifier.height(56.dp),
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        contentPadding = PaddingValues(0.dp),
-                        windowInsets = WindowInsets(0, 0, 0, 0),
-                        tonalElevation = NavigationBarDefaults.Elevation
-                    ) {
-                        tabs.forEachIndexed { index, tab ->
-                            val isSelected = pagerState.currentPage == index
-                            val icon = when(index) {
-                                0 -> Icons.Default.Star
-                                1 -> Icons.Default.Home
-                                else -> Icons.Default.Person
+            directive = navigator.scaffoldDirective,
+            value = navigator.scaffoldValue,
+            paneExpansionState = paneExpansionState,
+            listPane = {
+                AnimatedPane {
+                    Scaffold(
+                        topBar = {
+                            HomeScreenTopBar(selectedTabIndex, options, onActionClick = { action ->
+                                if (ActionOptionsHome.getById(action) == ActionOptionsHome.POLICIES) {
+                                    detailContent = HomeDetailContent.Policies
+                                    coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
+                                } else {
+                                    viewModel.onActionClick(openScreen, restartApp, action)
+                                }
+                            })
+                        },
+                        bottomBar = {
+                            if (!isTabletLandscape) {
+                                HomeBottomBar(selectedTabIndex, tabs, onClick = { index ->
+                                    selectedTabIndex = index
+                                })
                             }
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxHeight()
-                                    .clickable {
-                                        coroutineScope.launch { pagerState.animateScrollToPage(index) }
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .background(
-                                            color = if (isSelected) MaterialTheme.colorScheme.secondaryContainer else androidx.compose.ui.graphics.Color.Transparent,
-                                            shape = androidx.compose.foundation.shape.CircleShape
-                                        )
-                                        .padding(horizontal = 20.dp, vertical = 4.dp),
-                                    contentAlignment = Alignment.Center
+                        },
+                        floatingActionButton = {
+                            if (selectedTabIndex == 2) {
+                                FloatingActionButton(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    onClick = { viewModel.editUser(openScreen) }
                                 ) {
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Icon(
-                                            imageVector = icon,
-                                            contentDescription = null,
-                                            tint = if (isSelected)
-                                                MaterialTheme.colorScheme.onSecondaryContainer
-                                            else
-                                                MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                        Text(
-                                            text=stringResource(tab.title),
-                                            style = MaterialTheme.typography.labelSmall,
-                                        )
-                                    }
+                                    Icon(painterResource(R.drawable.edit), stringResource(R.string.edit))
+                                }
+                            }
+                        }
+                    ) { innerPadding ->
+                        if (isTabletLandscape) {
+                            Box(modifier = Modifier.fillMaxSize().padding(innerPadding).clipToBounds()) {
+                                when(selectedTabIndex){
+                                    0 -> ReferralsScreen(openScreen = openScreen)
+                                    1 -> HomeMainContent(
+                                        user = userData,
+                                        users = users,
+                                        isLoading = isLoading,
+                                        searchText = searchText,
+                                        updateSearchText = viewModel::updateSearchText,
+                                        selectedIndustry = selectedIndustry?.label(),
+                                        onIndustryChange = viewModel::onIndustryChange,
+                                        industryOptions = industryOptions,
+                                        onUserClick = { uId -> 
+                                            detailContent = HomeDetailContent.UserDetail(uId)
+                                            coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
+                                        },
+                                        referralsMetrics = referralsMetrics,
+                                        usersAndMetrics = usersAndMetrics,
+                                        referralsConversion = referralsConversion,
+                                        onPaymentView = { 
+                                            detailContent = HomeDetailContent.Payments
+                                            coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
+                                        }
+                                    )
+                                    2 -> SettingsScreen(openScreen = openScreen, restartApp = restartApp)
+                                }
+                            }
+                        } else {
+                            HorizontalPager(
+                                modifier = Modifier.fillMaxSize().padding(innerPadding).clipToBounds(),
+                                state = pagerState,
+                                userScrollEnabled = true
+                            ) { index ->
+                                when(index){
+                                    0 -> ReferralsScreen(openScreen = openScreen)
+                                    1 -> HomeMainContent(
+                                        user = userData,
+                                        users = users,
+                                        isLoading = isLoading,
+                                        searchText = searchText,
+                                        updateSearchText = viewModel::updateSearchText,
+                                        selectedIndustry = selectedIndustry?.label(),
+                                        onIndustryChange = viewModel::onIndustryChange,
+                                        industryOptions = industryOptions,
+                                        onUserClick = { uId -> 
+                                            detailContent = HomeDetailContent.UserDetail(uId)
+                                            coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
+                                        },
+                                        referralsMetrics = referralsMetrics,
+                                        usersAndMetrics = usersAndMetrics,
+                                        referralsConversion = referralsConversion,
+                                        onPaymentView = { 
+                                            detailContent = HomeDetailContent.Payments
+                                            coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
+                                        }
+                                    )
+                                    2 -> SettingsScreen(openScreen = openScreen, restartApp = restartApp)
                                 }
                             }
                         }
                     }
                 }
             },
-            floatingActionButton = {
-                if (pagerState.currentPage == 2) {
-                    FloatingActionButton(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        onClick = onEditClick
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.edit),
-                            contentDescription = stringResource(R.string.edit)
-                        )
-                    }
-                }
-            },
-            content = { innerPadding ->
-                HorizontalPager(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    state = pagerState,
-                    userScrollEnabled = true
-                ) { index ->
-                    when(index){
-                        0 -> ReferralsScreen(openScreen = openScreen)
-                        1 -> HomeMainContent(
-                            user = user,
-                            users = users,
-                            isLoading = isLoading,
-                            searchText = searchText,
-                            updateSearchText = updateSearchText,
-                            selectedIndustry = selectedIndustry,
-                            onIndustryChange = onIndustryChange,
-                            industryOptions = industryOptions,
-                            onUserClick = { uId -> onUserClick(uId) },
-                            referralsMetrics = referralsMetrics,
-                            usersAndMetrics = usersAndMetrics,
-                            referralsConversion = referralsConversion,
-                            onPaymentView = { onPaymentView() }
-                        )
-                        2 -> SettingsScreen(openScreen = openScreen, restartApp = restartApp)
+            detailPane = {
+                AnimatedPane {
+                    if (isHomeTab) {
+                        when (val content = detailContent) {
+                            is HomeDetailContent.Policies -> {
+                                PoliciesScreen(
+                                    popUp = { coroutineScope.launch { navigator.navigateBack() } },
+                                    showTopBar = !isShowingBothPanels
+                                )
+                            }
+                            is HomeDetailContent.Payments -> {
+                                PaymentsMovement(
+                                    popUp = { coroutineScope.launch { navigator.navigateBack() } },
+                                    showTopBar = !isShowingBothPanels
+                                )
+                            }
+                            is HomeDetailContent.UserDetail -> {
+                                DetailScreenUser(
+                                    uId = content.userId,
+                                    popUp = { coroutineScope.launch { navigator.navigateBack() } },
+                                    openScreen = openScreen,
+                                    showTopBar = !isShowingBothPanels
+                                )
+                            }
+                            null -> {}
+                        }
                     }
                 }
             }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeScreenTopBar(currentTab: Int, options: List<Int>, onActionClick: (Int) -> Unit) {
+    TopAppBar(
+        title = {
+            when (currentTab) {
+                0 -> { Text(stringResource(R.string.referrals)) }
+                1 -> { Text(stringResource(R.string.app_name_presentation)) }
+                2 -> { Text(stringResource(R.string.profile)) }
+            }
+        },
+        actions = {
+            DropdownContextMenu(options = options) { action -> onActionClick(action) }
+        }
+    )
+}
+
+@Composable
+private fun HomeBottomBar(currentTab: Int, tabs: List<StartListTab>, onClick: (Int) -> Unit) {
+    BottomAppBar(
+        modifier = Modifier.height(56.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentPadding = PaddingValues(0.dp),
+        windowInsets = WindowInsets(0, 0, 0, 0),
+        tonalElevation = NavigationBarDefaults.Elevation
+    ) {
+        tabs.forEachIndexed { index, tab ->
+            val isSelected = currentTab == index
+            val icon = when(index) {
+                0 -> Icons.Default.Star
+                1 -> Icons.Default.Home
+                else -> Icons.Default.Person
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .clickable { onClick(index) },
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = if (isSelected) MaterialTheme.colorScheme.secondaryContainer else androidx.compose.ui.graphics.Color.Transparent,
+                            shape = androidx.compose.foundation.shape.CircleShape
+                        )
+                        .padding(horizontal = 20.dp, vertical = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = if (isSelected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(stringResource(tab.title), style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+            }
+        }
     }
 }
 
