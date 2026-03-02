@@ -130,6 +130,48 @@ fun HomeScreen(
 
     val isHomeTab = selectedTabIndex == 1
 
+    val customDirective = calculatePaneScaffoldDirective(adaptiveInfo).copy(
+        maxHorizontalPartitions = if (isTabletLandscape && isHomeTab) 2 else 1,
+        horizontalPartitionSpacerSize = 24.dp
+    )
+
+    val navigator = rememberListDetailPaneScaffoldNavigator<HomeDetailContent>(
+        scaffoldDirective = customDirective
+    )
+    
+    var detailContent by remember { 
+        mutableStateOf<HomeDetailContent?>(if (isTabletLandscape) HomeDetailContent.Payments else null) 
+    }
+
+    val paneExpansionState = rememberPaneExpansionState()
+    val isShowingBothPanels = isTabletLandscape && isHomeTab && navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded
+
+    LaunchedEffect(isShowingBothPanels) {
+        if (isShowingBothPanels) {
+            paneExpansionState.setFirstPaneProportion(0.6f)
+        }
+    }
+
+    // NAVEGACIÓN Y LIMPIEZA: Maneja el inicio, el regreso a la pestaña de Inicio y el cambio a otras pestañas
+    LaunchedEffect(selectedTabIndex, isTabletLandscape) {
+        if (selectedTabIndex == 1) {
+            if (isTabletLandscape && detailContent == null) {
+                detailContent = HomeDetailContent.Payments
+                navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
+            }
+        } else {
+            // Si salimos de Inicio, cerramos detalle y limpiamos estado para evitar navegación fantasma
+            if (navigator.canNavigateBack()) {
+                navigator.navigateBack()
+            }
+            detailContent = null
+        }
+    }
+
+    BackHandler(navigator.canNavigateBack()) {
+        coroutineScope.launch { navigator.navigateBack() }
+    }
+
     Row(Modifier.fillMaxSize()) {
         if (isTabletLandscape) {
             NavigationRail(
@@ -153,39 +195,6 @@ fun HomeScreen(
                 }
                 Spacer(Modifier.weight(1f))
             }
-        }
-
-        val customDirective = calculatePaneScaffoldDirective(adaptiveInfo).copy(
-            maxHorizontalPartitions = if (isTabletLandscape && isHomeTab) 2 else 1,
-            horizontalPartitionSpacerSize = 24.dp
-        )
-
-        val navigator = rememberListDetailPaneScaffoldNavigator<HomeDetailContent>(
-            scaffoldDirective = customDirective
-        )
-        
-        var detailContent by remember { mutableStateOf<HomeDetailContent?>(null) }
-        val paneExpansionState = rememberPaneExpansionState()
-        
-        val isShowingBothPanels = isTabletLandscape && isHomeTab && navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded
-
-        LaunchedEffect(isShowingBothPanels) {
-            if (isShowingBothPanels) {
-                paneExpansionState.setFirstPaneProportion(0.6f)
-            }
-        }
-
-        LaunchedEffect(selectedTabIndex) {
-            if (selectedTabIndex != 1) {
-                coroutineScope.launch { 
-                    if (navigator.canNavigateBack()) navigator.navigateBack()
-                    detailContent = null
-                }
-            }
-        }
-
-        BackHandler(navigator.canNavigateBack()) {
-            coroutineScope.launch { navigator.navigateBack() }
         }
 
         ListDetailPaneScaffold(
