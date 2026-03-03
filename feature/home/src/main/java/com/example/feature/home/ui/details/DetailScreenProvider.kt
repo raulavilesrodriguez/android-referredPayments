@@ -58,7 +58,7 @@ fun DetailScreenProvider(
     provider: UserData.Provider,
     onBackClick: () -> Unit,
     onAddReferClick: (String) -> Unit,
-    showTopBar: Boolean = true // Añadido
+    showTopBar: Boolean = true
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,

@@ -1,4 +1,4 @@
-package com.example.feature.home.ui
+package com.avilesrodriguez.presentation.navigation
 
 import androidx.annotation.StringRes
 import com.avilesrodriguez.presentation.R

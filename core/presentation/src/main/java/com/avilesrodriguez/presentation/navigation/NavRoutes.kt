@@ -10,7 +10,8 @@ object NavRoutes {
     const val EDIT_USER = "edit_user"
 
     const val POLICIES = "policies"
-
+    const val REFERRALS = "referrals"
+    const val SETTINGS = "settings"
     const val HOME = "home"
     const val PAYMENTS_MOVEMENT = "payments_movement"
 

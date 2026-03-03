@@ -40,7 +40,9 @@ import com.avilesrodriguez.feature.referrals.ui.referral.EditNameReferral
 import com.avilesrodriguez.feature.referrals.ui.referral.EditPhoneReferral
 import com.avilesrodriguez.feature.referrals.ui.referral.ReferralScreen
 import com.avilesrodriguez.feature.referrals.ui.referral.ReferralViewModel
+import com.avilesrodriguez.feature.referrals.ui.referrals.ReferralsScreen
 import com.avilesrodriguez.feature.settings.ui.EditScreen
+import com.avilesrodriguez.feature.settings.ui.SettingsScreen
 import com.avilesrodriguez.presentation.navigation.AppState
 import com.avilesrodriguez.presentation.navigation.DeepLinks
 import com.avilesrodriguez.presentation.navigation.NavRoutes
@@ -84,6 +86,8 @@ fun MainNavigation(){
                     addSignUp(appState)
                     addLogin(appState)
                     addHome(appState)
+                    referralsNavigation(appState)
+                    settingsNavigation(appState)
                     paymentsMovement(appState)
                     addPolicies(appState)
                     addEditUser(appState)
@@ -146,6 +150,24 @@ private fun NavGraphBuilder.addHome(appState: AppState){
     composable(NavRoutes.HOME) {
         HomeScreen(
             openScreen = {route -> appState.navigate(route)},
+            restartApp = {route -> appState.clearAndNavigate(route)}
+        )
+    }
+}
+
+private fun NavGraphBuilder.referralsNavigation(appState: AppState){
+    composable(NavRoutes.REFERRALS) {
+        ReferralsScreen(
+            openScreen = { route -> appState.navigate(route) },
+            restartApp = {route -> appState.clearAndNavigate(route)}
+        )
+    }
+}
+
+private fun NavGraphBuilder.settingsNavigation(appState: AppState){
+    composable(NavRoutes.SETTINGS) {
+        SettingsScreen(
+            openScreen = { route -> appState.navigate(route) },
             restartApp = {route -> appState.clearAndNavigate(route)}
         )
     }

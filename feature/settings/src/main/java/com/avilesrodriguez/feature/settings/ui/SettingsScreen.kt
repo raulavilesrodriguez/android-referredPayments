@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,21 +19,30 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -40,6 +50,10 @@ import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.avatar.DEFAULT_AVATAR_USER
+import com.avilesrodriguez.presentation.composables.BottomBarNavigation
+import com.avilesrodriguez.presentation.composables.TopBarMain
+import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
+import com.avilesrodriguez.presentation.navigation.generateTabs
 import com.avilesrodriguez.presentation.profile.ItemEditProfile
 import com.avilesrodriguez.presentation.profile.ItemProfile
 
@@ -53,15 +67,88 @@ fun SettingsScreen(
     val userData by viewModel.uiState.collectAsState()
     var showDialogDeleteAccount by remember { mutableStateOf(false) }
 
+    val options = ActionOptionsHome.getOptions()
+    val adaptiveInfo = currentWindowAdaptiveInfo()
+    val tabs = generateTabs()
+
+    // 1. FUENTE DE VERDAD: Estado de la pestaña actual
+    var selectedTabIndex by rememberSaveable { mutableIntStateOf(2) }
+
+    val isTabletLandscape = adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(840) &&
+            adaptiveInfo.windowSizeClass.isHeightAtLeastBreakpoint(480)
+
+    // NAVEGACIÓN Y LIMPIEZA: Maneja el inicio, el regreso a la pestaña de Inicio y el cambio a otras pestañas
+    LaunchedEffect(selectedTabIndex) {
+        when(selectedTabIndex){
+            0 -> viewModel.onReferrals { openScreen(it) }
+            1 -> viewModel.onHome { openScreen(it) }
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.reloadUserData()
     }
 
-    Box(modifier = Modifier.fillMaxSize()){
-        Profile(
-            userData = userData,
-            onDeleteAccountClick = { showDialogDeleteAccount = true }
-        )
+    Row(Modifier.fillMaxSize()){
+        if(isTabletLandscape){
+            NavigationRail(
+                modifier = Modifier.width(84.dp).fillMaxHeight(),
+                containerColor = MaterialTheme.colorScheme.surface
+            ) {
+                Spacer(Modifier.weight(1f))
+                tabs.forEachIndexed { index, tab ->
+                    NavigationRailItem(
+                        selected = selectedTabIndex == index,
+                        onClick = { selectedTabIndex = index },
+                        icon = { Icon(tab.icon, null) },
+                        label = { Text(stringResource(tab.title)) },
+                        alwaysShowLabel = false
+                    )
+                }
+                Spacer(Modifier.weight(1f))
+            }
+        }
+        Scaffold(
+            modifier = Modifier.weight(1f),
+            topBar = {
+                TopBarMain(
+                    title = stringResource(R.string.profile),
+                    options = options,
+                    onActionClick = { action ->
+                        viewModel.onActionClick(openScreen, restartApp, action)
+                    }
+                )
+            },
+            bottomBar = {
+                if(!isTabletLandscape){
+                    BottomBarNavigation(
+                        currentTab = selectedTabIndex,
+                        tabs = tabs,
+                        onClick = {index -> selectedTabIndex = index}
+                    )
+                }
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    onClick = { viewModel.editUser(openScreen) }
+                ) {
+                    Icon(painterResource(R.drawable.edit), stringResource(R.string.edit))
+                }
+            }
+        ) { innerPadding ->
+            Box(modifier = Modifier.fillMaxSize().padding(innerPadding)){
+                when(selectedTabIndex){
+                    2 -> Profile(
+                        userData = userData,
+                        onDeleteAccountClick = { showDialogDeleteAccount = true }
+                    )
+                    else -> {
+                        Box(Modifier.fillMaxSize())
+                    }
+                }
+            }
+        }
     }
 
     if(showDialogDeleteAccount){

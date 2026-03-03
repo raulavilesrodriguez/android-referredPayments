@@ -15,12 +15,111 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+
+@Composable
+fun SearchFieldBasic(
+    value: String,
+    onValueChange: (String) -> Unit,
+    @StringRes placeholder: Int,
+    @DrawableRes trailingIcon: Int,
+    modifier: Modifier = Modifier
+){
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = { onValueChange(it) },
+            placeholder = { Text(text = stringResource(id = placeholder)) },
+            trailingIcon = {
+                Icon(
+                    painter = painterResource(id = trailingIcon),
+                    contentDescription = null
+                )
+            },
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.outline,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        )
+    }
+    LaunchedEffect(Unit) {
+        focusManager.clearFocus()
+    }
+}
+
+@Composable
+fun SearchToolBar(
+    @StringRes title: Int,
+    @DrawableRes iconBack: Int,
+    iconBackClick: () -> Unit,
+    @DrawableRes iconSearch: Int,
+    iconSearchClick: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .defaultMinSize()
+            .padding(top = 16.dp, start = 0.dp, end = 0.dp, bottom = 16.dp)
+    ){
+        IconButton(
+            onClick = {iconBackClick()},
+            modifier = Modifier
+                .padding(start = 0.dp, end = 12.dp)
+                .align(Alignment.CenterStart)
+        ) {
+            Icon(
+                painter = painterResource(id = iconBack),
+                contentDescription = null
+            )
+        }
+        Column(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxWidth(0.80f)
+        ){
+            Text(
+                text = stringResource(id = title),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+        }
+        IconButton(
+            onClick = iconSearchClick,
+            modifier = Modifier
+                .padding(end = 4.dp)
+                .align(Alignment.CenterEnd)
+        ){
+            Icon(
+                painter = painterResource(id = iconSearch),
+                contentDescription = null
+            )
+        }
+    }
+}
 
 @Composable
 fun SearchField(
@@ -31,9 +130,10 @@ fun SearchField(
     onLeadingIconClick: () -> Unit,
     modifier: Modifier = Modifier
 ){
-    Box(modifier = modifier
-        .padding(16.dp)
-        .fillMaxWidth(),
+    Box(
+        modifier = modifier
+            .padding(16.dp)
+            .fillMaxWidth(),
     ) {
         OutlinedTextField(
             value = value,
@@ -76,94 +176,6 @@ fun SearchToolBarNoBack(
             .defaultMinSize()
             .padding(top = 16.dp, start = 0.dp, end = 0.dp, bottom = 16.dp)
     ){
-        Column(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth(0.80f)
-        ){
-            Text(
-                text = stringResource(id = title),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-        }
-        IconButton(
-            onClick = iconSearchClick,
-            modifier = Modifier
-                .padding(end = 4.dp)
-                .align(Alignment.CenterEnd)
-        ){
-            Icon(
-                painter = painterResource(id = iconSearch),
-                contentDescription = null
-            )
-        }
-    }
-}
-
-@Composable
-fun SearchFieldBasic(
-    value: String,
-    onValueChange: (String) -> Unit,
-    @StringRes placeholder: Int,
-    @DrawableRes trailingIcon: Int,
-    modifier: Modifier = Modifier
-){
-    Box(modifier = modifier
-        .fillMaxWidth(),
-    ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = { onValueChange(it) },
-            placeholder = { Text(text = stringResource(id = placeholder)) },
-            trailingIcon = {
-                Icon(
-                    painter = painterResource(id = trailingIcon),
-                    contentDescription = null
-                )
-            },
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.outline,
-                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        )
-    }
-}
-
-@Composable
-fun SearchToolBar(
-    @StringRes title: Int,
-    @DrawableRes iconBack: Int,
-    iconBackClick: () -> Unit,
-    @DrawableRes iconSearch: Int,
-    iconSearchClick: () -> Unit,
-    modifier: Modifier = Modifier
-){
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .defaultMinSize()
-            .padding(top = 16.dp, start = 0.dp, end = 0.dp, bottom = 16.dp)
-    ){
-        IconButton(
-            onClick = {iconBackClick()},
-            modifier = Modifier
-                .padding(start= 0.dp, end = 12.dp)
-                .align(Alignment.CenterStart)
-        ) {
-            Icon(
-                painter = painterResource(id = iconBack),
-                contentDescription = null
-            )
-        }
         Column(
             modifier = Modifier
                 .align(Alignment.Center)

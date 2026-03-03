@@ -17,6 +17,7 @@ import com.avilesrodriguez.domain.usecases.SearchUsersClient
 import com.avilesrodriguez.domain.usecases.SearchUsersProvider
 import com.avilesrodriguez.domain.usecases.SignOut
 import com.avilesrodriguez.presentation.industries.getById
+import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import com.example.feature.home.models.UserAndReferralMetrics
@@ -166,10 +167,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun editUser(openScreen: (String) -> Unit){
-        openScreen(NavRoutes.EDIT_USER)
-    }
-
     fun navigationUserDetails(uid:String, openScreen: (String) -> Unit){
         val route = NavRoutes.USER_DETAIL.replace("{${NavRoutes.UserArgs.ID}}", uid)
         openScreen(route)
@@ -242,8 +239,12 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onPaymentView(openScreen: (String) -> Unit){
-        openScreen(NavRoutes.PAYMENTS_MOVEMENT)
+    fun onReferrals(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.REFERRALS)
+    }
+
+    fun onSettings(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.SETTINGS)
     }
 
 }

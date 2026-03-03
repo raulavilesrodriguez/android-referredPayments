@@ -24,19 +24,16 @@ import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 
 @Composable
 fun PoliciesScreen(
-    popUp: () -> Unit,
-    showTopBar: Boolean = true // Nuevo parámetro para control adaptativo
+    popUp: () -> Unit
 ) {
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
-            if (showTopBar) {
-                ToolBarWithIcon(
-                    iconBack = R.drawable.arrow_back,
-                    title = stringResource(R.string.policies),
-                    backClick = popUp
-                )
-            }
+            ToolBarWithIcon(
+                iconBack = R.drawable.arrow_back,
+                title = stringResource(R.string.policies),
+                backClick = popUp
+            )
         },
         content = { innerPadding ->
             PoliciesScreenContent(

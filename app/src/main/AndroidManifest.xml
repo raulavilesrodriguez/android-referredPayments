@@ -19,7 +19,7 @@
             android:launchMode="singleTask"
             android:alwaysRetainTaskState="true"
             android:label="@string/app_name"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.WinApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

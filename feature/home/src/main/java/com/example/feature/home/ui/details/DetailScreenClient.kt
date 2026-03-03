@@ -73,7 +73,7 @@ fun DetailScreenClient(
     statusOptions: List<Int>,
     onBackClick: () -> Unit,
     onReferClick: (String) -> Unit,
-    showTopBar: Boolean = true // Añadido
+    showTopBar: Boolean = true
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,

@@ -11,6 +11,7 @@ import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SaveUser
 import com.avilesrodriguez.domain.usecases.SecureDeleteAccount
+import com.avilesrodriguez.domain.usecases.SignOut
 import com.avilesrodriguez.domain.usecases.UploadPhoto
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.banksPays.BanksEcuador
@@ -22,6 +23,7 @@ import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_RUC
 import com.avilesrodriguez.presentation.ext.isValidUrl
 import com.avilesrodriguez.presentation.industries.getById
+import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
@@ -41,7 +43,8 @@ class SettingsViewModel @Inject constructor(
     private val downloadPhoto: DownloadUrlPhoto,
     private val saveUser: SaveUser,
     private val secureDeleteAccount: SecureDeleteAccount,
-    @param:ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context,
+    private val signOut: SignOut
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow<UserData?>(null)
     val uiState: StateFlow<UserData?> = _uiState
@@ -229,6 +232,28 @@ class SettingsViewModel @Inject constructor(
 
     fun cancelEditUser(popUp: () -> Unit){
         popUp()
+    }
+
+    fun onHome(openScreen: (String) -> Unit) {
+        openScreen(NavRoutes.HOME)
+    }
+
+    fun onReferrals(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.REFERRALS)
+    }
+
+    fun editUser(openScreen: (String) -> Unit){
+        openScreen(NavRoutes.EDIT_USER)
+    }
+
+    fun onActionClick(openScreen: (String) -> Unit, restartApp: (String) -> Unit, action: Int){
+        when(ActionOptionsHome.getById(action)){
+            ActionOptionsHome.POLICIES -> openScreen(NavRoutes.POLICIES)
+            ActionOptionsHome.SIGN_OUT -> launchCatching {
+                signOut()
+                restartApp(NavRoutes.SPLASH)
+            }
+        }
     }
 
 }

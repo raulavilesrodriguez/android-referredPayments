@@ -9,6 +9,8 @@ import com.avilesrodriguez.domain.usecases.GetReferralsByClient
 import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
+import com.avilesrodriguez.domain.usecases.SignOut
+import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +31,8 @@ class ReferralsViewModel @Inject constructor(
     private val hasUser: HasUser,
     private val getUser: GetUser,
     private val getReferralsByClient: GetReferralsByClient,
-    private val getReferralsByProvider: GetReferralsByProvider
+    private val getReferralsByProvider: GetReferralsByProvider,
+    private val signOut: SignOut
 ) : BaseViewModel(){
     private val _allReferrals = MutableStateFlow<List<ReferralWithNames>>(emptyList())
     private val _uiState = MutableStateFlow<List<ReferralWithNames>>(emptyList())
@@ -79,14 +82,14 @@ class ReferralsViewModel @Inject constructor(
             flow?.collect { referrals ->
                 val referralsWithNames = referrals.map { referral ->
                     val otherId = if (userData is UserData.Client) referral.providerId else referral.clientId
-                    val otherUser = getUser(otherId) // Obtenemos el usuario (puedes usar cache en el Repository)
+                    val otherUser = getUser(otherId) // Obtenemos el usuario (puedes usar caché en el Repository)
                     ReferralWithNames(
                         referral = referral,
                         otherPartyName = otherUser?.name ?: ""
                     )
                 }
                 _allReferrals.value = referralsWithNames
-                //si habia algo escrito
+                //si there was algo escrito
                 filterReferralsLocally(_searchText.value)
                 _isLoading.value = false
             }
@@ -138,4 +141,21 @@ class ReferralsViewModel @Inject constructor(
         openScreen(route)
     }
 
+    fun onActionClick(openScreen: (String) -> Unit, restartApp: (String) -> Unit, action: Int){
+        when(ActionOptionsHome.getById(action)){
+            ActionOptionsHome.POLICIES -> openScreen(NavRoutes.POLICIES)
+            ActionOptionsHome.SIGN_OUT -> launchCatching {
+                signOut()
+                restartApp(NavRoutes.SPLASH)
+            }
+        }
+    }
+
+    fun onHome(openScreen: (String) -> Unit) {
+        openScreen(NavRoutes.HOME)
+    }
+
+    fun onSettings(openScreen: (String) -> Unit) {
+        openScreen(NavRoutes.SETTINGS)
+    }
 }

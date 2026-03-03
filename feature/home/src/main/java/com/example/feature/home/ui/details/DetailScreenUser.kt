@@ -21,7 +21,7 @@ fun DetailScreenUser(
     uId: String?,
     popUp: () -> Unit,
     openScreen: (String) -> Unit,
-    showTopBar: Boolean = true, // Nuevo parámetro
+    showTopBar: Boolean = true,
     viewModel: DetailViewModel = hiltViewModel()
 ){
     LaunchedEffect(uId) {
