@@ -1,8 +1,6 @@
 package com.example.feature.home.ui.details
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -29,6 +26,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -42,12 +40,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
-import com.avilesrodriguez.presentation.composables.ToolBarDetails
+import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.details.DetailMetricItem
 import com.avilesrodriguez.presentation.fakeData.userProvider
 import com.avilesrodriguez.presentation.industries.label
@@ -60,16 +59,18 @@ fun DetailScreenProvider(
     onAddReferClick: (String) -> Unit,
     showTopBar: Boolean = true
 ){
+    val backgroundColor = MaterialTheme.colorScheme.surfaceContainer
+
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets.safeDrawing,
+        containerColor = backgroundColor,
         topBar = {
             if (showTopBar) {
-                ToolBarDetails(
-                    title = R.string.information_provider,
-                    backClick = { onBackClick() },
-                    modifier = Modifier.background(
-                        MaterialTheme.colorScheme.secondary
-                    )
+                ToolBarWithIcon(
+                    iconBack = R.drawable.arrow_back,
+                    title = stringResource(R.string.information_provider),
+                    backClick = { onBackClick() }
                 )
             }
         },
@@ -89,15 +90,16 @@ fun ButtonToRefer(
     provider: UserData.Provider,
 ){
     Surface(
-        //tonalElevation = 8.dp,
-        shadowElevation = 8.dp,
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 2.dp,
+        shadowElevation = 12.dp,
         modifier = Modifier.fillMaxWidth()
     ) {
         Button(
             onClick = { onReferClick(provider.uid) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(horizontal = 20.dp, vertical = 16.dp)
                 .height(56.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -121,49 +123,59 @@ private fun ProfileProvider(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .padding(top = 8.dp)
     ){
-        Box(modifier = Modifier
+        ElevatedCard(
+            modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
-            .background(
-                MaterialTheme.colorScheme.secondary,
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+            shape = RoundedCornerShape(24.dp),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = MaterialTheme.colorScheme.surface
             )
         ){
             Column(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp),
+                    .fillMaxWidth()
+                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
             ) {
+                Avatar(photoUri = provider.photoUrl, size = 90.dp)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = provider.name ?: stringResource(R.string.unnamed),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
                 Surface(
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(8.dp)
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.padding(top = 8.dp)
                 ) {
                     Text(
                         text = stringResource(provider.industry.label()),
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
-                Text(
-                    text = provider.name ?: stringResource(R.string.unnamed),
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1
-                )
-                Avatar(
-                    photoUri = provider.photoUrl,
-                    size = 80.dp
-                )
             }
         }
-        Column(modifier = Modifier.padding(16.dp)){
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = RoundedCornerShape(24.dp)
+        ){
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ){
                 DetailMetricItem(
                     icon = Icons.Default.Star,
@@ -171,7 +183,7 @@ private fun ProfileProvider(
                     label = stringResource(R.string.rating),
                     tint = Color(0xFFFFC107)
                 )
-                VerticalDivider(modifier = Modifier.height(40.dp))
+                VerticalDivider(modifier = Modifier.height(40.dp), thickness = 1.dp)
                 DetailMetricItem(
                     icon = Icons.Default.Payments,
                     value = "${provider.totalPayouts}",
@@ -195,39 +207,44 @@ private fun ProfileProvider(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(24.dp))
+        }
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 16.dp)
+        ) {
             Text(
                 text = stringResource(R.string.company_description),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
             )
             Text(
                 text = provider.companyDescription ?: "",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 3,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-            if (!provider.website.isNullOrBlank()) {
-                InfoCard(
-                    icon = Icons.Default.Language,
-                    title = stringResource(R.string.website),
-                    value = provider.website!!
-                )
-            }
-            InfoCard(
-                icon = Icons.Default.Email,
-                title = stringResource(R.string.email),
-                value = provider.email
-            )
-            InfoCard(
-                icon = Icons.Default.Business,
-                title = stringResource(R.string.settings_industry),
-                value = stringResource(provider.industry.label())
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
             )
         }
+        if (!provider.website.isNullOrBlank()) {
+            InfoCard(
+                icon = Icons.Default.Language,
+                title = stringResource(R.string.website),
+                value = provider.website!!
+            )
+        }
+        InfoCard(
+            icon = Icons.Default.Email,
+            title = stringResource(R.string.email),
+            value = provider.email
+        )
+        InfoCard(
+            icon = Icons.Default.Business,
+            title = stringResource(R.string.settings_industry),
+            value = stringResource(provider.industry.label())
+        )
+        Spacer(modifier = Modifier.height(100.dp))
     }
 }
 
@@ -236,8 +253,8 @@ fun InfoCard(icon: ImageVector, title: String, value: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            .padding(vertical = 4.dp, horizontal = 16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
