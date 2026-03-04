@@ -1,13 +1,16 @@
 package com.avilesrodriguez.feature.referrals.ui.referrals
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -151,13 +154,13 @@ fun ReferralsScreen(
         coroutineScope.launch { navigator.navigateBack() }
     }
 
-    Row(Modifier.fillMaxSize()){
+    Row(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainer)){
         if(isTabletLandscape){
             NavigationRail(
                 modifier = Modifier
                     .width(84.dp)
                     .fillMaxHeight(),
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
             ) {
                 Spacer(Modifier.weight(1f))
                 tabs.forEachIndexed { index, tab ->
@@ -181,6 +184,8 @@ fun ReferralsScreen(
             listPane = {
                 AnimatedPane {
                     Scaffold(
+                        contentWindowInsets = WindowInsets.safeDrawing,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         topBar = {
                             TopBarMain(
                                 title = stringResource(R.string.referrals),

@@ -52,8 +52,8 @@ fun BasicBottomBar(@StringRes value: Int){
 @Composable
 fun BottomBarNavigation(currentTab: Int, tabs: List<StartListTab>, onClick: (Int) -> Unit) {
     BottomAppBar(
-        modifier = Modifier.height(56.dp),
-        containerColor = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.height(56.dp).fillMaxWidth(),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         contentPadding = PaddingValues(0.dp),
         windowInsets = WindowInsets(0, 0, 0, 0),
         tonalElevation = NavigationBarDefaults.Elevation

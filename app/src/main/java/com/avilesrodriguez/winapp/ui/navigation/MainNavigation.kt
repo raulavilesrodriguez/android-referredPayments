@@ -63,6 +63,7 @@ fun MainNavigation(){
             val appState = rememberAppState()
 
             Scaffold(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 snackbarHost = {
                     SnackbarHost(
                         hostState = appState.snackbarHostState,

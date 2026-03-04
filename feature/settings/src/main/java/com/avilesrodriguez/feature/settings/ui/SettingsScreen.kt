@@ -2,15 +2,17 @@ package com.avilesrodriguez.feature.settings.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -41,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -89,11 +90,13 @@ fun SettingsScreen(
         viewModel.reloadUserData()
     }
 
-    Row(Modifier.fillMaxSize()){
+    Row(modifier=Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainer)){
         if(isTabletLandscape){
             NavigationRail(
-                modifier = Modifier.width(84.dp).fillMaxHeight(),
-                containerColor = MaterialTheme.colorScheme.surface
+                modifier = Modifier
+                    .width(84.dp)
+                    .fillMaxHeight(),
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
             ) {
                 Spacer(Modifier.weight(1f))
                 tabs.forEachIndexed { index, tab ->
@@ -110,6 +113,8 @@ fun SettingsScreen(
         }
         Scaffold(
             modifier = Modifier.weight(1f),
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            contentWindowInsets = WindowInsets.safeDrawing,
             topBar = {
                 TopBarMain(
                     title = stringResource(R.string.profile),
@@ -137,7 +142,9 @@ fun SettingsScreen(
                 }
             }
         ) { innerPadding ->
-            Box(modifier = Modifier.fillMaxSize().padding(innerPadding)){
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)){
                 when(selectedTabIndex){
                     2 -> Profile(
                         userData = userData,
@@ -182,93 +189,90 @@ fun Profile(
     userData: UserData?,
     onDeleteAccountClick: () -> Unit
 ){
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .size(80.dp)
-                .clip(CircleShape)
-                .background(Color.LightGray)
-                .clickable {},
-            contentAlignment = Alignment.Center // Center the content
-        ) {
-            Avatar(
-                photoUri = if(userData?.photoUrl.isNullOrBlank()) DEFAULT_AVATAR_USER else userData.photoUrl,
-                size = 80.dp
-            )
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter){
         Column(
             modifier = Modifier
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start
-        ){
-            ItemProfile(icon = R.drawable.name, title = R.string.settings_name, data = userData?.name?:stringResource(R.string.no_information))
-            ItemProfile(icon = R.drawable.mail, title = R.string.email, data = userData?.email?:stringResource(R.string.no_information))
-            when(userData){
-                is UserData.Client -> {
-                    ItemProfile(
-                        icon = R.drawable.id_card,
-                        title = R.string.settings_identity_card_client,
-                        data = userData.identityCard?:stringResource(R.string.no_information))
-                    ItemProfile(
-                        icon = R.drawable.bank,
-                        title = R.string.settings_bank_name_client,
-                        data = userData.bankName?:stringResource(R.string.no_information)
-                    )
-                    ItemProfile(
-                        icon = R.drawable.account,
-                        title = R.string.settings_count_number_bank_client,
-                        data = userData.countNumberPay?:stringResource(R.string.no_information)
-                    )
-                    ItemProfile(
-                        icon = R.drawable.account_type,
-                        title = R.string.settings_account_type,
-                        data = userData.accountType.name
-                    )
-                }
-                is UserData.Provider -> {
-                    ItemProfile(
-                        icon = R.drawable.id_card,
-                        title = R.string.settings_identity_card_provider,
-                        data = userData.ciOrRuc?: stringResource(R.string.no_information)
-                    )
-                    ItemProfile(
-                        icon = R.drawable.industry,
-                        title = R.string.settings_industry,
-                        data = userData.industry.name
-                    )
-                    ItemProfile(
-                        icon = R.drawable.description,
-                        title = R.string.company_description,
-                        data = userData.companyDescription?: stringResource(R.string.no_information)
-                    )
-                    ItemProfile(
-                        icon = R.drawable.website,
-                        title = R.string.website,
-                        data = userData.website?: stringResource(R.string.no_information)
-                    )
-                }
-                else -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                    .clickable {},
+                contentAlignment = Alignment.Center // Center the content
+            ) {
+                Avatar(
+                    photoUri = if(userData?.photoUrl.isNullOrBlank()) DEFAULT_AVATAR_USER else userData.photoUrl,
+                    size = 100.dp
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Column(modifier = Modifier.fillMaxWidth()){
+                ItemProfile(icon = R.drawable.name, title = R.string.settings_name, data = userData?.name?:stringResource(R.string.no_information))
+                ItemProfile(icon = R.drawable.mail, title = R.string.email, data = userData?.email?:stringResource(R.string.no_information))
+                when(userData){
+                    is UserData.Client -> {
+                        ItemProfile(
+                            icon = R.drawable.id_card,
+                            title = R.string.settings_identity_card_client,
+                            data = userData.identityCard?:stringResource(R.string.no_information))
+                        ItemProfile(
+                            icon = R.drawable.bank,
+                            title = R.string.settings_bank_name_client,
+                            data = userData.bankName?:stringResource(R.string.no_information)
+                        )
+                        ItemProfile(
+                            icon = R.drawable.account,
+                            title = R.string.settings_count_number_bank_client,
+                            data = userData.countNumberPay?:stringResource(R.string.no_information)
+                        )
+                        ItemProfile(
+                            icon = R.drawable.account_type,
+                            title = R.string.settings_account_type,
+                            data = userData.accountType.name
+                        )
+                    }
+                    is UserData.Provider -> {
+                        ItemProfile(
+                            icon = R.drawable.id_card,
+                            title = R.string.settings_identity_card_provider,
+                            data = userData.ciOrRuc?: stringResource(R.string.no_information)
+                        )
+                        ItemProfile(
+                            icon = R.drawable.industry,
+                            title = R.string.settings_industry,
+                            data = userData.industry.name
+                        )
+                        ItemProfile(
+                            icon = R.drawable.description,
+                            title = R.string.company_description,
+                            data = userData.companyDescription?: stringResource(R.string.no_information)
+                        )
+                        ItemProfile(
+                            icon = R.drawable.website,
+                            title = R.string.website,
+                            data = userData.website?: stringResource(R.string.no_information)
+                        )
+                    }
+                    else -> {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        }
                     }
                 }
+                ItemEditProfile(icon = R.drawable.delete_user, title = R.string.delete_account, data = "", iconEdit = R.drawable.delete) { onDeleteAccountClick() }
+                /**
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )*/
             }
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-                thickness = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-            )
-            ItemEditProfile(icon = R.drawable.delete_user, title = R.string.delete_account, data = "") { onDeleteAccountClick() }
         }
     }
 }

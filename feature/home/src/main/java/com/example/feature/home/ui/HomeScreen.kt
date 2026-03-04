@@ -1,6 +1,7 @@
 package com.example.feature.home.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -175,11 +177,11 @@ fun HomeScreen(
         coroutineScope.launch { navigator.navigateBack() }
     }
 
-    Row(Modifier.fillMaxSize()) {
+    Row(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainer)) {
         if (isTabletLandscape) {
             NavigationRail(
                 modifier = Modifier.width(84.dp).fillMaxHeight(),
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
             ) {
                 Spacer(Modifier.weight(1f))
                 tabs.forEachIndexed { index, tab ->
@@ -203,6 +205,8 @@ fun HomeScreen(
             listPane = {
                 AnimatedPane {
                     Scaffold(
+                        contentWindowInsets = WindowInsets.safeDrawing,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         topBar = {
                             TopBarMain(
                                 title = stringResource(R.string.app_name_presentation),
