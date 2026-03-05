@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -27,35 +28,37 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
-import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.composables.FullSearch
-import com.avilesrodriguez.presentation.composables.MenuDropdownBox
 import com.avilesrodriguez.presentation.composables.RatingBar
-import com.avilesrodriguez.presentation.composables.SearchFieldBasic
 import com.avilesrodriguez.presentation.composables.StatItem
 import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.fakeData.usersProviders
+import com.avilesrodriguez.presentation.industries.icons
 import com.avilesrodriguez.presentation.industries.label
 import com.avilesrodriguez.presentation.industries.options
 import java.util.Locale
@@ -113,11 +116,11 @@ fun HomeScreenClient(
                 modifier = Modifier
                     .fillMaxWidth()
                     .nestedScroll(noPagerScrollConnection), // Aplicamos el bloqueador aquí
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
             ) {
                 item {
                     StatItem(
-                        modifier = Modifier,
+                        modifier = Modifier.padding(start=4.dp),
                         title = stringResource(R.string.referrals),
                         value = "${referralsMetrics.totalReferrals}",
                         icon = Icons.Default.People,
@@ -130,7 +133,7 @@ fun HomeScreenClient(
                         title = stringResource(R.string.pending),
                         value = "${referralsMetrics.pendingReferrals}",
                         icon = Icons.Default.Alarm,
-                        color = MaterialTheme.colorScheme.secondaryContainer
+                        color = MaterialTheme.colorScheme.tertiaryContainer
                     )
                 }
                 item{
@@ -139,7 +142,7 @@ fun HomeScreenClient(
                         title = stringResource(R.string.processing),
                         value = "${referralsMetrics.processingReferrals}",
                         icon = Icons.Default.BuildCircle,
-                        color = MaterialTheme.colorScheme.tertiaryContainer
+                        color = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }
                 item {
@@ -154,12 +157,15 @@ fun HomeScreenClient(
             }
         }
         item(span = { GridItemSpan(maxLineSpan)}){
-            Column(modifier = Modifier.padding(vertical = 8.dp)) {
+            Column(
+                modifier = Modifier.padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = stringResource(R.string.search_companies),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp),
+                    modifier = Modifier.padding(bottom = 4.dp),
                     color = MaterialTheme.colorScheme.primary
                 )
 
@@ -201,13 +207,22 @@ fun HomeScreenClient(
 }
 
 @Composable
-fun BalanceCard(balance: String, received: String? = null, onPaymentView: () -> Unit) {
+fun BalanceCard(balance: String, onPaymentView: () -> Unit) {
+    var isVisible by remember { mutableStateOf(true) }
+    val icon =
+        if (isVisible) painterResource(R.drawable.visibility)
+        else painterResource(R.drawable.visibility_off)
+
+    val displayedBalance =
+        if (isVisible) "$$balance"
+        else "$" + "*".repeat(balance.length)
+
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onPaymentView() },
         shape = RoundedCornerShape(24.dp),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -219,23 +234,33 @@ fun BalanceCard(balance: String, received: String? = null, onPaymentView: () -> 
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ){
+                Text(
+                    text = displayedBalance,
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                IconButton(
+                    onClick = { isVisible = !isVisible },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(painter = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                }
+            }
+
             Text(
                 text = stringResource(R.string.total_profits),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
-            Text(
-                text = "$$balance",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
             Spacer(modifier = Modifier.height(16.dp))
-
-            if(received != null){
-                Text(text=stringResource(R.string.charged), color = MaterialTheme.colorScheme.onPrimary)
-                Text("$$received", fontWeight = FontWeight.Bold, color= MaterialTheme.colorScheme.onPrimary)
-            }
         }
     }
 }
@@ -246,35 +271,45 @@ fun ProviderCard(provider: UserData.Provider, onUserClick: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
             .clickable{onUserClick(provider.uid)},
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Absolute.Left
         ) {
-            AsyncImage(
-                model = provider.photoUrl,
+            Icon(
+                painter = painterResource(provider.industry.icons()),
                 contentDescription = null,
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(100.dp)
-                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
-                contentScale = ContentScale.Crop
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(48.dp)
             )
-            Column(modifier = Modifier.padding(8.dp)) {
+            Spacer(modifier = Modifier.width(24.dp))
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
+            ) {
                 Text(
                     text = provider.name ?: stringResource(R.string.unnamed),
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
-                    style = MaterialTheme.typography.bodyMedium
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
                     text = stringResource(provider.industry.label()),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     RatingBar(rating = provider.paymentRating)
@@ -292,7 +327,9 @@ fun ProviderCard(provider: UserData.Provider, onUserClick: (String) -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenClientPreview() {
-    MaterialTheme {
+    MaterialTheme(
+        colorScheme = MaterialTheme.colorScheme
+    ) {
         HomeScreenClient(
             user = userClient,
             users = usersProviders,

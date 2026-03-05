@@ -18,6 +18,21 @@ fun IndustriesType.label(): Int{
     }
 }
 
+fun IndustriesType.icons(): Int{
+    return when(this){
+        IndustriesType.INSURANCE -> R.drawable.insurance
+        IndustriesType.REAL_ESTATE -> R.drawable.real_estate
+        IndustriesType.OPTICS -> R.drawable.optics
+        IndustriesType.FITNESS -> R.drawable.fitness
+        IndustriesType.HEALTH -> R.drawable.health
+        IndustriesType.BEAUTY -> R.drawable.beauty
+        IndustriesType.TRAVEL -> R.drawable.travel
+        IndustriesType.RETAIL -> R.drawable.retail
+        IndustriesType.FINANCIAL -> R.drawable.financial
+        IndustriesType.OTHER -> R.drawable.other
+    }
+}
+
 fun IndustriesType.Companion.options(search: Boolean): List<Int>{
     if(search){
         return listOf(R.string.all_industries) + IndustriesType.entries.map { it.label() }
