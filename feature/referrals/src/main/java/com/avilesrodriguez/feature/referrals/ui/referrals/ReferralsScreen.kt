@@ -188,7 +188,7 @@ fun ReferralsScreen(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         topBar = {
                             TopBarMain(
-                                title = stringResource(R.string.referrals),
+                                title = stringResource(R.string.app_name_presentation),
                                 options = options
                             ) { action ->
                                 viewModel.onActionClick(openScreen, restartApp, action)
@@ -263,21 +263,15 @@ private fun ReferralsScreenContent(
 
     Column(modifier = Modifier.fillMaxSize()){
         if(!isLoading){
-            if(referrals.isNotEmpty()){
-                ReferralsList(
-                    searchText = searchText,
-                    onValueChange = onValueChange,
-                    onReferralClick = onReferralClick,
-                    referrals = referrals,
-                    user = user,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-            } else {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = stringResource(R.string.no_have_referreds))
-                }
-            }
+            ReferralsList(
+                searchText = searchText,
+                onValueChange = onValueChange,
+                onReferralClick = onReferralClick,
+                referrals = referrals,
+                user = user,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            )
         } else {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(

@@ -117,7 +117,7 @@ fun SettingsScreen(
             contentWindowInsets = WindowInsets.safeDrawing,
             topBar = {
                 TopBarMain(
-                    title = stringResource(R.string.profile),
+                    title = stringResource(R.string.app_name_presentation),
                     options = options,
                     onActionClick = { action ->
                         viewModel.onActionClick(openScreen, restartApp, action)

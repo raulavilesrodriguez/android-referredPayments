@@ -48,6 +48,8 @@ import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
+import com.avilesrodriguez.presentation.avatar.Avatar
+import com.avilesrodriguez.presentation.composables.FullSearch
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
 import com.avilesrodriguez.presentation.composables.RatingBar
 import com.avilesrodriguez.presentation.composables.SearchFieldBasic
@@ -93,7 +95,7 @@ fun HomeScreenClient(
     }
 
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(160.dp),
+        columns = GridCells.Fixed(1),
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -157,29 +159,26 @@ fun HomeScreenClient(
                     text = stringResource(R.string.search_companies),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    color = MaterialTheme.colorScheme.primary
                 )
-                MenuDropdownBox(
-                    options = industryOptions,
-                    selectedOption = selectedIndustry?:R.string.all_industries,
-                    onClick = onIndustryChange,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .fillMaxWidth()
-                )
+
                 Row(
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.Start
                 ) {
-                    SearchFieldBasic(
+                    FullSearch(
+                        options = industryOptions,
+                        selectedOption = selectedIndustry?:R.string.all_industries,
+                        onClick = onIndustryChange,
                         value = searchText,
                         onValueChange = updateSearchText,
                         placeholder = R.string.search,
                         trailingIcon = R.drawable.search,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
                     )
                 }
             }
@@ -204,11 +203,13 @@ fun HomeScreenClient(
 @Composable
 fun BalanceCard(balance: String, received: String? = null, onPaymentView: () -> Unit) {
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth().clickable { onPaymentView() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onPaymentView() },
         shape = RoundedCornerShape(24.dp),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column(
@@ -219,12 +220,15 @@ fun BalanceCard(balance: String, received: String? = null, onPaymentView: () -> 
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(R.string.total_profits)
+                text = stringResource(R.string.total_profits),
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
             )
             Text(
                 text = "$$balance",
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -243,15 +247,19 @@ fun ProviderCard(provider: UserData.Provider, onUserClick: (String) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable{onUserClick(provider.uid)},
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             AsyncImage(
                 model = provider.photoUrl,
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .width(100.dp)
                     .height(100.dp)
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
                 contentScale = ContentScale.Crop

@@ -3,6 +3,7 @@ package com.avilesrodriguez.presentation.navigation
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddTask
+import androidx.compose.material.icons.filled.Diamond
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -15,7 +16,7 @@ data class StartListTab(
 
 fun generateTabs(): List<StartListTab> {
     return listOf(
-        StartListTab(R.string.referrals, Icons.Default.AddTask),
+        StartListTab(R.string.referrals, Icons.Default.Diamond),
         StartListTab(R.string.start, Icons.Default.Home),
         StartListTab(R.string.settings, Icons.Default.Person)
     )

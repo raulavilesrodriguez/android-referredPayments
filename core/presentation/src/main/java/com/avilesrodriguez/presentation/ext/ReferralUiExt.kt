@@ -7,9 +7,9 @@ import com.avilesrodriguez.presentation.R
 fun ReferralStatus.toColor(): Color {
     return when (this) {
         ReferralStatus.PENDING -> Color(0xFFF5AD18)
-        ReferralStatus.PROCESSING -> Color(0xFF6594B1)
-        ReferralStatus.REJECTED -> Color(0XFFDC0E0E)
-        ReferralStatus.PAID -> Color(0xFF08CB00)
+        ReferralStatus.PROCESSING -> Color(0xFF3674B5)
+        ReferralStatus.REJECTED -> Color(0XFFD25353)
+        ReferralStatus.PAID -> Color(0xFF609966)
     }
 }
 

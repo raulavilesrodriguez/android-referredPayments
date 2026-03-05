@@ -59,12 +59,10 @@ fun DetailScreenProvider(
     onAddReferClick: (String) -> Unit,
     showTopBar: Boolean = true
 ){
-    val backgroundColor = MaterialTheme.colorScheme.surfaceContainer
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets.safeDrawing,
-        containerColor = backgroundColor,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
             if (showTopBar) {
                 ToolBarWithIcon(

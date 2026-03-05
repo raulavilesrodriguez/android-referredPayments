@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralWithNames
@@ -46,34 +46,43 @@ fun ReferralsList(
             )
         }
         item{
-            Text(
-                text= stringResource(R.string.search_your_referred),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
-            )
-        }
-        item{
             SearchFieldBasic(
                 value = searchText,
                 onValueChange = onValueChange,
-                placeholder = R.string.select_referred,
+                placeholder = R.string.search_your_referred,
                 trailingIcon = R.drawable.search,
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 2.dp)
             )
         }
-        items(referrals){ item ->
-            Box(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .clickable{ onReferralClick(item.referral) }
-            ){
-                ReferralItem(
-                    referral = item.referral,
-                    otherPartyName = item.otherPartyName,
-                    user = user
-                )
+        if(referrals.isEmpty()){
+            item{
+                Box(
+                    modifier = Modifier
+                        .fillParentMaxHeight(0.7f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.no_have_referreds),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }else{
+            items(referrals){ item ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .clickable { onReferralClick(item.referral) }
+                ){
+                    ReferralItem(
+                        referral = item.referral,
+                        otherPartyName = item.otherPartyName,
+                        user = user
+                    )
+                }
             }
         }
     }
