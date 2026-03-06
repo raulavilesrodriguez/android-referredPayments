@@ -63,11 +63,11 @@ fun SearchFieldBasic(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceContainerLow),
-        ) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLow
+    ) {
         OutlinedTextField(
             value = value,
             onValueChange = { onValueChange(it) },
@@ -78,15 +78,16 @@ fun SearchFieldBasic(
                     contentDescription = null
                 )
             },
+            singleLine = true,
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
                 focusedBorderColor = Color.Transparent,
-                unfocusedLabelColor = Color.Transparent
+                unfocusedBorderColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent
             )
         )
     }

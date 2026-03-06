@@ -25,19 +25,26 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.BuildCircle
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Diamond
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Payment
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +53,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -132,7 +140,7 @@ fun HomeScreenProvider(
                         title = stringResource(R.string.payment_rating),
                         value = "${provider.paymentRating}",
                         icon = Icons.Default.Star,
-                        color = MaterialTheme.colorScheme.secondaryContainer
+                        color = MaterialTheme.colorScheme.tertiaryContainer
                     )
                 }
                 item{
@@ -141,7 +149,7 @@ fun HomeScreenProvider(
                         title = stringResource(R.string.referrals_conversion),
                         value = referralsConversion,
                         icon = Icons.Default.AutoAwesome,
-                        color = MaterialTheme.colorScheme.tertiaryContainer
+                        color = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }
                 item{
@@ -159,7 +167,7 @@ fun HomeScreenProvider(
                         title = stringResource(R.string.pending),
                         value = "${referralsMetrics.pendingReferrals}",
                         icon = Icons.Default.Alarm,
-                        color = MaterialTheme.colorScheme.surfaceDim
+                        color = MaterialTheme.colorScheme.tertiaryContainer
                     )
                 }
                 item {
@@ -168,7 +176,7 @@ fun HomeScreenProvider(
                         title = stringResource(R.string.processing),
                         value = "${referralsMetrics.processingReferrals}",
                         icon = Icons.Default.BuildCircle,
-                        color = MaterialTheme.colorScheme.tertiaryContainer
+                        color = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }
                 item {
@@ -223,10 +231,17 @@ private fun BalanceCardProvider(
     iconMoneyPaid: ImageVector,
     onPaymentView: () -> Unit
     ) {
-    Card(
+    var isVisible by remember { mutableStateOf(true) }
+    val icon =
+        if (isVisible) painterResource(R.drawable.visibility)
+        else painterResource(R.drawable.visibility_off)
+    val displayMoneyPaid = if (isVisible) "$$moneyPaid" else "$" + "*".repeat(moneyPaid.length)
+
+    ElevatedCard(
         modifier = Modifier.fillMaxWidth().clickable { onPaymentView() },
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier
@@ -235,22 +250,28 @@ private fun BalanceCardProvider(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ){
-                Icon(imageVector = iconPaidReferrals, contentDescription = null, modifier = Modifier.size(24.dp))
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                Text(
+                    text = stringResource(R.string.paid_referreds),
+                    style = MaterialTheme.typography.labelMedium,
+                    maxLines = 1,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ){
-                    Text(
-                        text = stringResource(R.string.paid_referreds),
-                        style = MaterialTheme.typography.labelMedium,
-                        maxLines = 1
+                    Icon(
+                        imageVector = iconPaidReferrals,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary
                     )
+                    Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = paidReferrals,
                         fontWeight = FontWeight.Bold,
@@ -260,28 +281,42 @@ private fun BalanceCardProvider(
                 }
             }
             Spacer(modifier = Modifier.height(4.dp))
-            Row(
-                modifier = Modifier.padding(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(4.dp).fillMaxWidth()
             ){
-                Icon(imageVector = iconMoneyPaid, contentDescription = null, modifier = Modifier.size(24.dp))
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                Text(
+                    text = stringResource(R.string.money_paid),
+                    style = MaterialTheme.typography.labelMedium,
+                    maxLines = 1,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ){
-                    Text(
-                        text = stringResource(R.string.money_paid),
-                        style = MaterialTheme.typography.labelMedium,
-                        maxLines = 1
+                    Icon(
+                        imageVector = iconMoneyPaid,
+                        tint = MaterialTheme.colorScheme.primary,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
                     )
+                    Spacer(modifier = Modifier.width(16.dp))
                     Text(
-                        text = "$${moneyPaid}",
+                        text = displayMoneyPaid,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.headlineMedium,
                         maxLines = 1
                     )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    IconButton(
+                        onClick = { isVisible = !isVisible },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(painter = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    }
                 }
             }
         }
@@ -312,9 +347,11 @@ fun ClientRow(clientMetrics: UserAndReferralMetrics, onClientClick: (String) -> 
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ){
-                Avatar(
-                    photoUri = clientMetrics.user.photoUrl,
-                    size = 40.dp
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(40.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -325,7 +362,7 @@ fun ClientRow(clientMetrics: UserAndReferralMetrics, onClientClick: (String) -> 
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 DetailMetricItem(
-                    icon = Icons.Default.People,
+                    icon = Icons.Default.Diamond,
                     value = clientMetrics.referralMetrics.totalReferrals.toString(),
                     label = stringResource(R.string.total_referrals)
                 )

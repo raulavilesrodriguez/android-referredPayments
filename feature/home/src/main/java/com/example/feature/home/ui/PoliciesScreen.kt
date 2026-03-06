@@ -28,6 +28,7 @@ fun PoliciesScreen(
 ) {
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
             ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
@@ -57,7 +58,8 @@ fun PoliciesScreenContent(
     ) {
         Text(
             text = stringResource(R.string.policies_title),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -112,7 +114,8 @@ private fun PolicySection(
 
     Text(
         text = stringResource(title),
-        style = MaterialTheme.typography.titleMedium
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.primary
     )
 
     Spacer(modifier = Modifier.height(6.dp))

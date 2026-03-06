@@ -179,14 +179,14 @@ private fun ProfileProvider(
                     icon = Icons.Default.Star,
                     value = String.format(Locale.US, "%.1f", provider.paymentRating),
                     label = stringResource(R.string.rating),
-                    tint = Color(0xFFFFC107)
+                    tint = Color(0xFF0F2854)
                 )
                 VerticalDivider(modifier = Modifier.height(40.dp), thickness = 1.dp)
                 DetailMetricItem(
                     icon = Icons.Default.Payments,
                     value = "${provider.totalPayouts}",
                     label = stringResource(R.string.payouts),
-                    tint = Color(0xFFFFC107)
+                    tint = Color(0xFF1C4D8D)
                 )
                 VerticalDivider(modifier = Modifier.height(40.dp))
                 if(provider.isActive){

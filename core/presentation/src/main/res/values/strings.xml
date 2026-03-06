@@ -238,10 +238,9 @@
 
     <!-- Section 3 -->
     <string name="policies_section_3_title">3. Verification and control</string>
-    <string name="policies_section_3_body"> All rewards are subject to verification and
-        validation processes. The platform reserves the right to reject or cancel payments
-        that do not meet the established conditions. Any fraudulent or abusive use of the
-        referral system may result in account suspension or termination. </string>
+    <string name="policies_section_3_body"> Rewards offered through the referral program may be subject to review by the corresponding service provider or financial institution. Payments are processed through the Ecuadorian financial system by the appropriate financial institutions. This application does not process, manage, or intervene in payment transactions and does not have control over the payment processing
+        systems. The platform may limit or disable access to the referral program in cases of suspected fraudulent, abusive, or improper use.
+    </string>
 
     <!-- Section 4 -->
     <string name="policies_section_4_title">4. Payment information</string>
@@ -252,7 +251,8 @@
     <!-- Section 5 -->
     <string name="policies_section_5_title">5. User responsibility</string>
     <string name="policies_section_5_body">
-        The platform is not responsible for failed payments, delays, or losses caused by incorrect or false information provided by the user. Using the application implies acceptance of these policies.
+        The platform is not responsible for failed payments, delays, or losses related to payment processing. Payments, if applicable, are handled by the Ecuadorian financial system and the corresponding financial institutions. This application does not process or manage payment transactions. Users are responsible for
+        providing accurate and truthful information. Use of the application implies acceptance of these policies.
     </string>
 
 </resources>

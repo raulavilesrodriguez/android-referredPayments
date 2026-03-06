@@ -28,8 +28,8 @@ fun referralMetricsLabels(): List<String> {
 fun referralMetricsColors(): List<Color> {
     return listOf(
         Color(0xFFF5AD18),
-        Color(0xFF6594B1),
-        Color(0XFFDC0E0E),
-        Color(0xFF08CB00)
+        Color(0xFF3674B5),
+        Color(0XFFD25353),
+        Color(0xFF609966)
     )
 }

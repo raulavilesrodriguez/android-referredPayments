@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -50,6 +51,7 @@ import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
 import com.avilesrodriguez.presentation.composables.ToolBarDetails
+import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.details.DetailMetricItem
 import com.avilesrodriguez.presentation.ext.options
 import com.avilesrodriguez.presentation.ext.referralMetricsColors
@@ -80,12 +82,10 @@ fun DetailScreenClient(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
             if (showTopBar) {
-                ToolBarDetails(
-                    title = R.string.information_client,
-                    backClick = { onBackClick() },
-                    modifier = Modifier.background(
-                        MaterialTheme.colorScheme.secondary
-                    )
+                ToolBarWithIcon(
+                    iconBack = R.drawable.arrow_back,
+                    title = stringResource(R.string.information_client),
+                    backClick = { onBackClick() }
                 )
             }
         },
@@ -120,30 +120,32 @@ private fun ProfileClient(
             .fillMaxSize()
     ){
         item{
-            Box(modifier = Modifier
+            ElevatedCard(
+                modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .background(
-                    MaterialTheme.colorScheme.secondary,
-                )
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(24.dp),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
+                colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
             ){
                 Column(
                     modifier = Modifier
-                        .align(Alignment.Center)
+                        .fillMaxWidth()
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(
-                        text = client.name ?: stringResource(R.string.unnamed),
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1
-                    )
                     Avatar(
                         photoUri = client.photoUrl,
                         size = 80.dp
+                    )
+                    Text(
+                        text = client.name ?: stringResource(R.string.unnamed),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.ExtraBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -162,14 +164,14 @@ private fun ProfileClient(
                         icon = Icons.Default.People,
                         value = referralsMetrics.totalReferrals.toString(),
                         label = stringResource(R.string.all_referrals),
-                        tint = Color(0xFF00CAFF)
+                        tint = Color(0xFF0F2854)
                     )
                     VerticalDivider(modifier = Modifier.height(40.dp))
                     DetailMetricItem(
                         icon = Icons.Default.People,
                         value = referralsMetrics.pendingReferrals.toString(),
                         label = stringResource(R.string.pending),
-                        tint = Color(0xFFF5AD18)
+                        tint = Color(0xFF1C4D8D)
                     )
                     VerticalDivider(modifier = Modifier.height(40.dp))
                     if(client.isActive){
@@ -213,26 +215,16 @@ private fun ProfileClient(
                     text = stringResource(R.string.referreds_by, client.name?:""),
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Text(
-                        text = stringResource(R.string.filter_by_status),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    MenuDropdownBox(
-                        options = statusOptions,
-                        selectedOption = selectedStatus?:R.string.all_status,
-                        onClick = filterReferralsByStatus,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                    )
-                }
+                MenuDropdownBox(
+                    options = statusOptions,
+                    selectedOption = selectedStatus?:R.string.all_status,
+                    onClick = filterReferralsByStatus,
+                    title = R.string.filter_by_status,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 48.dp)
+                )
             }
         }
         items(referrals){ referral ->
@@ -247,51 +239,58 @@ private fun ProfileClient(
 @Composable
 private fun ItemReferralInDetail(referral: Referral, onReferClick: (String) -> Unit){
     val createdAt = formatTimestamp(referral.createdAt)
-    Row(
+    Card(
         modifier = Modifier
             .clickable { onReferClick(referral.id) }
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
+            .padding(8.dp)
+            .clip(RoundedCornerShape(12.dp)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column {
-            Text(
-                text = referral.name.truncate(20),
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 18.sp
-            )
-            Text(
-                text = stringResource(R.string.created, createdAt),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-            )
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        Column(
-            horizontalAlignment = Alignment.End,
-            modifier = Modifier.padding(start = 8.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
         ) {
-            val status = referral.status.toDisplayName()
-            val colorBackground = referral.status.toColor()
-            Icon(
-                imageVector = Icons.Default.Circle,
-                contentDescription = null,
-                tint = colorBackground,
-                modifier = Modifier.size(32.dp)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = stringResource(status),
-                style = MaterialTheme.typography.bodySmall,
-                color = colorBackground
-            )
+            Column {
+                Text(
+                    text = referral.name.truncate(20),
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = stringResource(R.string.created, createdAt),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Column(
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.padding(start = 8.dp)
+            ) {
+                val status = referral.status.toDisplayName()
+                val colorBackground = referral.status.toColor()
+                Icon(
+                    imageVector = Icons.Default.Circle,
+                    contentDescription = null,
+                    tint = colorBackground,
+                    modifier = Modifier.size(32.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(status),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colorBackground
+                )
+            }
         }
     }
 }
