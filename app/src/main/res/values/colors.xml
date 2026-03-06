@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Color primario para el Splash Screen (Coincide con primaryLight en Theme.kt) -->
+    <color name="primary_splash">#425E91</color>
 </resources>

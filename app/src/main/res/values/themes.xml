@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.WinApp" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Tema base de la aplicación -->
+    <style name="Theme.WinApp" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Color de fondo inicial para evitar el pantallazo blanco -->
+        <item name="android:windowBackground">@color/primary_splash</item>
+        <item name="android:statusBarColor">@color/primary_splash</item>
+        <item name="android:navigationBarColor">@color/primary_splash</item>
+    </style>
 </resources>

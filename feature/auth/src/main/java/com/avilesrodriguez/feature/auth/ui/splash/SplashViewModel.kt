@@ -8,9 +8,12 @@ import com.avilesrodriguez.domain.usecases.IsFirstTime
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,44 +26,59 @@ class SplashViewModel @Inject constructor(
 
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
+    
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private val delay = 3000L // 2 seconds
+    // Canal para eventos de navegación (solo se consumen una vez)
+    private val _navigationEvent = Channel<Pair<String, String>>()
+    val navigationEvent = _navigationEvent.receiveAsFlow()
+
+    private val splashDelay = 3000L
+    private var isCheckStarted = false
 
     val currentUserId
         get() = currentUserIdUseCase()
 
-    fun alreadyLoggedIn(
-        openAndPopUp: (String, String) -> Unit
-    ){
+    fun alreadyLoggedIn() {
+        // Evita que se ejecute de nuevo al rotar
+        if (isCheckStarted) return
+        isCheckStarted = true
+
         launchCatching {
+            _isLoading.value = true
             val startTime = System.currentTimeMillis()
-            if(hasUser()){
+            
+            if (hasUser()) {
                 val userId = currentUserId
                 val user = if (userId.isNotEmpty()) getUser(userId) else null
+                
                 if (user?.name != null) {
                     _userDataStore.value = user
                 }
+                
                 waitDelay(startTime)
-                if (user?.name !=null){
-                    openAndPopUp(NavRoutes.HOME, NavRoutes.SPLASH)
+                
+                if (user?.name != null) {
+                    _navigationEvent.send(NavRoutes.HOME to NavRoutes.SPLASH)
                 } else {
-                    openAndPopUp(NavRoutes.LOGIN, NavRoutes.SPLASH)
+                    _navigationEvent.send(NavRoutes.LOGIN to NavRoutes.SPLASH)
                 }
             } else {
                 val firstTime = isFirstTime()
                 waitDelay(startTime)
-                if(firstTime){
-                    openAndPopUp(NavRoutes.SIGN_UP, NavRoutes.SPLASH)
+                
+                if (firstTime) {
+                    _navigationEvent.send(NavRoutes.SIGN_UP to NavRoutes.SPLASH)
                 } else {
-                    openAndPopUp(NavRoutes.LOGIN, NavRoutes.SPLASH)
+                    _navigationEvent.send(NavRoutes.LOGIN to NavRoutes.SPLASH)
                 }
             }
         }
     }
 
     private suspend fun waitDelay(startTime: Long) {
-        val remainingTime = delay - (System.currentTimeMillis() - startTime)
+        val remainingTime = splashDelay - (System.currentTimeMillis() - startTime)
         if (remainingTime > 0) delay(remainingTime)
     }
-
 }
