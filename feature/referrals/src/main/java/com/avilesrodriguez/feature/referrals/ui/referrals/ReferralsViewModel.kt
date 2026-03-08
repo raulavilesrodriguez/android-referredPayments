@@ -16,11 +16,15 @@ import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -45,6 +49,8 @@ class ReferralsViewModel @Inject constructor(
     val userDataStore: StateFlow<UserData?> = _userDataStore
 
     private var referralsJob: Job? = null
+    //ConcurrentHashMap guarantees that writings y readings en el caché no corrompan los datos ni lancen una ConcurrentModificationException
+    private val nameCache = ConcurrentHashMap<String, String>()
 
     val currentUserId
         get() = currentUserIdUseCase()
@@ -80,12 +86,25 @@ class ReferralsViewModel @Inject constructor(
             }
 
             flow?.collect { referrals ->
+                val uniqueIds = referrals.map { referral ->
+                    val otherId = if (userData is UserData.Client) referral.providerId else referral.clientId
+                     otherId
+                }.distinct()
+                val missingIds = uniqueIds.filter { !nameCache.containsKey(it) }
+                if (missingIds.isNotEmpty()) {
+                    coroutineScope {
+                        missingIds.map{id ->
+                            async { id to (getUser(id)?.name ?: "") }
+                        }.awaitAll().forEach { (id, name) ->
+                            nameCache[id] = name
+                        }
+                    }
+                }
                 val referralsWithNames = referrals.map { referral ->
                     val otherId = if (userData is UserData.Client) referral.providerId else referral.clientId
-                    val otherUser = getUser(otherId) // Obtenemos el usuario (puedes usar caché en el Repository)
                     ReferralWithNames(
                         referral = referral,
-                        otherPartyName = otherUser?.name ?: ""
+                        otherPartyName = nameCache[otherId] ?: ""
                     )
                 }
                 _allReferrals.value = referralsWithNames

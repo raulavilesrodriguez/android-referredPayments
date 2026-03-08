@@ -83,7 +83,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
     implementation(libs.coil)
-    implementation(libs.ucrop)
+    implementation(libs.android.image.cropper)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material.icons.core)
 }

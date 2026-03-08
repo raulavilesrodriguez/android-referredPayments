@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.avilesrodriguez.domain.model.referral.Referral
+import com.avilesrodriguez.domain.model.referral.ReferralWithNames
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
@@ -29,7 +30,7 @@ import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 fun PaymentsScreenProvider(
     provider: UserData.Provider,
     onBackClick: () -> Unit,
-    referrals: List<Referral>,
+    referrals: List<ReferralWithNames>,
     isLoading: Boolean,
     showTopBar: Boolean = true // Añadido para soporte adaptativo
 ){
@@ -69,7 +70,7 @@ fun PaymentsScreenProvider(
 @Composable
 private fun PaymentsProvider(
     provider: UserData.Provider,
-    referrals: List<Referral>,
+    referrals: List<ReferralWithNames>,
     modifier: Modifier = Modifier
 ){
     Column(

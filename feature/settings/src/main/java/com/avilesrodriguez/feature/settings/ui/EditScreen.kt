@@ -1,5 +1,7 @@
 package com.avilesrodriguez.feature.settings.ui
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -35,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -63,11 +64,13 @@ import com.avilesrodriguez.presentation.industries.options
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
 import com.avilesrodriguez.presentation.composables.MenuDropdownBoxLeadIcon
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COMPANY_DESCRIPTION
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
 import com.avilesrodriguez.presentation.fakeData.userClient
-import com.avilesrodriguez.presentation.fakeData.userProvider
 import com.avilesrodriguez.presentation.industries.label
-import com.avilesrodriguez.presentation.photo.pickImageLauncher
+import com.avilesrodriguez.presentation.photo.MyCropImageContract
+import com.avilesrodriguez.presentation.photo.MyCropImageInputs
+import com.avilesrodriguez.presentation.snackbar.SnackbarManager
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 
 @Composable
 fun EditScreen(
@@ -80,15 +83,35 @@ fun EditScreen(
     val selectedOption by viewModel.selectedOption.collectAsState()
     val industryOptions = IndustriesType.options(false)
 
-    val imagePicker = pickImageLauncher(
-        context = LocalContext.current,
-        updatePhotoUri = { newUri ->
-            // Cuando la imagen se recorta con éxito, actualizamos el ViewModel
-            viewModel.updatePhoto(newUri)
-        },
-        errorCropping = R.string.error_cropping,
-        errorSaving = R.string.error_saving
-    )
+    val cropImage = rememberLauncherForActivityResult(MyCropImageContract()){result ->
+        if(result.isSuccessful){
+            result.uriContent?.let { newUri ->
+                viewModel.updatePhoto(newUri.toString())
+            }
+        } else {
+            SnackbarManager.showMessage(R.string.error_cropping)
+        }
+    }
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+        uri?.let { selectedUri ->
+            // Cuando seleccionamos una imagen, lanzamos el contrato de recorte
+            cropImage.launch(
+                MyCropImageInputs(
+                    uri = selectedUri,
+                    options = CropImageOptions(
+                        // Aquí configuras las opciones que desees
+                        guidelines = CropImageView.Guidelines.ON,
+                        aspectRatioX = 1,
+                        aspectRatioY = 1,
+                        fixAspectRatio = true
+                    )
+                )
+            )
+        }
+    }
 
     Scaffold(
         topBar = {

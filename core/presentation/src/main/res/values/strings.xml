@@ -15,6 +15,7 @@
     <string name="downloading">Downloading</string>
     <string name="download_error">Download error</string>
     <string name="name">"Name: "</string>
+    <string name="usd">USD</string>
     <!-- Photo -->
     <string name="cancel_crooper">Cancel</string>
     <string name="confirm_crooper">Crop</string>
@@ -119,6 +120,7 @@
     <string name="email_referred">Email Referred</string>
     <string name="phone_number_referred">Phone Number Referred</string>
     <string name="paid_to">Paid to: %s</string>
+    <string name="payments_for">Payments for: %s</string>
     <string name="refer_now">Refer Now</string>
     <string name="total_referrals">Total Referrals</string>
     <string name="paid_referreds">Paid Referreds</string>

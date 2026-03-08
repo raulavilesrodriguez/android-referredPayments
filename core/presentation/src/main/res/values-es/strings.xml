@@ -15,6 +15,7 @@
     <string name="downloading">Descargando</string>
     <string name="download_error">Error en la descarga</string>
     <string name="name">"Nombre: "</string>
+    <string name="usd">USD</string>
     <string name="cancel_crooper">Cancelar</string>
     <string name="confirm_crooper">Recortar</string>
     <string name="error_cropping">Error al recortar la imagen</string>
@@ -97,6 +98,7 @@
     <string name="all_status">Todos</string>
     <string name="paid">Pagado</string>
     <string name="paid_to">Pagar a: %s</string>
+    <string name="payments_for">Pagos por: %s</string>
     <string name="refer_now">Refiere Ahora</string>
     <string name="yesterday">Ayer</string>
     <string name="financial">Financiero</string>
