@@ -152,10 +152,12 @@ private fun ReferralsList(
                 onDateToChange = onDateToChange
             )
         }
-        items(referrals) { item ->
-            if(!referrals.isEmpty()){
+        if(!referrals.isEmpty()){
+            items(referrals) { item ->
                 ReferralPaidItem(referral = item, client = client)
-            }else{
+            }
+        }else{
+            item{
                 Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center){
                     Text(text = stringResource(R.string.no_payments))
                 }

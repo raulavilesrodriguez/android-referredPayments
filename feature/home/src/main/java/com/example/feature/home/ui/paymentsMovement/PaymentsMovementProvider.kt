@@ -59,7 +59,6 @@ import com.avilesrodriguez.presentation.composables.AdvancedSearchSection
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.composables.ToolbarPlaceholder
 import com.avilesrodriguez.presentation.ext.truncate
-import com.avilesrodriguez.presentation.time.formatTime
 import com.avilesrodriguez.presentation.time.formatTimeBasic
 
 
@@ -165,15 +164,16 @@ private fun ReferralsList(
                 onDateToChange = onDateToChange
             )
         }
-        items(referrals){ item ->
-            if(!referrals.isEmpty()){
+        if(!referrals.isEmpty()){
+            items(referrals){ item ->
                 ReferralPaidItem(referral = item, provider = provider)
-            }else{
+            }
+        }else{
+            item{
                 Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center){
                     Text(text = stringResource(R.string.no_payments))
                 }
             }
-
         }
     }
 }
