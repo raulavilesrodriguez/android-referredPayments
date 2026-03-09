@@ -1,5 +1,7 @@
 package com.example.feature.home.ui.paymentsMovement
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,43 +13,67 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.referral.ReferralWithNames
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
+import com.avilesrodriguez.presentation.composables.AdvancedSearchSection
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
+import com.avilesrodriguez.presentation.composables.ToolbarPlaceholder
 import com.avilesrodriguez.presentation.ext.truncate
-import com.avilesrodriguez.presentation.fakeData.referral
-import com.avilesrodriguez.presentation.fakeData.userProvider
-import com.avilesrodriguez.presentation.time.formatTimestamp
+import com.avilesrodriguez.presentation.time.formatTime
+import com.avilesrodriguez.presentation.time.formatTimeBasic
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentsScreenClient(
     client: UserData.Client,
     onBackClick: () -> Unit,
     referrals: List<ReferralWithNames>,
     isLoading: Boolean,
-    showTopBar: Boolean = true // Añadido para soporte adaptativo
+    dateFrom: Long?,
+    dateTo: Long?,
+    onDateFromChange: (Long?) -> Unit,
+    onDateToChange: (Long?) -> Unit,
+    showTopBar: Boolean = true
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -59,24 +85,23 @@ fun PaymentsScreenClient(
                     title = stringResource(R.string.payments),
                     backClick = { onBackClick() }
                 )
+            } else {
+                ToolbarPlaceholder()
             }
         },
         content = { innerPadding ->
             if(isLoading){
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth().height(200.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(8.dp)
-                    )
+                Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
                 }
             } else {
                 PaymentsClient(
                     client = client,
                     referrals = referrals,
+                    dateFrom = dateFrom,
+                    dateTo = dateTo,
+                    onDateFromChange = onDateFromChange,
+                    onDateToChange = onDateToChange,
                     modifier = Modifier.padding(innerPadding)
                 )
             }
@@ -88,115 +113,131 @@ fun PaymentsScreenClient(
 private fun PaymentsClient(
     client: UserData.Client,
     referrals: List<ReferralWithNames>,
+    dateFrom: Long?,
+    dateTo: Long?,
+    onDateFromChange: (Long?) -> Unit,
+    onDateToChange: (Long?) -> Unit,
     modifier: Modifier = Modifier
 ){
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ReferralsList(client = client, referrals = referrals)
+    Column(modifier = modifier.fillMaxSize()) {
+        ReferralsList(
+            client = client,
+            referrals = referrals,
+            dateFrom = dateFrom,
+            dateTo = dateTo,
+            onDateFromChange = onDateFromChange,
+            onDateToChange = onDateToChange
+        )
     }
 }
 
 @Composable
 private fun ReferralsList(
     client: UserData.Client,
-    referrals: List<ReferralWithNames>
+    referrals: List<ReferralWithNames>,
+    dateFrom: Long?,
+    dateTo: Long?,
+    onDateFromChange: (Long?) -> Unit,
+    onDateToChange: (Long?) -> Unit
 ){
-    val referralsPaid = referrals.filter { it.referral.status == ReferralStatus.PAID }
-
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        item{
-            client.name?.let {
-                Text(
-                    text = it,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+        item {
+            AdvancedSearchSection(
+                dateFrom = dateFrom,
+                dateTo = dateTo,
+                onDateFromChange = onDateFromChange,
+                onDateToChange = onDateToChange
+            )
         }
-        items(referralsPaid){ item ->
-            ReferralPaidItem(referral = item)
+        items(referrals) { item ->
+            if(!referrals.isEmpty()){
+                ReferralPaidItem(referral = item, client = client)
+            }else{
+                Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center){
+                    Text(text = stringResource(R.string.no_payments))
+                }
+            }
         }
     }
 }
 
 @Composable
 private fun ReferralPaidItem(
-    referral: ReferralWithNames
+    referral: ReferralWithNames,
+    client: UserData.Client,
 ){
-    val paidAt = formatTimestamp(referral.referral.paidAt)
+    val paidAt = formatTimeBasic(referral.referral.paidAt)
+    var expanded by remember { mutableStateOf(false) }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+                .padding(12.dp)
+                .clickable { expanded = !expanded },
+            verticalAlignment = Alignment.CenterVertically
         ){
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = referral.referral.name.truncate(30),
+                    text = referral.referral.name.truncate(40),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = stringResource(R.string.payments_for, referral.otherPartyName),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                )
             }
-            Spacer(modifier = Modifier.weight(1f))
-            Column(
-                horizontalAlignment = Alignment.End,
-                modifier = Modifier.padding(start = 8.dp)
-            ) {
+            Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = "USD ${referral.referral.amountPaid}",
+                    text = "$ ${referral.referral.amountPaid}",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.ExtraBold
                 )
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = paidAt,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ReferralPaidItemPreview(){
-    MaterialTheme {
-        ReferralPaidItem(
-            referral = ReferralWithNames(
-                referral = referral,
-                otherPartyName = userProvider.name?:""
-            )
-        )
+        if(expanded){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ){
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.payments_for, referral.otherPartyName),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    )
+                    Text(
+                        text = stringResource(R.string.paid_to, client.name?:""),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    )
+                }
+                IconButton(
+                    onClick = { expanded = !expanded }
+                ) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
+        }
     }
 }

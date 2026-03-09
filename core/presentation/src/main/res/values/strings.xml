@@ -16,6 +16,10 @@
     <string name="download_error">Download error</string>
     <string name="name">"Name: "</string>
     <string name="usd">USD</string>
+    <string name="start_date">Start date</string>
+    <string name="end_date">End date</string>
+    <string name="advanced_search">Advanced search</string>
+    <string name="selected_date">Selected date</string>
     <!-- Photo -->
     <string name="crop_image">Crop Image</string>
     <string name="cancel_crooper">Cancel</string>
@@ -184,6 +188,7 @@
     <string name="other">Other</string>
     <string name="all_industries">All</string>
     <string name="status">Status</string>
+    <string name="industry">Industry: %s</string>
 
     <!-- Banks -->
     <string name="bank">Bank</string>
@@ -212,6 +217,7 @@
     <string name="bank_austro">Bank of the Austro</string>
     <string name="savings">Savings</string>
     <string name="checking">Checking</string>
+    <string name="no_payments">There are no payments</string>
 
 
     <!-- Policies Screen -->

@@ -18,3 +18,17 @@ fun formatTimeBasic(millis: Long?) : String {
         sdf.format(date)
     }
 }
+
+@Composable
+fun formatTime(millis: Long?) : String {
+    return remember(millis) {
+        val date = java.util.Date(millis ?: System.currentTimeMillis())
+        // dd/MM/yyyy -> Fecha (día/mes/año)
+        // hh:mm -> Hora y minutos (formato 12h)
+        // a -> Marcador AM/PM
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        // Formateamos para obtener "AM/PM" en mayúsculas
+        sdf.format(date)
+    }
+}

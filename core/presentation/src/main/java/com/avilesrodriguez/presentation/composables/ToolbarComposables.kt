@@ -7,10 +7,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
+private val TOOLBAR_HEIGHT = 64.dp
 
 @Composable
 fun ToolBarWithIcon(
@@ -42,7 +42,8 @@ fun ToolBarWithIcon(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 0.dp),
+            .height(TOOLBAR_HEIGHT)
+            .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Absolute.Left
     ){
@@ -68,10 +69,16 @@ fun ToolBarWithIcon(
     }
 }
 
+@Composable
+fun ToolbarPlaceholder(modifier: Modifier = Modifier) {
+    Spacer(modifier = modifier.height(TOOLBAR_HEIGHT))
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BasicToolbar(@StringRes title: Int) {
+fun BasicToolbar(@StringRes title: Int, modifier: Modifier = Modifier) {
     TopAppBar(
+        modifier = modifier.height(TOOLBAR_HEIGHT),
         title = {
             Text(
                 text= stringResource(title),
@@ -91,46 +98,11 @@ fun BasicToolbar(@StringRes title: Int) {
     )
 }
 
-@Composable
-fun ToolBarDetails(
-    @StringRes title: Int,
-    backClick: () -> Unit,
-    modifier: Modifier = Modifier
-){
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Absolute.Left
-    ){
-        IconButton(
-            onClick = { backClick()}
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                tint = MaterialTheme.colorScheme.onPrimary,
-                contentDescription = null
-            )
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = stringResource(id = title),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier
-                .padding(start = 4.dp)
-                .fillMaxWidth(0.80f),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarMain(title: String, options: List<Int>, onActionClick: (Int) -> Unit) {
     TopAppBar(
+        modifier = Modifier.height(TOOLBAR_HEIGHT),
         title = {
             Text(
                 text= title,

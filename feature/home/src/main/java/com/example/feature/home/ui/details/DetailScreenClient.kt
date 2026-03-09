@@ -50,7 +50,6 @@ import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
-import com.avilesrodriguez.presentation.composables.ToolBarDetails
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.details.DetailMetricItem
 import com.avilesrodriguez.presentation.ext.options

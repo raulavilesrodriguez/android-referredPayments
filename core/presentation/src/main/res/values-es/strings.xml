@@ -16,6 +16,9 @@
     <string name="download_error">Error en la descarga</string>
     <string name="name">"Nombre: "</string>
     <string name="usd">USD</string>
+    <string name="end_date">Fecha hasta</string>
+    <string name="advanced_search">Busqueda avanzada</string>
+    <string name="selected_date">Fecha seleccionada</string>
     <string name="crop_image">Recortar Imagen</string>
     <string name="cancel_crooper">Cancelar</string>
     <string name="confirm_crooper">Recortar</string>
@@ -112,6 +115,7 @@
     <string name="proof_of_payment">Comprobante de Pago - %s</string>
     <string name="bank_austro">Banco del Austro</string>
     <string name="checking">Corriente</string>
+    <string name="no_payments">No hay pagos</string>
     <string name="policies">Políticas</string>
     <string name="policies_title">Política de uso y programa de referidos</string>
     <string name="policies_intro">Esta aplicación ofrece un programa de referidos basado exclusivamente en compras reales y verificables de productos o servicios proporcionados         por empresas registradas en la plataforma.</string>
@@ -136,6 +140,7 @@
     <string name="retail">Retail</string>
     <string name="all_industries">Todas</string>
     <string name="status">Estado</string>
+    <string name="industry">Industria: %s</string>
     <string name="bank">Banco</string>
     <string name="account">Cuenta</string>
     <string name="beneficiary">Beneficiario:</string>
@@ -201,4 +206,5 @@
     <string name="savings">Ahorros</string>
     <string name="process">Procesar</string>
     <string name="reject">Rechazar</string>
+    <string name="start_date">Fecha desde</string>
 </resources>

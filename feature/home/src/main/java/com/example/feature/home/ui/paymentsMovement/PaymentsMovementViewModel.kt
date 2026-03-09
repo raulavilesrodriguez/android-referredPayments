@@ -1,5 +1,6 @@
 package com.example.feature.home.ui.paymentsMovement
 
+import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.referral.ReferralWithNames
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
@@ -17,6 +18,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -34,19 +36,33 @@ class PaymentsMovementViewModel @Inject constructor(
 ): BaseViewModel() {
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
+
     private val _referralsProvider = MutableStateFlow<List<ReferralWithNames>>(emptyList())
-    val referralsProvider: StateFlow<List<ReferralWithNames>> = _referralsProvider
     private val _referralsClient = MutableStateFlow<List<ReferralWithNames>>(emptyList())
-    val referralsClient: StateFlow<List<ReferralWithNames>> = _referralsClient
+
+    // Filtros de fecha
+    private val _dateFrom = MutableStateFlow<Long?>(null)
+    val dateFrom: StateFlow<Long?> = _dateFrom.asStateFlow()
+
+    private val _dateTo = MutableStateFlow<Long?>(null)
+    val dateTo: StateFlow<Long?> = _dateTo.asStateFlow()
+
+    // Referidos filtrados
+    val filteredReferralsProvider = combine(_referralsProvider, _dateFrom, _dateTo) { referrals, from, to ->
+        filterByDate(referrals, from, to)
+    }
+
+    val filteredReferralsClient = combine(_referralsClient, _dateFrom, _dateTo) { referrals, from, to ->
+        filterByDate(referrals, from, to)
+    }
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     private var referralsJob: Job? = null
 
-    // Caché of names
     private val nameCache = ConcurrentHashMap<String, String>()
 
-    val currentUserId
-        get() = currentUserIdUseCase()
+    val currentUserId get() = currentUserIdUseCase()
 
     init {
         launchCatching{
@@ -59,13 +75,21 @@ class PaymentsMovementViewModel @Inject constructor(
             }
             val user = _userDataStore.filterNotNull().first()
             when(user){
-                is UserData.Provider ->{
-                    loadReferralsByProvider()
-                }
-                is UserData.Client -> {
-                    loadReferralsByClient()
-                }
+                is UserData.Provider -> loadReferralsByProvider()
+                is UserData.Client -> loadReferralsByClient()
             }
+        }
+    }
+
+    fun onDateFromChange(date: Long?) { _dateFrom.value = date }
+    fun onDateToChange(date: Long?) { _dateTo.value = date }
+
+    private fun filterByDate(referrals: List<ReferralWithNames>, from: Long?, to: Long?): List<ReferralWithNames> {
+        return referrals.filter { referral ->
+            val paidAt = referral.referral.paidAt
+            val matchFrom = from == null || paidAt >= from
+            val matchTo = to == null || paidAt <= (to + 86399999) // Incluir todo el día hasta las 23:59:59
+            matchFrom && matchTo
         }
     }
 
@@ -73,67 +97,61 @@ class PaymentsMovementViewModel @Inject constructor(
         _isLoading.value = true
         referralsJob?.cancel()
         referralsJob = launchCatching {
-            getReferralsByProvider(currentUserId)
-                .collect { referrals ->
-                    // 1. Identificar IDs de clientes únicos que no están en caché
-                    val uniqueIds = referrals.map { it.clientId }.distinct()
-                    val missingIds = uniqueIds.filter { !nameCache.containsKey(it) }
+            getReferralsByProvider(currentUserId).collect { referrals ->
+                val uniqueIds = referrals.map { it.clientId }.distinct()
+                val missingIds = uniqueIds.filter { !nameCache.containsKey(it) }
 
-                    // 2. Cargar nombres faltantes en paralelo
-                    if (missingIds.isNotEmpty()) {
-                        coroutineScope {
-                            missingIds.map { id ->
-                                async { id to (getUser(id)?.name ?: "") }
-                            }.awaitAll().forEach { (id, name) ->
-                                nameCache[id] = name
-                            }
+                if (missingIds.isNotEmpty()) {
+                    coroutineScope {
+                        missingIds.map { id ->
+                            async { id to (getUser(id)?.name ?: "") }
+                        }.awaitAll().forEach { (id, name) ->
+                            nameCache[id] = name
                         }
                     }
+                }
 
-                    // 3. Mapear la lista final usando el caché
-                    val referralsWithNames = referrals.map { referral ->
+                _referralsProvider.value = referrals
+                    .filter { it.status == ReferralStatus.PAID }
+                    .map { referral ->
                         ReferralWithNames(
                             referral = referral,
                             otherPartyName = nameCache[referral.clientId] ?: ""
                         )
-                    }
-                    _referralsProvider.value = referralsWithNames
-                    _isLoading.value = false
-                }
+                    }.sortedByDescending { it.referral.paidAt }
+                _isLoading.value = false
+            }
         }
     }
 
-    private fun loadReferralsByClient(){
+    private fun loadReferralsByClient() {
         _isLoading.value = true
         referralsJob?.cancel()
         referralsJob = launchCatching {
-            getReferralsByClient(currentUserId)
-                .collect { referrals ->
-                    // 1. Identificar IDs de proveedores únicos que no están en caché
-                    val uniqueIds = referrals.map { it.providerId }.distinct()
-                    val missingIds = uniqueIds.filter { !nameCache.containsKey(it) }
+            getReferralsByClient(currentUserId).collect { referrals ->
+                val uniqueIds = referrals.map { it.providerId }.distinct()
+                val missingIds = uniqueIds.filter { !nameCache.containsKey(it) }
 
-                    // 2. Cargar nombres faltantes en paralelo
-                    if (missingIds.isNotEmpty()) {
-                        coroutineScope {
-                            missingIds.map { id ->
-                                async { id to (getUser(id)?.name ?: "") }
-                            }.awaitAll().forEach { (id, name) ->
-                                nameCache[id] = name
-                            }
+                if (missingIds.isNotEmpty()) {
+                    coroutineScope {
+                        missingIds.map { id ->
+                            async { id to (getUser(id)?.name ?: "") }
+                        }.awaitAll().forEach { (id, name) ->
+                            nameCache[id] = name
                         }
                     }
+                }
 
-                    // 3. Mapear la lista final usando el caché
-                    val referralsWithNames = referrals.map { referral ->
+                _referralsClient.value = referrals
+                    .filter { it.status == ReferralStatus.PAID }
+                    .map { referral ->
                         ReferralWithNames(
                             referral = referral,
                             otherPartyName = nameCache[referral.providerId] ?: ""
                         )
-                    }
-                    _referralsClient.value = referralsWithNames
-                    _isLoading.value = false
-                }
+                    }.sortedByDescending { it.referral.paidAt }
+                _isLoading.value = false
+            }
         }
     }
 }
