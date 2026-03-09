@@ -50,12 +50,11 @@ class MyCropImageActivity : AppCompatActivity() {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-            // Usamos el string del recurso crop_image
             title = getString(R.string.crop_image)
             setBackgroundColor(Color.BLACK)
             setTitleTextColor(Color.WHITE)
 
-            // Cambiar color de la flecha de atrás a blanco de forma segura
+            // Cambiar color de la flecha de atrás a blanco
             val navigationIcon = ContextCompat.getDrawable(context, androidx.appcompat.R.drawable.abc_ic_ab_back_material)
             if (navigationIcon != null) {
                 val wrappedDrawable = DrawableCompat.wrap(navigationIcon)
@@ -69,7 +68,6 @@ class MyCropImageActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            // Ajustamos el padding superior y lateral para evitar desbordes en horizontal (landscape)
             view.updatePadding(
                 top = insets.top,
                 left = insets.left,
@@ -79,7 +77,6 @@ class MyCropImageActivity : AppCompatActivity() {
             WindowInsetsCompat.CONSUMED
         }
 
-        // Visor de recorte con fondo NEGRO
         cropImageView = CropImageView(this).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -113,13 +110,25 @@ class MyCropImageActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Usamos el string del recurso ok ("OK") y forzamos el color BLANCO
+        // 1. Botón ROTAR
+        val rotateIcon = ContextCompat.getDrawable(this, com.canhub.cropper.R.drawable.ic_rotate_left_24)
+        if (rotateIcon != null) {
+            val wrapped = DrawableCompat.wrap(rotateIcon).mutate()
+            DrawableCompat.setTint(wrapped, Color.WHITE)
+            menu.add(Menu.NONE, 2, Menu.NONE, "Rotate").apply {
+                icon = wrapped
+                setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+            }
+        }
+
+        // 2. Botón OK
         val okText = getString(R.string.ok)
         val title = SpannableString(okText)
         title.setSpan(ForegroundColorSpan(Color.WHITE), 0, title.length, 0)
+        menu.add(Menu.NONE, 1, Menu.NONE, title).apply {
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        }
         
-        val item = menu.add(Menu.NONE, 1, Menu.NONE, title)
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         return true
     }
 
@@ -127,6 +136,11 @@ class MyCropImageActivity : AppCompatActivity() {
         return when (item.itemId) {
             1 -> {
                 cropImageView.croppedImageAsync()
+                true
+            }
+            2 -> {
+                // Rotar 90 grados a la derecha
+                cropImageView.rotateImage(90)
                 true
             }
             android.R.id.home -> {
