@@ -68,7 +68,6 @@ import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.industries.label
 import com.avilesrodriguez.presentation.photo.MyCropImageContract
 import com.avilesrodriguez.presentation.photo.MyCropImageInputs
-import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
 
@@ -83,13 +82,9 @@ fun EditScreen(
     val selectedOption by viewModel.selectedOption.collectAsState()
     val industryOptions = IndustriesType.options(false)
 
-    val cropImage = rememberLauncherForActivityResult(MyCropImageContract()){result ->
-        if(result.isSuccessful){
-            result.uriContent?.let { newUri ->
-                viewModel.updatePhoto(newUri.toString())
-            }
-        } else {
-            SnackbarManager.showMessage(R.string.error_cropping)
+    val cropImage = rememberLauncherForActivityResult(MyCropImageContract()){newUri ->
+        if(newUri != null){
+            viewModel.updatePhoto(newUri.toString())
         }
     }
 
@@ -106,7 +101,8 @@ fun EditScreen(
                         guidelines = CropImageView.Guidelines.ON,
                         aspectRatioX = 1,
                         aspectRatioY = 1,
-                        fixAspectRatio = true
+                        fixAspectRatio = true,
+                        showProgressBar = true
                     )
                 )
             )

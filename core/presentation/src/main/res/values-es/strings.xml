@@ -16,6 +16,7 @@
     <string name="download_error">Error en la descarga</string>
     <string name="name">"Nombre: "</string>
     <string name="usd">USD</string>
+    <string name="crop_image">Recortar Imagen</string>
     <string name="cancel_crooper">Cancelar</string>
     <string name="confirm_crooper">Recortar</string>
     <string name="error_cropping">Error al recortar la imagen</string>
