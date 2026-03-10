@@ -1,6 +1,5 @@
 package com.example.feature.home.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,7 +46,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -64,7 +62,6 @@ import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.presentation.R
-import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.composables.SearchFieldBasic
 import com.avilesrodriguez.presentation.composables.StatItem
 import com.avilesrodriguez.presentation.details.DetailMetricItem
@@ -127,11 +124,11 @@ fun HomeScreenProvider(
             ) {
                 item{
                     StatItem(
-                        modifier = Modifier,
+                        modifier = Modifier.padding(start=4.dp),
                         title = stringResource(R.string.total_payout),
                         value = "${provider.totalPayouts}",
                         icon = Icons.Outlined.Payment,
-                        color = MaterialTheme.colorScheme.primaryContainer
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
                 item{
@@ -140,7 +137,7 @@ fun HomeScreenProvider(
                         title = stringResource(R.string.payment_rating),
                         value = "${provider.paymentRating}",
                         icon = Icons.Default.Star,
-                        color = MaterialTheme.colorScheme.tertiaryContainer
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
                 item{
@@ -149,7 +146,7 @@ fun HomeScreenProvider(
                         title = stringResource(R.string.referrals_conversion),
                         value = referralsConversion,
                         icon = Icons.Default.AutoAwesome,
-                        color = MaterialTheme.colorScheme.secondaryContainer
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
                 item{
@@ -158,7 +155,7 @@ fun HomeScreenProvider(
                         title = stringResource(R.string.total_referrals),
                         value = "${referralsMetrics.totalReferrals}",
                         icon = Icons.Default.People,
-                        color = MaterialTheme.colorScheme.inversePrimary
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
                 item{
@@ -167,7 +164,7 @@ fun HomeScreenProvider(
                         title = stringResource(R.string.pending),
                         value = "${referralsMetrics.pendingReferrals}",
                         icon = Icons.Default.Alarm,
-                        color = MaterialTheme.colorScheme.tertiaryContainer
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
                 item {
@@ -176,7 +173,7 @@ fun HomeScreenProvider(
                         title = stringResource(R.string.processing),
                         value = "${referralsMetrics.processingReferrals}",
                         icon = Icons.Default.BuildCircle,
-                        color = MaterialTheme.colorScheme.secondaryContainer
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
                 item {
@@ -185,7 +182,7 @@ fun HomeScreenProvider(
                         title = stringResource(R.string.rejected),
                         value = "${referralsMetrics.rejectedReferrals}",
                         icon = Icons.Default.Block,
-                        color = MaterialTheme.colorScheme.errorContainer
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
             }
@@ -325,83 +322,88 @@ private fun BalanceCardProvider(
 
 @Composable
 fun ClientRow(clientMetrics: UserAndReferralMetrics, onClientClick: (String) -> Unit){
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .clickable{onClientClick(clientMetrics.user.uid)}
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
+            .padding(8.dp)
+            .clickable{onClientClick(clientMetrics.user.uid)},
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start
-        ){
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding( 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Column(
+                modifier = Modifier.padding(8.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
             ){
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(40.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding( 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ){
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(40.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = clientMetrics.user.name ?:"",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    DetailMetricItem(
+                        icon = Icons.Default.Diamond,
+                        value = clientMetrics.referralMetrics.totalReferrals.toString(),
+                        label = stringResource(R.string.total_referrals)
+                    )
+                }
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = clientMetrics.user.name ?:"",
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                DetailMetricItem(
-                    icon = Icons.Default.Diamond,
-                    value = clientMetrics.referralMetrics.totalReferrals.toString(),
-                    label = stringResource(R.string.total_referrals)
-                )
-            }
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-                thickness = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding( 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ){
-                DetailMetricItem(
-                    icon = Icons.Default.Alarm,
-                    value = clientMetrics.referralMetrics.pendingReferrals.toString(),
-                    label = stringResource(R.string.pending)
-                )
-                VerticalDivider(modifier = Modifier.height(40.dp))
-                DetailMetricItem(
-                    icon = Icons.Default.CheckCircle,
-                    value = clientMetrics.referralMetrics.paidReferrals.toString(),
-                    label = stringResource(R.string.paid)
-                )
-                VerticalDivider(modifier = Modifier.height(40.dp))
-                DetailMetricItem(
-                    icon = Icons.Default.BuildCircle,
-                    value = clientMetrics.referralMetrics.processingReferrals.toString(),
-                    label = stringResource(R.string.processing)
-                )
-                VerticalDivider(modifier = Modifier.height(40.dp))
-                DetailMetricItem(
-                    icon = Icons.Default.Block,
-                    value = clientMetrics.referralMetrics.rejectedReferrals.toString(),
-                    label = stringResource(R.string.rejected)
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding( 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ){
+                    DetailMetricItem(
+                        icon = Icons.Default.Alarm,
+                        value = clientMetrics.referralMetrics.pendingReferrals.toString(),
+                        label = stringResource(R.string.pending)
+                    )
+                    VerticalDivider(modifier = Modifier.height(40.dp))
+                    DetailMetricItem(
+                        icon = Icons.Default.CheckCircle,
+                        value = clientMetrics.referralMetrics.paidReferrals.toString(),
+                        label = stringResource(R.string.paid)
+                    )
+                    VerticalDivider(modifier = Modifier.height(40.dp))
+                    DetailMetricItem(
+                        icon = Icons.Default.BuildCircle,
+                        value = clientMetrics.referralMetrics.processingReferrals.toString(),
+                        label = stringResource(R.string.processing)
+                    )
+                    VerticalDivider(modifier = Modifier.height(40.dp))
+                    DetailMetricItem(
+                        icon = Icons.Default.Block,
+                        value = clientMetrics.referralMetrics.rejectedReferrals.toString(),
+                        label = stringResource(R.string.rejected)
+                    )
+                }
             }
         }
     }
