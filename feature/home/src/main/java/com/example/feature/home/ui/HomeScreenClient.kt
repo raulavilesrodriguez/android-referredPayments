@@ -124,7 +124,7 @@ fun HomeScreenClient(
                         title = stringResource(R.string.referrals),
                         value = "${referralsMetrics.totalReferrals}",
                         icon = Icons.Default.People,
-                        color = MaterialTheme.colorScheme.primaryContainer
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
                 item {
@@ -133,7 +133,7 @@ fun HomeScreenClient(
                         title = stringResource(R.string.pending),
                         value = "${referralsMetrics.pendingReferrals}",
                         icon = Icons.Default.Alarm,
-                        color = MaterialTheme.colorScheme.tertiaryContainer
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
                 item{
@@ -142,7 +142,7 @@ fun HomeScreenClient(
                         title = stringResource(R.string.processing),
                         value = "${referralsMetrics.processingReferrals}",
                         icon = Icons.Default.BuildCircle,
-                        color = MaterialTheme.colorScheme.secondaryContainer
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
                 item {
@@ -151,7 +151,7 @@ fun HomeScreenClient(
                         title = stringResource(R.string.rejected),
                         value = "${referralsMetrics.rejectedReferrals}",
                         icon = Icons.Default.Block,
-                        color = MaterialTheme.colorScheme.errorContainer
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
             }
@@ -234,6 +234,12 @@ fun BalanceCard(balance: String, onPaymentView: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            Text(
+                text = stringResource(R.string.total_profits),
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.ExtraBold,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -254,13 +260,6 @@ fun BalanceCard(balance: String, onPaymentView: () -> Unit) {
                     Icon(painter = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 }
             }
-
-            Text(
-                text = stringResource(R.string.total_profits),
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

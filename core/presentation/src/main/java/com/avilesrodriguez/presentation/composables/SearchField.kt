@@ -122,7 +122,7 @@ fun FullSearch(
                 .width(IntrinsicSize.Min) 
                 .widthIn(min = 80.dp, max = 160.dp),
             shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant
+            color = MaterialTheme.colorScheme.secondaryContainer
         ) {
             ExposedDropdownMenuBox(
                 expanded = expanded,

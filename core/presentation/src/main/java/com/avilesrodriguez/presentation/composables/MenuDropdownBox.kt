@@ -43,7 +43,7 @@ fun MenuDropdownBox(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant
+        color = MaterialTheme.colorScheme.surface
     ) {
         ExposedDropdownMenuBox(
             expanded = expanded,

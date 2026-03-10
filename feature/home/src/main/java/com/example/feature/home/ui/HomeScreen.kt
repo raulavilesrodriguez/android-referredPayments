@@ -192,7 +192,7 @@ fun HomeScreen(
                 AnimatedPane {
                     Scaffold(
                         contentWindowInsets = WindowInsets.safeDrawing,
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                         topBar = {
                             TopBarMain(
                                 title = stringResource(R.string.app_name_presentation),

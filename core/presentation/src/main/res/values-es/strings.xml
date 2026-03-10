@@ -19,6 +19,7 @@
     <string name="end_date">Fecha hasta</string>
     <string name="advanced_search">Busqueda avanzada</string>
     <string name="selected_date">Fecha seleccionada</string>
+    <string name="total">Total</string>
     <string name="crop_image">Recortar Imagen</string>
     <string name="cancel_crooper">Cancelar</string>
     <string name="confirm_crooper">Recortar</string>
