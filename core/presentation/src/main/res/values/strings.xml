@@ -165,12 +165,20 @@
     <string name="reason">Reason</string>
 
     <!-- Referral Metrics -->
+    <string name="statistics">Statistics</string>
     <string name="all_referrals">All Referrals</string>
     <string name="pending">Pending</string>
     <string name="processing">Processing</string>
     <string name="rejected">Rejected</string>
     <string name="all_status">All</string>
     <string name="paid">Paid</string>
+    <string name="income">Income</string>
+    <string name="profit_by_referred">Profit by Referred</string>
+    <string name="cost_by_referred">Investment by Referred</string>
+    <string name="percentage_pending">Percentage pending</string>
+    <string name="percentage_processing">Percentage processing</string>
+    <string name="percentage_rejected">Percentage rejected</string>
+    <string name="percentage_paid">Percentage paid</string>
 
 
     <!-- Time -->

@@ -88,7 +88,7 @@ val userClient = UserData.Client(
     countNumberPay = "12223440455",
     bankName = "Produbanco",
     accountType = AccountType.SAVINGS,
-    moneyEarned = 1000.0
+    moneyEarned = 467.5
 )
 
 val userProvider = UserData.Provider(

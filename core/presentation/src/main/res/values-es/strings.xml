@@ -105,6 +105,9 @@
     <string name="paid_to">Pagar a: %s</string>
     <string name="payments_for">Pagos por: %s</string>
     <string name="refer_now">Refiere Ahora</string>
+    <string name="income">Ingresos</string>
+    <string name="profit_by_referred">Ingreso por Referido</string>
+    <string name="percentage_paid">Porcentaje pagados</string>
     <string name="yesterday">Ayer</string>
     <string name="financial">Financiero</string>
     <string name="other">Otros</string>
@@ -176,6 +179,7 @@
     <string name="open_with">Abrir con</string>
     <string name="pay">Pagar</string>
     <string name="reason">Motivo</string>
+    <string name="statistics">Estadísticas</string>
     <string name="all_referrals">Todos los Referidos</string>
     <string name="pending">Pendiente</string>
     <string name="processing">Procesando</string>
@@ -208,4 +212,8 @@
     <string name="process">Procesar</string>
     <string name="reject">Rechazar</string>
     <string name="start_date">Fecha desde</string>
+    <string name="cost_by_referred">Inversión por Referido</string>
+    <string name="percentage_pending">Porcentaje Pendientes</string>
+    <string name="percentage_processing">Porcentaje Procesados</string>
+    <string name="percentage_rejected">Porcentaje rechazados</string>
 </resources>

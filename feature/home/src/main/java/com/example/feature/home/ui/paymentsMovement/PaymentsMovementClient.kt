@@ -62,7 +62,7 @@ fun PaymentsScreenClient(
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         topBar = {
             if (showTopBar) {
                 ToolBarWithIcon(

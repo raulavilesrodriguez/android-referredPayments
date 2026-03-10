@@ -1,5 +1,6 @@
 package com.avilesrodriguez.presentation.graphs
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,10 +36,9 @@ fun DonutGraph(
         modifier = modifier
             .fillMaxWidth()
             .height(250.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-        ),
-        shape = RoundedCornerShape(16.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box(modifier = Modifier
             .padding(16.dp)
@@ -47,8 +47,8 @@ fun DonutGraph(
                 values = values,
                 label = { index ->
                     Text(
-                        text = "${labels[index]}: ${values[index]}",
-                        style = MaterialTheme.typography.labelSmall
+                        text = "${labels[index]}: ${values[index].toInt()}",
+                        style = MaterialTheme.typography.labelMedium
                     )
                         },
                 slice = { index ->
@@ -56,20 +56,25 @@ fun DonutGraph(
                         color = colors[index],
                     )
                 },
-                holeSize = 0.5f,
+                holeSize = 0.55f,
                 holeContent = {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Column{
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
                             Text(
                                 text = stringResource(R.string.total),
-                                style = MaterialTheme.typography.titleLarge
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text = "%.2f".format(total),
-                                style = MaterialTheme.typography.displaySmall
+                                text = "%.0f".format(total),
+                                style = MaterialTheme.typography.displaySmall,
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
