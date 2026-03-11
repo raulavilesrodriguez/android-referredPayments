@@ -75,7 +75,8 @@ fun HomeScreenClient(
     industryOptions: List<Int>,
     onUserClick: (String) -> Unit,
     referralsMetrics: ReferralMetrics,
-    onPaymentView: () -> Unit
+    onPaymentView: () -> Unit,
+    onGraphMetricsView: () -> Unit
 ) {
     val client = user as? UserData.Client
 
@@ -115,7 +116,8 @@ fun HomeScreenClient(
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .nestedScroll(noPagerScrollConnection), // Aplicamos el bloqueador aquí
+                    .nestedScroll(noPagerScrollConnection) // Aplicamos el bloqueador aquí
+                    .clickable{onGraphMetricsView()},
                 horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
             ) {
                 item {
@@ -346,7 +348,8 @@ fun HomeScreenClientPreview() {
                 rejectedReferrals = 2,
                 paidReferrals = 10
             ),
-            onPaymentView = {}
+            onPaymentView = {},
+            onGraphMetricsView = {}
         )
     }
 }

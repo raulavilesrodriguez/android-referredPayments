@@ -56,12 +56,14 @@ import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
 import com.avilesrodriguez.presentation.navigation.generateTabs
 import com.example.feature.home.models.UserAndReferralMetrics
 import com.example.feature.home.ui.details.DetailScreenUser
+import com.example.feature.home.ui.graphicsMetrics.GraphMetrics
 import com.example.feature.home.ui.paymentsMovement.PaymentsMovement
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 sealed class HomeDetailContent {
     data object Payments : HomeDetailContent()
+    data object GraphMetrics : HomeDetailContent()
     data class UserDetail(val userId: String) : HomeDetailContent()
 
     // SAVER PARA QUE EL CONTENIDO SOBREVIVA A LA ROTACIÓN
@@ -70,6 +72,7 @@ sealed class HomeDetailContent {
             save = { content ->
                 when (content) {
                     is Payments -> "payments"
+                    is GraphMetrics -> "graph_metrics"
                     is UserDetail -> "user_detail:${content.userId}"
                     null -> null
                 }
@@ -78,6 +81,7 @@ sealed class HomeDetailContent {
                 val str = value as? String ?: return@Saver null
                 when {
                     str == "payments" -> Payments
+                    str == "graph_metrics" -> GraphMetrics
                     str.startsWith("user_detail:") -> UserDetail(str.removePrefix("user_detail:"))
                     else -> null
                 }
@@ -233,6 +237,10 @@ fun HomeScreen(
                                     onPaymentView = {
                                         detailContent = HomeDetailContent.Payments
                                         coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
+                                    },
+                                    onGraphMetricsView = {
+                                        detailContent = HomeDetailContent.GraphMetrics
+                                        coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
                                     }
                                 )
                                 else -> {
@@ -249,6 +257,12 @@ fun HomeScreen(
                         when (val content = detailContent) {
                             is HomeDetailContent.Payments -> {
                                 PaymentsMovement(
+                                    popUp = { coroutineScope.launch { navigator.navigateBack() } },
+                                    showTopBar = !isShowingBothPanels
+                                )
+                            }
+                            is HomeDetailContent.GraphMetrics ->{
+                                GraphMetrics(
                                     popUp = { coroutineScope.launch { navigator.navigateBack() } },
                                     showTopBar = !isShowingBothPanels
                                 )
@@ -284,7 +298,8 @@ fun HomeMainContent(
     referralsMetrics: ReferralMetrics,
     usersAndMetrics: List<UserAndReferralMetrics>,
     referralsConversion: String,
-    onPaymentView: () -> Unit
+    onPaymentView: () -> Unit,
+    onGraphMetricsView: () -> Unit
 ) {
     if (user != null) {
         when (user.type) {
@@ -299,7 +314,8 @@ fun HomeMainContent(
                 industryOptions = industryOptions,
                 onUserClick = onUserClick,
                 referralsMetrics = referralsMetrics,
-                onPaymentView = onPaymentView
+                onPaymentView = onPaymentView,
+                onGraphMetricsView = onGraphMetricsView
             )
             UserType.PROVIDER -> HomeScreenProvider(
                 user = user,
@@ -310,7 +326,8 @@ fun HomeMainContent(
                 onUserClick = onUserClick,
                 usersAndMetrics = usersAndMetrics,
                 referralsConversion = referralsConversion,
-                onPaymentView = onPaymentView
+                onPaymentView = onPaymentView,
+                onGraphMetricsView = onGraphMetricsView
             )
         }
     } else {

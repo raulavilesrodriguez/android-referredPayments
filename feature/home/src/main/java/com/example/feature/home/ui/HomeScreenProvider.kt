@@ -78,7 +78,8 @@ fun HomeScreenProvider(
     onUserClick: (String) -> Unit,
     usersAndMetrics: List<UserAndReferralMetrics>,
     referralsConversion: String,
-    onPaymentView: () -> Unit
+    onPaymentView: () -> Unit,
+    onGraphMetricsView: () -> Unit
 ){
     val provider = user as UserData.Provider
 
@@ -119,7 +120,8 @@ fun HomeScreenProvider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
-                    .nestedScroll(noPagerScrollConnection),
+                    .nestedScroll(noPagerScrollConnection)
+                    .clickable{onGraphMetricsView()},
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 item{
@@ -430,7 +432,8 @@ fun HomeScreenProviderPreview(){
             onUserClick = {},
             usersAndMetrics = generateFakeUserAndReferralMetrics(),
             referralsConversion = "10.00",
-            onPaymentView = {}
+            onPaymentView = {},
+            onGraphMetricsView = {}
         )
     }
 }

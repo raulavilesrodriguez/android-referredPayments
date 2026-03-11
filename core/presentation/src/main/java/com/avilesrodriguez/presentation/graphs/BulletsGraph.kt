@@ -100,7 +100,7 @@ fun BulletsGraphProvider(
             }
             bullet(FloatLinearAxisModel(0f..1f)){
                 label { TwoLineLabel(stringResource(R.string.referrals_conversion), "${(referralConversion * 100).toInt()}%")}
-                axis { labels { Text("${it.toInt()}", style = MaterialTheme.typography.labelSmall) } }
+                axis { labels { Text("%.2f".format(it), style = MaterialTheme.typography.labelSmall) } }
                 featuredMeasureBar(referralConversion)
                 ranges(0f, 0.25f, 0.75f, 1f)
             }
@@ -127,7 +127,7 @@ fun BulletsGraphPercentages(
             percentagesMetrics.forEach { pair ->
                 bullet(FloatLinearAxisModel(0f..1f)){
                     label { TwoLineLabel(pair.second, "${(pair.first * 100).toInt()}%")}
-                    axis { labels { Text("$it", style = MaterialTheme.typography.labelSmall) } }
+                    axis { labels { Text("%.2f".format(it), style = MaterialTheme.typography.labelSmall) } }
                     featuredMeasureBar(pair.first)
                     ranges(0f, 0.25f, 0.75f, 1f)
                 }
