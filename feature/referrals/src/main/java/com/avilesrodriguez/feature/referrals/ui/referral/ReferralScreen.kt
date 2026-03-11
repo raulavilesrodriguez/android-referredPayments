@@ -110,6 +110,7 @@ fun ReferralScreenContent(
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
             if(showTopBar)
             ToolBarWithIcon(

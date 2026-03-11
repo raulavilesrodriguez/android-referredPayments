@@ -122,9 +122,9 @@ fun PayReferral(
                 onClick = { onCancelPay() },
                 modifier = Modifier.padding(vertical = 4.dp),
             ) {
-                Icon(Icons.Default.Cancel, null, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Cancel, null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
                 Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.cancel))
+                Text(text=stringResource(R.string.cancel), color = MaterialTheme.colorScheme.primary)
             }
             Spacer(Modifier.width(12.dp))
             val canPay = !loading && selectedOption !=null
@@ -157,7 +157,7 @@ fun PayReferral(
                     .weight(1f)
                     .heightIn(min = 100.dp)
                     .background(
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                        MaterialTheme.colorScheme.surfaceContainerLowest,
                         RoundedCornerShape(8.dp)
                     ),
                 contentAlignment = Alignment.Center

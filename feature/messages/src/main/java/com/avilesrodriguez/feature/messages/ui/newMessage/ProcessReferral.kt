@@ -131,9 +131,9 @@ fun ProcessReferral(
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Icon(Icons.Default.AttachFile, null)
+                Icon(Icons.Default.AttachFile, null, tint = MaterialTheme.colorScheme.primary)
                 Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.attach))
+                Text(text=stringResource(R.string.attach), color = MaterialTheme.colorScheme.primary)
             }
 
             val canSend = !loading &&

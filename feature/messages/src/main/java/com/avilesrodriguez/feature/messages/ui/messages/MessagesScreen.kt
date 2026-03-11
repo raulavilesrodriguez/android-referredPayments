@@ -2,9 +2,11 @@ package com.avilesrodriguez.feature.messages.ui.messages
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
@@ -78,6 +80,8 @@ private fun MessagesScreenContent(
     onNewMessageClick: () -> Unit
 ){
     Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
             ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,

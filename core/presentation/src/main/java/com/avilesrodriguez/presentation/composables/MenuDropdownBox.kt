@@ -39,50 +39,37 @@ fun MenuDropdownBox(
     @StringRes title: Int?=null,
 ){
     var expanded by remember { mutableStateOf(false) }
-
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = modifier
     ) {
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded },
+        OutlinedTextField(
+            value = stringResource(selectedOption),
+            onValueChange = {},
+            readOnly = true,
+            shape = RoundedCornerShape(16.dp),
+            label = title?.let { { Text(stringResource(it)) } },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
-        ) {
-            OutlinedTextField(
-                value = stringResource(selectedOption),
-                onValueChange = {},
-                readOnly = true,
-                shape = RoundedCornerShape(16.dp),
-                placeholder = title?.let { { Text(stringResource(it)) } },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier
-                    .menuAnchor(
-                        type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
-                        enabled = true
-                    )
-                    .fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    disabledBorderColor = Color.Transparent,
-                    errorBorderColor = Color.Transparent
+                .menuAnchor(
+                    type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                    enabled = true
                 )
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                options.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        text = { Text(stringResource(selectionOption)) },
-                        onClick = {
-                            expanded = false
-                            onClick(selectionOption)
-                        }
-                    )
-                }
+                .fillMaxWidth()
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(selectionOption)) },
+                    onClick = {
+                        expanded = false
+                        onClick(selectionOption)
+                    }
+                )
             }
         }
     }

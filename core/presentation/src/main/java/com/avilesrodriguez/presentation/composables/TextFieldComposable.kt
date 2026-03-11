@@ -97,7 +97,7 @@ fun TextFieldProfile(
             placeholder = {Text(text = stringResource(title))},
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(painter = painterResource(icon), contentDescription = "Email") },
+            leadingIcon = { Icon(painter = painterResource(icon), contentDescription = null, tint = MaterialTheme.colorScheme.primary)},
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,

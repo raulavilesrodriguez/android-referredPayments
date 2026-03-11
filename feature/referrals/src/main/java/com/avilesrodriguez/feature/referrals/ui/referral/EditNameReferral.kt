@@ -61,6 +61,7 @@ private fun EditNameReferralContent(
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
             ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
