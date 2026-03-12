@@ -21,7 +21,7 @@ fun EditSplash(){
         Text(
             text = stringResource(R.string.select_edit_information),
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            style = MaterialTheme.typography.displaySmall,
+            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.primary
         )
     }

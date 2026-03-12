@@ -41,6 +41,7 @@ import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.BasicButton
+import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.ext.basicButton
 import com.avilesrodriguez.presentation.ext.toColor
@@ -112,12 +113,15 @@ fun ReferralScreenContent(
         contentWindowInsets = WindowInsets.safeDrawing,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
-            if(showTopBar)
-            ToolBarWithIcon(
-                iconBack = R.drawable.arrow_back,
-                title = stringResource(R.string.information_referral),
-                backClick = { onBackClick() }
-            )
+            if(showTopBar){
+                ToolBarWithIcon(
+                    iconBack = R.drawable.arrow_back,
+                    title = stringResource(R.string.information_referral),
+                    backClick = { onBackClick() }
+                )
+            }else{
+                BasicToolbar(stringResource(R.string.information_referral))
+            }
         },
         content = { paddingValues ->
             if(!isLoading){

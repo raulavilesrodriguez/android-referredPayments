@@ -76,19 +76,21 @@ fun ToolbarPlaceholder(modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BasicToolbar(@StringRes title: Int, modifier: Modifier = Modifier) {
+fun BasicToolbar(title: String, modifier: Modifier = Modifier) {
     TopAppBar(
         modifier = modifier.height(TOOLBAR_HEIGHT),
         title = {
             Text(
-                text= stringResource(title),
+                text= title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
-                    .padding(start = 4.dp)
-                    .fillMaxWidth(0.80f),
+                    .padding(start = 4.dp),
             )
         },
+        windowInsets = WindowInsets(0, 0, 0, 0),
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer

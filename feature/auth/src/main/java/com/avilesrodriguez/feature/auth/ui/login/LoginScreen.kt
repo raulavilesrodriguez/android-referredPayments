@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.BasicBottomBar
@@ -37,7 +38,7 @@ fun LoginScreen(
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
-            BasicToolbar(R.string.login)
+            BasicToolbar(stringResource(R.string.login))
         },
         bottomBar = {
             BasicBottomBar(R.string.made_by)

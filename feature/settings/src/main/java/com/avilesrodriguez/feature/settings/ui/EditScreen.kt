@@ -30,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,6 +55,7 @@ import com.avilesrodriguez.presentation.avatar.DEFAULT_AVATAR_USER
 import com.avilesrodriguez.presentation.banksPays.BanksEcuador
 import com.avilesrodriguez.presentation.banksPays.label
 import com.avilesrodriguez.presentation.banksPays.options
+import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.FormButtons
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.composables.TextFieldProfile
@@ -77,7 +79,7 @@ import com.canhub.cropper.CropImageView
 @Composable
 fun EditScreen(
     popUp: () -> Unit,
-    Cancel:() -> Unit,
+    cancel:() -> Unit,
     showTopBar: Boolean = true,
     viewModel: SettingsViewModel = hiltViewModel()
 ){
@@ -125,7 +127,7 @@ fun EditScreen(
                     backClick = popUp
                 )
             }else{
-                ToolbarPlaceholder()
+                BasicToolbar(stringResource(R.string.edit_profile))
             }
         },
         content = { innerPadding ->
@@ -143,7 +145,7 @@ fun EditScreen(
                     )
                 },
                 onSaveClick = { viewModel.onSaveClick(popUp) },
-                onCancel = { Cancel() },
+                onCancel = { cancel() },
                 isEntryValid = isEntryValid,
                 selectedOption = selectedOption?.label,
                 onBankChange = viewModel::onBankChange,
@@ -285,7 +287,15 @@ fun EditScreenContent(
                         modifier = Modifier
                             .heightIn(min = 140.dp)
                             .fillMaxWidth()
-                            .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 4.dp)
+                            .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 4.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+                            cursorColor = MaterialTheme.colorScheme.primary,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                        )
                     )
                     Text(
                         text = "${userData.companyDescription?.length}/$MAX_LENGTH_COMPANY_DESCRIPTION",
@@ -303,7 +313,15 @@ fun EditScreenContent(
                     leadingIcon = { Icon(painter = painterResource(R.drawable.website), contentDescription = "Website")},
                     shape = RoundedCornerShape(16.dp),
                     maxLines = 1,
-                    modifier = Modifier.fieldModifier()
+                    modifier = Modifier.fieldModifier(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+                        cursorColor = MaterialTheme.colorScheme.primary,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                    )
                 )
             }
             else -> {
@@ -327,7 +345,7 @@ fun EditScreenContent(
 
 @Preview(showBackground = true)
 @Composable
-fun EditScreenContenPreview(){
+fun EditScreenContentPreview(){
     MaterialTheme {
         EditScreenContent(
             userData = userClient,

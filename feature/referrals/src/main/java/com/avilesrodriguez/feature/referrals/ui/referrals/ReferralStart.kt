@@ -21,7 +21,7 @@ fun ReferralStar(){
         Text(
             text = stringResource(R.string.select_referred),
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            style = MaterialTheme.typography.displaySmall,
+            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.primary
         )
     }

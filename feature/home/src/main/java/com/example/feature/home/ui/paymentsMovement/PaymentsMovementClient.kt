@@ -43,8 +43,8 @@ import com.avilesrodriguez.domain.model.referral.ReferralWithNames
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.AdvancedSearchSection
+import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
-import com.avilesrodriguez.presentation.composables.ToolbarPlaceholder
 import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.time.formatTimeBasic
 
@@ -71,7 +71,7 @@ fun PaymentsScreenClient(
                     backClick = { onBackClick() }
                 )
             } else {
-                ToolbarPlaceholder()
+                BasicToolbar(stringResource(R.string.payments))
             }
         },
         content = { innerPadding ->
@@ -104,7 +104,11 @@ private fun PaymentsClient(
     onDateToChange: (Long?) -> Unit,
     modifier: Modifier = Modifier
 ){
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         ReferralsList(
             client = client,
             referrals = referrals,
@@ -127,7 +131,8 @@ private fun ReferralsList(
 ){
     LazyColumn(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
             AdvancedSearchSection(

@@ -249,7 +249,10 @@ fun SettingsScreen(
                             is SettingsContent.EditUser -> {
                                 EditScreen(
                                     popUp = { coroutineScope.launch { navigator.navigateBack() } },
-                                    Cancel = { detailContent = null },
+                                    cancel = {
+                                        detailContent = SettingsContent.EditSplash
+                                        coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
+                                             },
                                     showTopBar = !isShowingBothPanels
                                 )
                             }

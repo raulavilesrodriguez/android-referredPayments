@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
+import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.composables.ToolbarPlaceholder
 import com.avilesrodriguez.presentation.ext.referralMetricsColors
@@ -56,7 +57,7 @@ fun GraphMetricsProvider(
                     backClick = { onBackClick() }
                 )
             } else {
-                ToolbarPlaceholder()
+                BasicToolbar(stringResource(R.string.statistics))
             }
         },
         content = {innerPadding ->

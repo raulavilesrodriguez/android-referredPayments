@@ -17,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.presentation.R
@@ -43,7 +44,7 @@ fun SignUpScreen(
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
-            BasicToolbar(R.string.sign_up)
+            BasicToolbar(stringResource(R.string.sign_up))
         },
         bottomBar = {
             BasicBottomBar(R.string.made_by)

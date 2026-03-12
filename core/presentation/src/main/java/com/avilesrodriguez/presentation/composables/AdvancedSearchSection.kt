@@ -53,7 +53,6 @@ fun AdvancedSearchSection(
     onDateFromChange: (Long?) -> Unit,
     onDateToChange: (Long?) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(true) }
     var showFromPicker by remember { mutableStateOf(false) }
     var showToPicker by remember { mutableStateOf(false) }
 
@@ -61,53 +60,36 @@ fun AdvancedSearchSection(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.Transparent)
-            .padding(bottom = 16.dp)
+            .padding(vertical = 16.dp)
     ) {
+        Text(
+            text = stringResource(R.string.advanced_search),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold
+        )
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = !expanded }
-                .padding(vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = stringResource(R.string.advanced_search),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
+            DateField(
+                label = stringResource(R.string.start_date),
+                timestamp = dateFrom,
+                onClick = { showFromPicker = true },
+                onClear = { onDateFromChange(null) },
+                modifier = Modifier.weight(1f)
             )
-            Icon(
-                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+            DateField(
+                label = stringResource(R.string.end_date),
+                timestamp = dateTo,
+                onClick = { showToPicker = true },
+                onClear = { onDateToChange(null) },
+                modifier = Modifier.weight(1f)
             )
         }
 
-        if (expanded) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                DateField(
-                    label = stringResource(R.string.start_date),
-                    timestamp = dateFrom,
-                    onClick = { showFromPicker = true },
-                    onClear = { onDateFromChange(null) },
-                    modifier = Modifier.weight(1f)
-                )
-                DateField(
-                    label = stringResource(R.string.end_date),
-                    timestamp = dateTo,
-                    onClick = { showToPicker = true },
-                    onClear = { onDateToChange(null) },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-            HorizontalDivider(Modifier.padding(top = 16.dp), thickness = 0.5.dp)
-        }
+        Spacer(Modifier.height(16.dp))
+        HorizontalDivider(Modifier.padding(top = 16.dp), thickness = 0.5.dp)
     }
 
     // Date Picker Dialogs
