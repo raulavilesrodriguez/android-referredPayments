@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -27,7 +26,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import androidx.navigation.navigation
 import com.avilesrodriguez.feature.auth.ui.login.LoginScreen
 import com.avilesrodriguez.feature.auth.ui.sign_up.SignUpScreen
 import com.avilesrodriguez.feature.auth.ui.splash.SplashScreen
@@ -39,7 +37,6 @@ import com.avilesrodriguez.feature.referrals.ui.referral.EditEmailReferral
 import com.avilesrodriguez.feature.referrals.ui.referral.EditNameReferral
 import com.avilesrodriguez.feature.referrals.ui.referral.EditPhoneReferral
 import com.avilesrodriguez.feature.referrals.ui.referral.ReferralScreen
-import com.avilesrodriguez.feature.referrals.ui.referral.ReferralViewModel
 import com.avilesrodriguez.feature.referrals.ui.referrals.ReferralsScreen
 import com.avilesrodriguez.feature.settings.ui.EditScreen
 import com.avilesrodriguez.feature.settings.ui.SettingsScreen
@@ -92,7 +89,10 @@ fun MainNavigation(){
                     paymentsMovement(appState)
                     addPolicies(appState)
                     addEditUser(appState)
-                    referralGraph(appState)
+                    referralNavigation(appState)
+                    editNameReferralNavigation(appState)
+                    editEmailReferralNavigation(appState)
+                    editPhoneReferralNavigation(appState)
                     addDetailUser(appState)
                     addNewReferral(appState)
                     addMessages(appState)
@@ -157,8 +157,20 @@ private fun NavGraphBuilder.addHome(appState: AppState){
 }
 
 private fun NavGraphBuilder.referralsNavigation(appState: AppState){
-    composable(NavRoutes.REFERRALS) {
+    composable(
+        route = NavRoutes.REFERRALS_ROUTE,
+        arguments = listOf(
+            navArgument(NavRoutes.ReferralsArgs.ID) {
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
+            }
+        ),
+        deepLinks = listOf(navDeepLink { uriPattern = DeepLinks.REFERRAL_URL })
+    ) { backStackEntry ->
+        val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralsArgs.ID)
         ReferralsScreen(
+            referralId = referralId,
             openScreen = { route -> appState.navigate(route) },
             restartApp = {route -> appState.clearAndNavigate(route)}
         )
@@ -198,69 +210,57 @@ private fun NavGraphBuilder.addEditUser(appState: AppState) {
     }
 }
 
-private fun NavGraphBuilder.referralGraph(appState: AppState){
-    navigation(
-        startDestination = NavRoutes.REFERRAL_DETAIL,
-        route = NavRoutes.REFERRAL_GRAPH
-    ){
-        composable(
-            route = NavRoutes.REFERRAL_DETAIL,
-            arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID) { type = NavType.StringType }),
-            deepLinks = listOf(navDeepLink { uriPattern = DeepLinks.REFERRAL_URL })
-        ) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                //Le pedimos explícitamente al NavController que nos dé el NavBackStackEntry que
-                // corresponde a la ruta de nuestro grafo anidado
-                appState.navController.getBackStackEntry(NavRoutes.REFERRAL_GRAPH)
-            }
-            //Le pasamos esa entrada del grafo padre a hiltViewModel. Esto le dice a Hilt:
-            // "El ciclo de vida de este ViewModel no está atado a la pantalla actual,
-            // sino al grafo de navegación padre"
-            val viewModel: ReferralViewModel = hiltViewModel(parentEntry)
-            val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
-            ReferralScreen(
-                referralId = referralId,
-                onBackClick = { appState.popUp() },
-                openScreen = { route -> appState.navigate(route) },
-                viewModel = viewModel
-            )
-        }
-        composable(
-            route = NavRoutes.EDIT_NAME_REFERRAL
-        ){ backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                appState.navController.getBackStackEntry(NavRoutes.REFERRAL_GRAPH)
-            }
-            val viewModel: ReferralViewModel = hiltViewModel(parentEntry)
-            EditNameReferral(
-                onBackClick = { appState.popUp() },
-                viewModel = viewModel
-            )
-        }
-        composable(
-            route = NavRoutes.EDIT_EMAIL_REFERRAL
-        ){ backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                appState.navController.getBackStackEntry(NavRoutes.REFERRAL_GRAPH)
-            }
-            val viewModel: ReferralViewModel = hiltViewModel(parentEntry)
-            EditEmailReferral(
-                onBackClick = { appState.popUp() },
-                viewModel = viewModel
-            )
-        }
-        composable(
-            route = NavRoutes.EDIT_PHONE_REFERRAL
-        ){ backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                appState.navController.getBackStackEntry(NavRoutes.REFERRAL_GRAPH)
-            }
-            val viewModel: ReferralViewModel = hiltViewModel(parentEntry)
-            EditPhoneReferral(
-                onBackClick = { appState.popUp() },
-                viewModel = viewModel
-            )
-        }
+private fun NavGraphBuilder.referralNavigation(appState: AppState){
+    composable(
+        route = NavRoutes.REFERRAL_DETAIL,
+        arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID){ type = NavType.StringType })
+    ){ backStackEntry ->
+        val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
+        ReferralScreen(
+            referralId = referralId,
+            onBackClick = { appState.popUp() },
+            openScreen = { route -> appState.navigate(route) }
+        )
+    }
+}
+
+private fun NavGraphBuilder.editNameReferralNavigation(appState: AppState){
+    composable(
+        route = NavRoutes.EDIT_NAME_REFERRAL,
+        arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID){type = NavType.StringType})
+    ){ backStackEntry ->
+        val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
+        EditNameReferral(
+            referralId = referralId,
+            onBackClick = { appState.popUp() }
+        )
+    }
+}
+
+private fun NavGraphBuilder.editEmailReferralNavigation(appState: AppState){
+    composable(
+        route = NavRoutes.EDIT_EMAIL_REFERRAL,
+        arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID){type = NavType.StringType})
+    ){ backStackEntry ->
+        val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
+        EditEmailReferral(
+            referralId = referralId,
+            onBackClick = { appState.popUp() }
+        )
+
+    }
+}
+
+private fun NavGraphBuilder.editPhoneReferralNavigation(appState: AppState){
+    composable(
+        route = NavRoutes.EDIT_PHONE_REFERRAL,
+        arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID){type = NavType.StringType})
+    ){ backStackEntry ->
+        val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
+        EditPhoneReferral(
+            referralId = referralId,
+            onBackClick = { appState.popUp() }
+        )
     }
 }
 

@@ -78,7 +78,8 @@ fun FormButtons(
         ) {
             Text(
                 text = stringResource(cancelText),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
             )
         }
         Spacer(Modifier.width(16.dp))

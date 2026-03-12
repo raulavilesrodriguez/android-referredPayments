@@ -54,7 +54,7 @@ fun ReferralsList(
                 placeholder = R.string.search_your_referred,
                 trailingIcon = R.drawable.search,
                 modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp, top = 2.dp, bottom = 8.dp)
+                    .padding(start = 8.dp, end = 8.dp, top = 2.dp, bottom = 4.dp)
             )
         }
         item {

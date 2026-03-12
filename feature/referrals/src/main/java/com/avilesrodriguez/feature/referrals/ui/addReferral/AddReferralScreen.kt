@@ -63,6 +63,7 @@ fun AddReferralScreenContent(
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
             ToolBarWithIcon(
                 iconBack = R.drawable.arrow_back,
@@ -99,7 +100,6 @@ fun FormAddReferral(
             modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .background(color = MaterialTheme.colorScheme.background)
                 .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally

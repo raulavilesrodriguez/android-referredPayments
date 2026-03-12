@@ -61,7 +61,20 @@ fun NameField(
             placeholder = {Text(text = stringResource(namePlaceholder))},
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = "Email") }
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Email",
+                    tint = MaterialTheme.colorScheme.primary
+                )},
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            )
         )
         Text(
             text = "${value.length}/$MAX_LENGTH_NAME",
@@ -80,7 +93,8 @@ fun TextFieldProfile(
     maxLength: Int,
     @DrawableRes icon: Int,
     @StringRes title: Int,
-    modifier: Modifier = Modifier){
+    modifier: Modifier = Modifier
+){
     Column(
         modifier = modifier
             .fillMaxWidth(),
@@ -97,17 +111,24 @@ fun TextFieldProfile(
             placeholder = {Text(text = stringResource(title))},
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(painter = painterResource(icon), contentDescription = null, tint = MaterialTheme.colorScheme.primary)},
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(icon),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )},
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
                 focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
             )
         )
         Text(
             text = "${value.length}/$maxLength",
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp, end = 8.dp),
             textAlign = TextAlign.End
@@ -147,15 +168,17 @@ fun NameTextFieldCursor(
             shape = RoundedCornerShape(16.dp),
             placeholder = {Text(text = stringResource(R.string.placeholder_name))},
             singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            ),
             modifier = Modifier
                 .fillMaxWidth()
-                .focusRequester(focusRequester)
+                .focusRequester(focusRequester),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            )
         )
         Text(
             text = "${textFieldValue.text.length}/$MAX_LENGTH_NAME",
@@ -174,9 +197,22 @@ fun EmailField(value: String, onNewValue: (String) -> Unit, modifier: Modifier =
         modifier = modifier,
         value = value,
         onValueChange = { onNewValue(it) },
-        placeholder = { Text(stringResource(R.string.email)) },
-        leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Email") },
-        shape = RoundedCornerShape(16.dp)
+        placeholder = {Text(text=stringResource(R.string.email))},
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Email,
+                contentDescription = "Email",
+                tint = MaterialTheme.colorScheme.primary
+            )},
+        shape = RoundedCornerShape(16.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        )
     )
 }
 
@@ -204,13 +240,22 @@ fun EmailFieldCursor(
         },
         label = { Text(text = stringResource(R.string.email)) },
         placeholder = { Text(text = stringResource(R.string.email)) },
-        leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = null) },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Email,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )},
         singleLine = true,
         shape = RoundedCornerShape(16.dp),
         modifier = modifier.focusRequester(focusRequester),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
     )
 }
@@ -228,8 +273,21 @@ fun PhoneField(value: String, onNewValue: (String) -> Unit, modifier: Modifier =
             value = value,
             onValueChange = { if(it.length <= MIN_PASS_LENGTH_PHONE_ECUADOR) onNewValue(it) },
             placeholder = { Text(stringResource(R.string.mobile_number))},
-            leadingIcon = { Icon(imageVector = Icons.Default.PhoneAndroid, contentDescription = "Phone")},
-            shape = RoundedCornerShape(16.dp)
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.PhoneAndroid,
+                    contentDescription = "Phone",
+                    tint = MaterialTheme.colorScheme.primary
+                )},
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            )
         )
         Text(
             text = "${value.length}/$MIN_PASS_LENGTH_PHONE_ECUADOR",
@@ -273,18 +331,25 @@ fun PhoneFieldCursor(
             label = { Text(text = stringResource(R.string.mobile_number)) },
             shape = RoundedCornerShape(16.dp),
             placeholder = { Text(text = stringResource(R.string.mobile_number)) },
-            leadingIcon = { Icon(imageVector = Icons.Default.PhoneAndroid, contentDescription = "Phone") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.PhoneAndroid,
+                    contentDescription = "Phone",
+                    tint = MaterialTheme.colorScheme.primary
+                )},
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            ),
             modifier = Modifier
                 .fillMaxWidth()
-                .focusRequester(focusRequester)
+                .focusRequester(focusRequester),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            )
         )
         Text(
             text = "${textFieldValue.text.length}/$MIN_PASS_LENGTH_PHONE_ECUADOR",
@@ -332,7 +397,12 @@ private fun PasswordField(
         onValueChange = { onNewValue(it) },
         shape = RoundedCornerShape(16.dp),
         placeholder = { Text(text = stringResource(placeholder)) },
-        leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = "Lock") },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = "Lock",
+                tint = MaterialTheme.colorScheme.primary
+            )},
         trailingIcon = {
             IconButton(
                 onClick = { isVisible = !isVisible }
@@ -341,6 +411,14 @@ private fun PasswordField(
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        visualTransformation = visualTransformation
+        visualTransformation = visualTransformation,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        )
     )
 }

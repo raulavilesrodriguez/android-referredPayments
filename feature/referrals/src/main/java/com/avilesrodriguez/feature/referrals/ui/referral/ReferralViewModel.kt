@@ -89,6 +89,7 @@ class ReferralViewModel @Inject constructor(
     }
 
     fun loadReferralInformation(referralId: String){
+        if (_referralState.value?.id == referralId) return
         loadJob?.cancel()
         _isLoading.value = true
         loadJob = launchCatching {
@@ -111,15 +112,21 @@ class ReferralViewModel @Inject constructor(
     }
 
     fun onNameReferral(openScreen: (String) -> Unit){
-        openScreen(NavRoutes.EDIT_NAME_REFERRAL)
+        val id = _referralState.value?.id ?: return
+        val route = NavRoutes.EDIT_NAME_REFERRAL.replace("{${NavRoutes.ReferralArgs.ID}}", id)
+        openScreen(route)
     }
 
     fun onEmailReferral(openScreen: (String) -> Unit){
-        openScreen(NavRoutes.EDIT_EMAIL_REFERRAL)
+        val id = _referralState.value?.id ?: return
+        val route = NavRoutes.EDIT_EMAIL_REFERRAL.replace("{${NavRoutes.ReferralArgs.ID}}", id)
+        openScreen(route)
     }
 
     fun onPhoneReferral(openScreen: (String) -> Unit){
-        openScreen(NavRoutes.EDIT_PHONE_REFERRAL)
+        val id = _referralState.value?.id ?: return
+        val route = NavRoutes.EDIT_PHONE_REFERRAL.replace("{${NavRoutes.ReferralArgs.ID}}", id)
+        openScreen(route)
     }
 
     fun onAcceptReferral(subject:String, content:String, openScreen: (String) -> Unit){
@@ -154,7 +161,6 @@ class ReferralViewModel @Inject constructor(
     }
 
     fun updateName(newName: String){
-        // Solo deja pasar letras y espacios, eliminando lo demás al instante
         val allowedSymbols = setOf('.', '-', ',', '/')
 
         val filteredName = newName
@@ -165,13 +171,14 @@ class ReferralViewModel @Inject constructor(
     }
 
     fun onSaveName(popUp: () -> Unit) {
-        if(nameReferral.isBlank()){
+        val currentName = _referralState.value?.name ?: ""
+        if(currentName.isBlank()){
             return
         }
         launchCatching {
             val updates = mapOf(
-                "name" to nameReferral,
-                "nameLowercase" to nameReferral.normalizeName()
+                "name" to currentName,
+                "nameLowercase" to currentName.normalizeName()
             )
             val referralId = _referralState.value?.id?:""
             updateReferralFields(referralId, updates)
@@ -184,13 +191,14 @@ class ReferralViewModel @Inject constructor(
     }
 
     fun onSaveEmail(popUp: () -> Unit) {
-        if(!emailReferral.isValidEmail()){
+        val currentEmail = _referralState.value?.email ?: ""
+        if(!currentEmail.isValidEmail()){
             SnackbarManager.showMessage(R.string.email_error)
             return
         }
         launchCatching {
             val updates = mapOf(
-                "email" to emailReferral
+                "email" to currentEmail
             )
             val referralId = _referralState.value?.id?:""
             updateReferralFields(referralId, updates)
@@ -204,13 +212,14 @@ class ReferralViewModel @Inject constructor(
     }
 
     fun onSaveNumberPhone(popUp: () -> Unit) {
-        if(!numberPhoneReferral.isValidNumber()){
+        val currentPhone = _referralState.value?.numberPhone ?: ""
+        if(!currentPhone.isValidNumber()){
             SnackbarManager.showMessage(R.string.invalid_phone_number)
             return
         }
         launchCatching {
             val updates = mapOf(
-                "numberPhone" to numberPhoneReferral
+                "numberPhone" to currentPhone
             )
             val referralId = _referralState.value?.id?:""
             updateReferralFields(referralId, updates)

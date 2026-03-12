@@ -2,36 +2,30 @@ package com.avilesrodriguez.presentation.navigation
 
 object NavRoutes {
     const val SPLASH = "splash"
-
     const val LOGIN = "login"
-
     const val SIGN_UP = "sign_up"
-
     const val EDIT_USER = "edit_user"
-
     const val POLICIES = "policies"
     const val REFERRALS = "referrals"
+    const val REFERRALS_ROUTE = "referrals?id={id}" //id del referral
+    object ReferralsArgs {
+        const val ID = "id"
+    }
     const val SETTINGS = "settings"
     const val HOME = "home"
     const val PAYMENTS_MOVEMENT = "payments_movement"
-
     const val NEW_REFERRAL = "new_referral/{id}"  //id del user provider
-
     const val USER_DETAIL = "user_detail/{id}" //id del user client o provider
     object UserArgs {
         const val ID = "id"
     }
-
-    const val REFERRAL_GRAPH = "referral_graph"
     const val REFERRAL_DETAIL = "referral_detail/{id}" //id del referral
+    const val EDIT_NAME_REFERRAL = "edit_name_referral/{id}" //id del referral
+    const val EDIT_EMAIL_REFERRAL = "edit_email_referral/{id}" //id del referral
+    const val EDIT_PHONE_REFERRAL = "edit_phone_referral/{id}" //id del referral
     object ReferralArgs {
         const val ID = "id"
     }
-
-    const val EDIT_NAME_REFERRAL = "edit_name_referral"
-    const val EDIT_EMAIL_REFERRAL = "edit_email_referral"
-    const val EDIT_PHONE_REFERRAL = "edit_phone_referral"
-    const val NEW_MESSAGE_GRAPH = "messages_graph"
     const val MESSAGES_SCREEN = "messages_screen/{id}" //id del referral
     const val NEW_MESSAGE = "new_message/{id}" //id del referral
     const val MESSAGE_SCREEN = "message_screen/{id}" //id del message

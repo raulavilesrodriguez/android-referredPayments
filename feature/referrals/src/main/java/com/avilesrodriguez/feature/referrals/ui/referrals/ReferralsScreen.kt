@@ -1,5 +1,6 @@
 package com.avilesrodriguez.feature.referrals.ui.referrals
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -86,6 +87,7 @@ sealed class ReferralsDetailContent{
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun ReferralsScreen(
+    referralId: String?= null,
     openScreen: (String) -> Unit,
     restartApp: (String) -> Unit,
     viewModel: ReferralsViewModel = hiltViewModel()
@@ -147,6 +149,15 @@ fun ReferralsScreen(
                 1 -> viewModel.onHome { openScreen(it) }
                 2 -> viewModel.onSettings { openScreen(it) }
             }
+        }
+    }
+
+
+    LaunchedEffect(referralId) {
+        if(!referralId.isNullOrBlank()){
+            Log.d("referralId", referralId)
+            detailContent = ReferralsDetailContent.ReferralDetail(referralId)
+            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
         }
     }
 

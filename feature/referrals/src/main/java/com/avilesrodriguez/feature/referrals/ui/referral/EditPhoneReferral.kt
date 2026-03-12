@@ -39,9 +39,13 @@ import com.avilesrodriguez.presentation.fakeData.referral
 
 @Composable
 fun EditPhoneReferral(
+    referralId: String?,
     onBackClick: () -> Unit,
     viewModel: ReferralViewModel = hiltViewModel()
 ){
+    LaunchedEffect(referralId) {
+        viewModel.loadReferralInformation(referralId.orEmpty())
+    }
     val referral by viewModel.referralState.collectAsState()
     EditPhoneReferralContent(
         referral = referral,

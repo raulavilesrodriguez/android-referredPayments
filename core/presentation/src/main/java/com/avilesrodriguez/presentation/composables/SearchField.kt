@@ -62,35 +62,30 @@ fun SearchFieldBasic(
 ){
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
-
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surfaceContainerLow
-    ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = { onValueChange(it) },
-            placeholder = { Text(text = stringResource(id = placeholder)) },
-            trailingIcon = {
-                Icon(
-                    painter = painterResource(id = trailingIcon),
-                    contentDescription = null
-                )
-            },
-            singleLine = true,
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent
+    OutlinedTextField(
+        value = value,
+        onValueChange = { onValueChange(it) },
+        placeholder = { Text(text = stringResource(id = placeholder)) },
+        trailingIcon = {
+            Icon(
+                painter = painterResource(id = trailingIcon),
+                contentDescription = null
             )
+        },
+        singleLine = true,
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
-    }
+    )
     LaunchedEffect(Unit) {
         focusManager.clearFocus()
     }
