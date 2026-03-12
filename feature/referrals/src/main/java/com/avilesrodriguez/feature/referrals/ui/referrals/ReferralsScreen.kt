@@ -127,7 +127,7 @@ fun ReferralsScreen(
 
     LaunchedEffect(isShowingBothPanels) {
         if (isShowingBothPanels) {
-            paneExpansionState.setFirstPaneProportion(0.6f)
+            paneExpansionState.setFirstPaneProportion(0.5f)
         }
     }
 

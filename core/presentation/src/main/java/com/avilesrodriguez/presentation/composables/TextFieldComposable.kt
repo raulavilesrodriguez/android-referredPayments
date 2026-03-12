@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -95,6 +97,8 @@ fun TextFieldProfile(
     @StringRes title: Int,
     modifier: Modifier = Modifier
 ){
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
     Column(
         modifier = modifier
             .fillMaxWidth(),
@@ -133,6 +137,9 @@ fun TextFieldProfile(
             modifier = Modifier.padding(top = 4.dp, end = 8.dp),
             textAlign = TextAlign.End
         )
+    }
+    LaunchedEffect(Unit) {
+        focusManager.clearFocus()
     }
 }
 

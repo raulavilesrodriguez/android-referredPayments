@@ -1,6 +1,7 @@
 package com.example.feature.home.ui.paymentsMovement
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -139,7 +140,7 @@ private fun ReferralsList(
     onDateToChange: (Long?) -> Unit
 ){
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -176,6 +177,7 @@ private fun ReferralPaidItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
@@ -183,7 +185,8 @@ private fun ReferralPaidItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(12.dp)
+                .clickable { expanded = !expanded },
             verticalAlignment = Alignment.CenterVertically
         ){
             Column(modifier = Modifier.weight(1f)) {

@@ -65,6 +65,7 @@ import com.avilesrodriguez.presentation.ext.fieldModifier
 import com.avilesrodriguez.presentation.industries.options
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
 import com.avilesrodriguez.presentation.composables.MenuDropdownBoxLeadIcon
+import com.avilesrodriguez.presentation.composables.ToolbarPlaceholder
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COMPANY_DESCRIPTION
 import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.industries.label
@@ -76,6 +77,8 @@ import com.canhub.cropper.CropImageView
 @Composable
 fun EditScreen(
     popUp: () -> Unit,
+    Cancel:() -> Unit,
+    showTopBar: Boolean = true,
     viewModel: SettingsViewModel = hiltViewModel()
 ){
     val isSaving by viewModel.isSaving.collectAsState()
@@ -115,11 +118,15 @@ fun EditScreen(
         contentWindowInsets = WindowInsets.safeDrawing,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
-            ToolBarWithIcon(
-                iconBack = R.drawable.arrow_back,
-                title = stringResource(R.string.edit_profile),
-                backClick = popUp
-            )
+            if(showTopBar){
+                ToolBarWithIcon(
+                    iconBack = R.drawable.arrow_back,
+                    title = stringResource(R.string.edit_profile),
+                    backClick = popUp
+                )
+            }else{
+                ToolbarPlaceholder()
+            }
         },
         content = { innerPadding ->
             EditScreenContent(
@@ -136,7 +143,7 @@ fun EditScreen(
                     )
                 },
                 onSaveClick = { viewModel.onSaveClick(popUp) },
-                onCancel = { viewModel.cancelEditUser(popUp) },
+                onCancel = { Cancel() },
                 isEntryValid = isEntryValid,
                 selectedOption = selectedOption?.label,
                 onBankChange = viewModel::onBankChange,

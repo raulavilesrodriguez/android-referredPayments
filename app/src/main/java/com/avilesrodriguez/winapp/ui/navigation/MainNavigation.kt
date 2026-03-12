@@ -36,9 +36,7 @@ import com.avilesrodriguez.feature.referrals.ui.addReferral.AddReferralScreen
 import com.avilesrodriguez.feature.referrals.ui.referral.EditEmailReferral
 import com.avilesrodriguez.feature.referrals.ui.referral.EditNameReferral
 import com.avilesrodriguez.feature.referrals.ui.referral.EditPhoneReferral
-import com.avilesrodriguez.feature.referrals.ui.referral.ReferralScreen
 import com.avilesrodriguez.feature.referrals.ui.referrals.ReferralsScreen
-import com.avilesrodriguez.feature.settings.ui.EditScreen
 import com.avilesrodriguez.feature.settings.ui.SettingsScreen
 import com.avilesrodriguez.presentation.navigation.AppState
 import com.avilesrodriguez.presentation.navigation.DeepLinks
@@ -47,8 +45,6 @@ import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import com.avilesrodriguez.winapp.ui.theme.WinAppTheme
 import com.example.feature.home.ui.HomeScreen
 import com.example.feature.home.ui.PoliciesScreen
-import com.example.feature.home.ui.details.DetailScreenUser
-import com.example.feature.home.ui.paymentsMovement.PaymentsMovement
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -86,14 +82,10 @@ fun MainNavigation(){
                     addHome(appState)
                     referralsNavigation(appState)
                     settingsNavigation(appState)
-                    paymentsMovement(appState)
                     addPolicies(appState)
-                    addEditUser(appState)
-                    referralNavigation(appState)
                     editNameReferralNavigation(appState)
                     editEmailReferralNavigation(appState)
                     editPhoneReferralNavigation(appState)
-                    addDetailUser(appState)
                     addNewReferral(appState)
                     addMessages(appState)
                     newMessageNavigation(appState)
@@ -186,40 +178,10 @@ private fun NavGraphBuilder.settingsNavigation(appState: AppState){
     }
 }
 
-private fun NavGraphBuilder.paymentsMovement(appState: AppState) {
-    composable(NavRoutes.PAYMENTS_MOVEMENT){
-        PaymentsMovement(
-            popUp = {appState.popUp()}
-        )
-    }
-}
-
 private fun NavGraphBuilder.addPolicies(appState: AppState){
     composable(NavRoutes.POLICIES) {
         PoliciesScreen(
             popUp = {appState.popUp()}
-        )
-    }
-}
-
-private fun NavGraphBuilder.addEditUser(appState: AppState) {
-    composable(NavRoutes.EDIT_USER) {
-        EditScreen(
-            popUp = { appState.popUp() }
-        )
-    }
-}
-
-private fun NavGraphBuilder.referralNavigation(appState: AppState){
-    composable(
-        route = NavRoutes.REFERRAL_DETAIL,
-        arguments = listOf(navArgument(NavRoutes.ReferralArgs.ID){ type = NavType.StringType })
-    ){ backStackEntry ->
-        val referralId = backStackEntry.arguments?.getString(NavRoutes.ReferralArgs.ID)
-        ReferralScreen(
-            referralId = referralId,
-            onBackClick = { appState.popUp() },
-            openScreen = { route -> appState.navigate(route) }
         )
     }
 }
@@ -260,20 +222,6 @@ private fun NavGraphBuilder.editPhoneReferralNavigation(appState: AppState){
         EditPhoneReferral(
             referralId = referralId,
             onBackClick = { appState.popUp() }
-        )
-    }
-}
-
-private fun NavGraphBuilder.addDetailUser(appState: AppState){
-    composable(
-        route = NavRoutes.USER_DETAIL,
-        arguments = listOf(navArgument(NavRoutes.UserArgs.ID){type = NavType.StringType})
-    ){ backStackEntry ->
-        val userId = backStackEntry.arguments?.getString(NavRoutes.UserArgs.ID)
-        DetailScreenUser(
-            uId = userId,
-            popUp = { appState.popUp() },
-            openScreen = { route -> appState.navigate(route) }
         )
     }
 }

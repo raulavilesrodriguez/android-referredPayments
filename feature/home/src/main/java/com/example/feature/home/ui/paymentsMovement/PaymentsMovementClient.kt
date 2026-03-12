@@ -160,7 +160,10 @@ private fun ReferralPaidItem(
     var expanded by remember { mutableStateOf(false) }
 
     Card(
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .clip(RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {

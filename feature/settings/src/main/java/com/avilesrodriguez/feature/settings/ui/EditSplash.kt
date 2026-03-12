@@ -1,4 +1,4 @@
-package com.avilesrodriguez.feature.referrals.ui.referrals
+package com.avilesrodriguez.feature.settings.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,14 +12,14 @@ import androidx.compose.ui.res.stringResource
 import com.avilesrodriguez.presentation.R
 
 @Composable
-fun ReferralStar(){
+fun EditSplash(){
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.select_referred),
+            text = stringResource(R.string.select_edit_information),
             modifier = Modifier.align(Alignment.CenterHorizontally),
             style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.primary

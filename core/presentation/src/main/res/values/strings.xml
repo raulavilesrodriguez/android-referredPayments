@@ -79,6 +79,7 @@
 
     <!-- Settings Screen -->
     <string name="profile">Profile</string>
+    <string name="select_edit_information">Select edit information</string>
     <string name="settings_edit_photo">Edit photo</string>
     <string name="settings_name">Name*</string>
     <string name="settings_industry">Industry</string>
