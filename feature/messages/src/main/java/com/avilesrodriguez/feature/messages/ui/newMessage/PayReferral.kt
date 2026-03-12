@@ -60,7 +60,7 @@ fun PayReferral(
     Column(
         modifier = Modifier
         .fillMaxSize()
-        .padding(4.dp)
+        .padding(8.dp)
         .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -99,6 +99,14 @@ fun PayReferral(
             shape = RoundedCornerShape(12.dp),
             textStyle = LocalTextStyle.current.copy(
                 textAlign = TextAlign.Center
+            ),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
             )
         )
         
@@ -244,7 +252,7 @@ private fun DetailRowCopy(@StringRes label: Int, value: String, onCopyClick: (St
                     imageVector = if (isSelected) Icons.Default.CheckCircle else Icons.Default.ContentCopy,
                     contentDescription = null,
                     modifier = Modifier.size(20.dp),
-                    tint = if (isSelected) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurface
+                    tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                 )
             }
             if (isSelected) {
