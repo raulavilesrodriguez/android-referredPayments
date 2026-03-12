@@ -48,7 +48,7 @@ enum class BanksEcuador(
 }
 
 fun BanksEcuador.Companion.options(): List<Pair<Int, Int>>{
-    return listOf(R.string.choose_your_bank to R.drawable.bank) + BanksEcuador.entries.map { it.label to it.icon }
+    return listOf(R.string.choose_your_bank to R.drawable.banks_color) + BanksEcuador.entries.map { it.label to it.icon }
 }
 
 fun BanksEcuador.Companion.getById(id: Int): BanksEcuador? {
