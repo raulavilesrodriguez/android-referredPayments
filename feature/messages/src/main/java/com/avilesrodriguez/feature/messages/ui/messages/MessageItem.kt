@@ -3,6 +3,7 @@ package com.avilesrodriguez.feature.messages.ui.messages
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Outbound
 import androidx.compose.material.icons.filled.MoveToInbox
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,7 +50,7 @@ fun MessageItem(
     val isSentByMe = message.senderId == currentUserId
     val nameClientProvider = if(clientWhoReferred?.uid == currentUserId)  providerThatReceived?.name?:"" else clientWhoReferred?.name?:""
 
-    val fontWeight = if (isUnreadForMe) FontWeight.Bold else FontWeight.Normal
+    val fontWeight = if (isUnreadForMe) FontWeight.ExtraBold else FontWeight.Normal
     val textColor = if (isUnreadForMe)
         MaterialTheme.colorScheme.onSurface
     else
@@ -56,61 +59,65 @@ fun MessageItem(
     val backgroundColor = if (isUnreadForMe)
         MaterialTheme.colorScheme.surfaceVariant
     else
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f)
+        MaterialTheme.colorScheme.surfaceContainerLow
 
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(backgroundColor)
+            .padding(vertical = 4.dp)
             .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
+            .clip(RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor)
     ) {
-        Icon(
-            imageVector = if (isSentByMe) Icons.AutoMirrored.Filled.Outbound else Icons.Default.MoveToInbox,
-            contentDescription = null,
-            tint = if (isSentByMe) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(40.dp)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Column(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier.fillMaxWidth().padding( 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = if (isSentByMe) Icons.AutoMirrored.Filled.Outbound else Icons.Default.MoveToInbox,
+                contentDescription = null,
+                tint = if (isSentByMe) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(40.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = if (isSentByMe) stringResource(R.string.you) else nameClientProvider,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = if (isSentByMe) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = formatTimestamp(message.createdAt),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = fontWeight
+                    )
+                }
                 Text(
-                    text = if (isSentByMe) stringResource(R.string.you) else nameClientProvider,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = if (isSentByMe) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
+                    text = message.subject,
+                    fontWeight = fontWeight,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = message.content,
+                    fontWeight = if (isUnreadForMe) FontWeight.Medium else FontWeight.Normal,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = formatTimestamp(message.createdAt),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = fontWeight
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textColor.copy(alpha = 0.8f)
                 )
             }
-            Text(
-                text = message.subject,
-                fontWeight = fontWeight,
-                style = MaterialTheme.typography.bodyMedium,
-                color = textColor,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = message.content,
-                fontWeight = if (isUnreadForMe) FontWeight.Medium else FontWeight.Normal,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyMedium,
-                color = textColor.copy(alpha = 0.8f)
-            )
         }
     }
 }

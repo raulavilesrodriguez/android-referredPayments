@@ -79,7 +79,7 @@ fun ReferralsList(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp)
+                        .padding(vertical = 4.dp)
                         .clickable { onReferralClick(item.referral) }
                 ){
                     ReferralItem(
