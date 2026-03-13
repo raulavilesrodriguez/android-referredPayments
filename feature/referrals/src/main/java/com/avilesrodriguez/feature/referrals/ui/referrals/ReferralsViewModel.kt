@@ -1,7 +1,6 @@
 package com.avilesrodriguez.feature.referrals.ui.referrals
 
 import com.avilesrodriguez.domain.ext.normalizeName
-import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralWithNames
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
@@ -127,37 +126,6 @@ class ReferralsViewModel @Inject constructor(
                 item.referral.nameLowercase.contains(queryNormalized)
             }
         }
-    }
-
-    /**
-    private fun performSearch(query: String){
-        _isLoading.value = true
-        referralsJob = launchCatching {
-            val userData = _userDataStore.value
-            when(userData){
-                is UserData.Client -> {
-                    searchReferralsByClient(query, currentUserId)
-                        .collect { referrals ->
-                            _uiState.value = referrals
-                            _isLoading.value = false
-                        }
-                }
-                is UserData.Provider -> {
-                    searchReferralsByProvider(query, currentUserId)
-                        .collect { referrals ->
-                            _uiState.value = referrals
-                            _isLoading.value = false
-                        }
-                }
-                else -> { emptyList<Referral>() }
-            }
-        }
-        referralsJob?.invokeOnCompletion { if (it is CancellationException) _isLoading.value = false }
-    } */
-
-    fun onReferralClick(referral: Referral, openScreen: (String) -> Unit) {
-        val route = NavRoutes.REFERRAL_DETAIL.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id)
-        openScreen(route)
     }
 
     fun onActionClick(openScreen: (String) -> Unit, restartApp: (String) -> Unit, action: Int){

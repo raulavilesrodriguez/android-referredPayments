@@ -15,7 +15,6 @@ import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.MarkAsDeleteBySenderMessage
 import com.avilesrodriguez.domain.usecases.MarkAsDeletedByReceiverMessage
 import com.avilesrodriguez.domain.usecases.MarkAsReadMessage
-import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview

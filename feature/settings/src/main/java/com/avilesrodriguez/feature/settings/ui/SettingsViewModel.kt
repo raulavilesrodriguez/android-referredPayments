@@ -230,20 +230,12 @@ class SettingsViewModel @Inject constructor(
         }.invokeOnCompletion { _isSaving.value = false }
     }
 
-    fun cancelEditUser(popUp: () -> Unit){
-        popUp()
-    }
-
     fun onHome(openScreen: (String) -> Unit) {
         openScreen(NavRoutes.HOME)
     }
 
     fun onReferrals(openScreen: (String) -> Unit){
         openScreen(NavRoutes.REFERRALS)
-    }
-
-    fun editUser(openScreen: (String) -> Unit){
-        openScreen(NavRoutes.EDIT_USER)
     }
 
     fun onActionClick(openScreen: (String) -> Unit, restartApp: (String) -> Unit, action: Int){

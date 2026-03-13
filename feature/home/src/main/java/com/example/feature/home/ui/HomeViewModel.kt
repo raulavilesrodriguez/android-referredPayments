@@ -167,11 +167,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun navigationUserDetails(uid:String, openScreen: (String) -> Unit){
-        val route = NavRoutes.USER_DETAIL.replace("{${NavRoutes.UserArgs.ID}}", uid)
-        openScreen(route)
-    }
-
     private fun updateMetrics(referrals: List<Referral>) {
         _uiStateReferralsMetrics.value = ReferralMetrics(
             totalReferrals = referrals.size,
