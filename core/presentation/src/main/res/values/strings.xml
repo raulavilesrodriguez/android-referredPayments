@@ -135,6 +135,7 @@
     <string name="comment_save_email_referred">Please check that this email is correct</string>
     <string name="comment_save_phone_number_referred">Please check that this mobile phone number is correct</string>
     <!-- Process Referral -->
+    <string name="select_message">Select message</string>
     <string name="review_payment_process">Review Payment Process</string>
     <string name="process_referral">Process Referral</string>
     <string name="search_in_mail">Search in mail</string>

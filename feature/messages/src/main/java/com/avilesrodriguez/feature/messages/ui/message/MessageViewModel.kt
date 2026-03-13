@@ -21,7 +21,6 @@ import com.avilesrodriguez.domain.usecases.GetMessageById
 import com.avilesrodriguez.domain.usecases.GetReferralById
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
-import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -196,12 +195,6 @@ class MessageViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e("MessageViewModel", "Error al abrir archivo", e)
         }
-    }
-
-    fun replyMessage(openScreen: (String) -> Unit){
-        val referralId = _referralState.value.id
-        val route = NavRoutes.NEW_MESSAGE.replace("{${NavRoutes.ReferralArgs.ID}}", referralId)
-        openScreen(route)
     }
 
 }

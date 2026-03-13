@@ -138,16 +138,12 @@ class MessagesViewModel @Inject constructor(
         }
     }
 
-    fun onNewMessageClick(openScreen: (String) -> Unit){
-        val referral = referralState.value
-        openScreen(NavRoutes.NEW_MESSAGE.replace("{${NavRoutes.ReferralArgs.ID}}", referral.id))
-    }
-
-    fun onMessageClick(message: Message, openScreen: (String) -> Unit){
-        launchCatching {
-            markAsReadMessage(message.id)
+    fun onMessageClick(message: Message){
+        if(message.receiverId == currentUserId && !message.isRead){
+            launchCatching {
+                markAsReadMessage(message.id)
+            }
         }
-        openScreen(NavRoutes.MESSAGE_SCREEN.replace("{${NavRoutes.MessageArgs.ID}}", message.id))
     }
 
 }

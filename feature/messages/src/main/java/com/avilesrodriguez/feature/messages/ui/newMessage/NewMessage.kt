@@ -44,6 +44,7 @@ import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.banksPays.copyClientData
 import com.avilesrodriguez.presentation.banksPays.openBankApp
+import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.ext.nameSelect
 import com.avilesrodriguez.presentation.fakeData.message1
@@ -57,10 +58,11 @@ fun NewMessage(
     referralId: String?,
     onBackClick: () -> Unit,
     openScreen: (String) -> Unit,
+    showTopBar: Boolean = true,
     viewModel: NewMessageViewModel = hiltViewModel(),
     sharedAttachmentViewModel: SharedAttachmentViewModel = hiltViewModel(LocalActivity.current as ComponentActivity)
 ){
-    LaunchedEffect(Unit) {
+    LaunchedEffect(referralId) {
         viewModel.loadReferralInformation(referralId.orEmpty())
     }
     // Observamos el archivo del ViewModel compartido
@@ -90,6 +92,7 @@ fun NewMessage(
 
     NewMessageContent(
         onBackClick = {
+            viewModel.resetValues()
             onBackClick()
                       },
         newMessageState = newMessageState,
@@ -110,12 +113,16 @@ fun NewMessage(
         onPayClick = {
             if(selectedBankPackage.isNotBlank()) openBankApp(selectedBankPackage, context)
         },
-        onCancelPay = {onBackClick()},
+        onCancelPay = {
+            viewModel.resetValues()
+            onBackClick()
+                      },
         onCopyClick = {infoUser -> copyClientData(context, infoUser)},
         selectedOption = selectedOption?.label,
         onBankChange = viewModel::onBankChange,
         onSendPay = {viewModel.onSendPay(subjectPaid, contentPaid, onBackClick)},
-        resetValues = viewModel::resetValues
+        resetValues = viewModel::resetValues,
+        showTopBar = showTopBar
     )
 }
 
@@ -144,16 +151,21 @@ private fun NewMessageContent(
     onBankChange: (Int) -> Unit,
     onSendPay: () -> Unit,
     resetValues: () -> Unit,
+    showTopBar: Boolean
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
-            ToolBarWithIcon(
-                iconBack = R.drawable.arrow_back,
-                title = stringResource(R.string.referred, referral.name),
-                backClick = { onBackClick() }
-            )
+            if(showTopBar){
+                ToolBarWithIcon(
+                    iconBack = R.drawable.arrow_back,
+                    title = stringResource(R.string.referred, referral.name),
+                    backClick = { onBackClick() }
+                )
+            }else{
+                BasicToolbar(title = stringResource(R.string.referred, referral.name))
+            }
         },
         content = { paddingValues ->
             NewEmail(
@@ -393,7 +405,8 @@ fun NewMessagePreview(){
             selectedOption = null,
             onBankChange = {},
             onSendPay = {},
-            resetValues = {}
+            resetValues = {},
+            showTopBar = true
         )
     }
 }

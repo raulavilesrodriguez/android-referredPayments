@@ -186,6 +186,7 @@ class NewMessageViewModel @Inject constructor(
 
             saveMessage(message)
             _isLoading.value = false
+            resetValues()
             popUp()
         }
     }
@@ -259,6 +260,7 @@ class NewMessageViewModel @Inject constructor(
                 updateUserProviderMetrics(uid = referral.providerId, moneyPaid = amountPaid)
 
                 // Navigation
+                resetValues()
                 popUp()
             } catch (e:Exception){
                 _isLoading.value = false

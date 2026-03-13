@@ -7,31 +7,27 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.message.Message
@@ -39,7 +35,9 @@ import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.attachment.AttachmentDownload
+import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.ButtonWithIcon
+import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.time.formatTimeBasic
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -47,10 +45,12 @@ import com.avilesrodriguez.presentation.time.formatTimeBasic
 fun MessageScreen(
     messageId: String?,
     onBackClick: () -> Unit,
+    onReplyClick: () -> Unit,
     openScreen: (String) -> Unit,
+    showTopBar: Boolean = true,
     viewModel: MessageViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
+    LaunchedEffect(messageId) {
         viewModel.loadMessage(messageId.orEmpty())
     }
     val user by viewModel.userDataStore.collectAsState()
@@ -70,8 +70,9 @@ fun MessageScreen(
             referral = referralState,
             clientWhoReferred = clientWhoReferred,
             providerThatReceived = providerThatReceived,
-            onReplyClick = { viewModel.replyMessage(openScreen) },
-            downloadFile = {viewModel.downloadFile(it, labelOpen)}
+            onReplyClick = onReplyClick,
+            downloadFile = {viewModel.downloadFile(it, labelOpen)},
+            showTopBar = showTopBar
         )
     }else{
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -84,7 +85,6 @@ fun MessageScreen(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MessageScreenContent(
     onBackClick: () -> Unit,
@@ -95,30 +95,24 @@ private fun MessageScreenContent(
     providerThatReceived: UserData?,
     onReplyClick: () -> Unit,
     downloadFile: (String) -> Unit,
+    showTopBar: Boolean,
 ){
     Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = referral.name,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                        },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { onBackClick() }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.arrow_back),
-                            contentDescription = null
-                        )
-                    }
-                }
-            )
+            if(showTopBar){
+                ToolBarWithIcon(
+                    iconBack = R.drawable.arrow_back,
+                    title = referral.name,
+                    backClick = { onBackClick() }
+                )
+            }else{
+                BasicToolbar(title = referral.name)
+            }
         },
         bottomBar = {
+            if(showTopBar)
             ButtonWithIcon(
                 text = R.string.reply,
                 icon = R.drawable.reply,

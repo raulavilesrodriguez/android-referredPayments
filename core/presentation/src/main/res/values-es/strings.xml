@@ -160,6 +160,7 @@
     <string name="paid_referreds">Referidos Pagados</string>
     <string name="comment_save_name_referred">Por favor, revisa que este nombre sea el correcto</string>
     <string name="comment_save_phone_number_referred">Por favor verifica que este número de teléfono móvil sea correcto</string>
+    <string name="select_message">Seleccione mensaje</string>
     <string name="review_payment_process">Revisar Proceso de Pago</string>
     <string name="process_referral">Procesar Referido</string>
     <string name="search_in_mail">Buscar en mensajes</string>

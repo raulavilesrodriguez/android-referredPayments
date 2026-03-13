@@ -250,9 +250,13 @@ fun SettingsScreen(
                                 EditScreen(
                                     popUp = { coroutineScope.launch { navigator.navigateBack() } },
                                     cancel = {
-                                        detailContent = SettingsContent.EditSplash
-                                        coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
-                                             },
+                                        if(isShowingBothPanels){
+                                            detailContent = SettingsContent.EditSplash
+                                            coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
+                                        }else{
+                                            detailContent = null
+                                            coroutineScope.launch { navigator.navigateBack() }
+                                        }},
                                     showTopBar = !isShowingBothPanels
                                 )
                             }
