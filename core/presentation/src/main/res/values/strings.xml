@@ -275,4 +275,15 @@
         providing accurate and truthful information. Use of the application implies acceptance of these policies.
     </string>
 
+    <!-- Rejection Reasons -->
+    <string name="select_rejection_reason">Select reason for rejection</string>
+    <string name="rejection_wrong_number">Incorrect or non-existent phone number</string>
+    <string name="rejection_not_interested">Referred is not interested in the product/service</string>
+    <string name="rejection_unknown_referrer">Referred does not know the person who referred them</string>
+    <string name="rejection_already_client">Referred is already a customer of the company</string>
+    <string name="rejection_duplicated">Duplicate referral (already registered)</string>
+    <string name="rejection_out_of_area">Referred is located outside the service area</string>
+    <string name="rejection_unreachable">Unable to establish contact after several attempts</string>
+    <string name="rejection_not_qualified">Referred does not meet the minimum requirements</string>
+
 </resources>

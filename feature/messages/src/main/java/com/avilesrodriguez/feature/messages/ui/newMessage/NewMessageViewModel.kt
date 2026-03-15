@@ -273,6 +273,10 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
+    fun onReasonToReject(newReason: String){
+        _newMessageState.value = _newMessageState.value.copy(content = newReason)
+    }
+
     fun onRejectReferral(subjectReject:String, popUp: () -> Unit){
         launchCatching {
             try {

@@ -2,12 +2,14 @@ package com.avilesrodriguez.feature.messages.ui.newMessage
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,8 +26,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,7 +38,7 @@ import com.avilesrodriguez.domain.model.message.Message
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.attachment.AttachmentPreviews
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
+import com.avilesrodriguez.presentation.composables.MenuDropdownBoxStrings
 
 @Composable
 fun RejectReferral(
@@ -51,6 +51,7 @@ fun RejectReferral(
     onContentChange: (String) -> Unit,
     onAttachFiles: (List<String>) -> Unit,
     onRemoveFile: (String) -> Unit,
+    onReasonToReject: (String) -> Unit,
     onRejectMessage: () -> Unit
 ){
     val launcher = rememberLauncherForActivityResult(
@@ -58,6 +59,17 @@ fun RejectReferral(
     ) { uris ->
         onAttachFiles(uris.map { it.toString() })
     }
+
+    val rejectionOptions = listOf(
+        stringResource(R.string.rejection_wrong_number),
+        stringResource(R.string.rejection_not_interested),
+        stringResource(R.string.rejection_unknown_referrer),
+        stringResource(R.string.rejection_already_client),
+        stringResource(R.string.rejection_duplicated),
+        stringResource(R.string.rejection_out_of_area),
+        stringResource(R.string.rejection_unreachable),
+        stringResource(R.string.rejection_not_qualified)
+    )
 
     Column(
         modifier = Modifier
@@ -75,31 +87,28 @@ fun RejectReferral(
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
         // --- 3. CONTENIDO DEL MENSAJE ---
-        Column {
-            OutlinedTextField(
-                value = newMessageState.content,
-                onValueChange = onContentChange,
-                label = { Text(stringResource(R.string.message_body)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 160.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.primary,
-                    cursorColor = MaterialTheme.colorScheme.primary,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            MenuDropdownBoxStrings(
+                options = rejectionOptions,
+                selectedOption = newMessageState.content,
+                onClick = onReasonToReject,
+                title = stringResource(R.string.select_rejection_reason)
+            )
+            Spacer(Modifier.height(8.dp))
+            if(newMessageState.content.isNotBlank()){
+                Text(
+                    text = stringResource(R.string.message_body),
+                    color = MaterialTheme.colorScheme.primary
                 )
-            )
-            Text(
-                text = "${newMessageState.content.length}/$MAX_LENGTH_CONTENT",
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.End,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+                Text(
+                    text = newMessageState.content,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Justify
+                )
+            }
         }
 
         // --- 4. VISTA PREVIA DE ADJUNTOS ---

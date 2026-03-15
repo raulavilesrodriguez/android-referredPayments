@@ -122,7 +122,8 @@ fun NewMessage(
         onBankChange = viewModel::onBankChange,
         onSendPay = {viewModel.onSendPay(subjectPaid, contentPaid, onBackClick)},
         resetValues = viewModel::resetValues,
-        showTopBar = showTopBar
+        showTopBar = showTopBar,
+        onReasonToReject = viewModel::onReasonToReject
     )
 }
 
@@ -151,7 +152,8 @@ private fun NewMessageContent(
     onBankChange: (Int) -> Unit,
     onSendPay: () -> Unit,
     resetValues: () -> Unit,
-    showTopBar: Boolean
+    showTopBar: Boolean,
+    onReasonToReject: (String) -> Unit,
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -191,6 +193,7 @@ private fun NewMessageContent(
                 onBankChange = onBankChange,
                 onSendPay = onSendPay,
                 resetValues = resetValues,
+                onReasonToReject = onReasonToReject,
                 modifier = Modifier.padding(paddingValues),
             )
         }
@@ -222,6 +225,7 @@ private fun NewEmail(
     onBankChange: (Int) -> Unit,
     onSendPay: () -> Unit,
     resetValues: () -> Unit,
+    onReasonToReject: (String) -> Unit,
     modifier: Modifier = Modifier
 ){
     val from = when(user){
@@ -299,6 +303,7 @@ private fun NewEmail(
                 onContentChange = onContentChange,
                 onAttachFiles = onAttachFiles,
                 onRemoveFile = onRemoveFile,
+                onReasonToReject = onReasonToReject,
                 onRejectMessage = onRejectMessage
             )
         }
@@ -406,7 +411,8 @@ fun NewMessagePreview(){
             onBankChange = {},
             onSendPay = {},
             resetValues = {},
-            showTopBar = true
+            showTopBar = true,
+            onReasonToReject = {}
         )
     }
 }

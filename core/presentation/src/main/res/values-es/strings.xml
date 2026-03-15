@@ -218,4 +218,13 @@
     <string name="percentage_pending">Porcentaje Pendientes</string>
     <string name="percentage_processing">Porcentaje Procesados</string>
     <string name="percentage_rejected">Porcentaje rechazados</string>
+    <string name="select_rejection_reason">Seleccione el motivo de rechazo</string>
+    <string name="rejection_wrong_number">Número telefónico incorrecto o inexistente</string>
+    <string name="rejection_not_interested">El referido no está interesado en el producto/servicio</string>
+    <string name="rejection_unknown_referrer">El referido desconoce a la persona que lo refirió</string>
+    <string name="rejection_already_client">El referido ya es cliente de la empresa</string>
+    <string name="rejection_duplicated">Referido duplicado (ya se encuentra registrado)</string>
+    <string name="rejection_out_of_area">El referido se encuentra fuera de la zona de servicio</string>
+    <string name="rejection_unreachable">No se pudo establecer contacto tras varios intentos</string>
+    <string name="rejection_not_qualified">El referido no cumple con los requisitos mínimos</string>
 </resources>
