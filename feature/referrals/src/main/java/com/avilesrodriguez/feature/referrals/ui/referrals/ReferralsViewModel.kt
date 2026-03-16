@@ -3,6 +3,8 @@ package com.avilesrodriguez.feature.referrals.ui.referrals
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.referral.ReferralWithNames
 import com.avilesrodriguez.domain.model.user.UserData
+import com.avilesrodriguez.domain.usecases.ClearFCMToken
+import com.avilesrodriguez.domain.usecases.ClearLocalCache
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetReferralsByClient
 import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
@@ -35,7 +37,9 @@ class ReferralsViewModel @Inject constructor(
     private val getUser: GetUser,
     private val getReferralsByClient: GetReferralsByClient,
     private val getReferralsByProvider: GetReferralsByProvider,
-    private val signOut: SignOut
+    private val signOut: SignOut,
+    private val clearLocalCache: ClearLocalCache,
+    private val clearFCMToken: ClearFCMToken
 ) : BaseViewModel(){
     private val _allReferrals = MutableStateFlow<List<ReferralWithNames>>(emptyList())
     private val _uiState = MutableStateFlow<List<ReferralWithNames>>(emptyList())
@@ -132,6 +136,9 @@ class ReferralsViewModel @Inject constructor(
         when(ActionOptionsHome.getById(action)){
             ActionOptionsHome.POLICIES -> openScreen(NavRoutes.POLICIES)
             ActionOptionsHome.SIGN_OUT -> launchCatching {
+                val userId = currentUserId
+                clearFCMToken(userId)
+                clearLocalCache()
                 signOut()
                 restartApp(NavRoutes.SPLASH)
             }

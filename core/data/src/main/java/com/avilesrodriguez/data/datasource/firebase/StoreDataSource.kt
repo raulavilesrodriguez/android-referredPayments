@@ -285,6 +285,19 @@ class StoreDataSource @Inject constructor(
         awaitClose { listener.remove() }
     }
 
+    suspend fun storeFCMToken(uid: String, token: String){
+        firestore.collection(USERS_COLLECTION)
+            .document(uid)
+            .update(FCM_TOKEN_FIELD, token)
+            .await()
+    }
+
+    suspend fun clearFCMToken(uid: String){
+        if (uid.isEmpty()) return
+        val userRef = firestore.collection(USERS_COLLECTION).document(uid)
+        userRef.update(FCM_TOKEN_FIELD, null).await()
+    }
+
 
     companion object{
         private const val USERS_COLLECTION = "users"
@@ -296,5 +309,6 @@ class StoreDataSource @Inject constructor(
         private const val INDUSTRY_FIELD = "industry"
         private const val PROVIDER_ID_FIELD = "providerId"
         private const val REFERRALS_COLLECTION = "referrals"
+        private const val FCM_TOKEN_FIELD = "fcmToken"
     }
 }

@@ -5,6 +5,8 @@ import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
+import com.avilesrodriguez.domain.usecases.ClearFCMToken
+import com.avilesrodriguez.domain.usecases.ClearLocalCache
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.DownloadUrlPhoto
 import com.avilesrodriguez.domain.usecases.GetUser
@@ -44,7 +46,9 @@ class SettingsViewModel @Inject constructor(
     private val saveUser: SaveUser,
     private val secureDeleteAccount: SecureDeleteAccount,
     @param:ApplicationContext private val context: Context,
-    private val signOut: SignOut
+    private val signOut: SignOut,
+    private val clearLocalCache: ClearLocalCache,
+    private val clearFCMToken: ClearFCMToken
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow<UserData?>(null)
     val uiState: StateFlow<UserData?> = _uiState
@@ -92,8 +96,11 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun secureDeleteAccount(restartApp: (String) -> Unit){
+        val userId = currentUserId
         launchCatching {
-            secureDeleteAccount(currentUserId)
+            clearFCMToken(userId)
+            clearLocalCache()
+            secureDeleteAccount(userId)
             restartApp(NavRoutes.SPLASH)
         }
     }
@@ -242,6 +249,9 @@ class SettingsViewModel @Inject constructor(
         when(ActionOptionsHome.getById(action)){
             ActionOptionsHome.POLICIES -> openScreen(NavRoutes.POLICIES)
             ActionOptionsHome.SIGN_OUT -> launchCatching {
+                val userId = currentUserId
+                clearFCMToken(userId)
+                clearLocalCache()
                 signOut()
                 restartApp(NavRoutes.SPLASH)
             }

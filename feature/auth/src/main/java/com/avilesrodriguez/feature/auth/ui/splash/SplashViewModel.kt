@@ -1,7 +1,9 @@
 package com.avilesrodriguez.feature.auth.ui.splash
 
+import android.util.Log
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
+import com.avilesrodriguez.domain.usecases.GetAndStoreFCMToken
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.IsFirstTime
@@ -21,7 +23,8 @@ class SplashViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
     private val hasUser: HasUser,
     private val getUser: GetUser,
-    private val isFirstTime: IsFirstTime
+    private val isFirstTime: IsFirstTime,
+    private val getAndStoreFCMToken: GetAndStoreFCMToken
 ) : BaseViewModel() {
 
     private val _userDataStore = MutableStateFlow<UserData?>(null)
@@ -52,6 +55,16 @@ class SplashViewModel @Inject constructor(
             if (hasUser()) {
                 val userId = currentUserId
                 val user = if (userId.isNotEmpty()) getUser(userId) else null
+
+                // FCM: Intentamos sincronizar el token una vez.
+                launchCatching(snackbar = false) {
+                    val wasUpdated = getAndStoreFCMToken(userId)
+                    if (wasUpdated) {
+                        Log.d("FCM_TOKEN_UPDATE", "FCM Token sincronizado con éxito: $userId")
+                    } else {
+                        Log.d("FCM_TOKEN_UPDATE", "No fue necesario actualizar el token (ya estaba al día)")
+                    }
+                }
                 
                 if (user?.name != null) {
                     _userDataStore.value = user
