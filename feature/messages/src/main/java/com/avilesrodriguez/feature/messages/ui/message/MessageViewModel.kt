@@ -6,13 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.content.ContextCompat
 import com.avilesrodriguez.domain.model.message.Message
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.user.UserData
@@ -94,7 +93,6 @@ class MessageViewModel @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun downloadFile(uriString: String, labelOpen: String) {
         try {
             val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
@@ -136,8 +134,12 @@ class MessageViewModel @Inject constructor(
                 }
             }
 
-            context.registerReceiver(onComplete,
-                IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_EXPORTED)
+            ContextCompat.registerReceiver(
+                context,
+                onComplete,
+                IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
+                ContextCompat.RECEIVER_EXPORTED
+            )
 
         } catch (e: Exception) {
             Log.e("MessageViewModel", "Error al iniciar descarga", e)
@@ -150,7 +152,7 @@ class MessageViewModel @Inject constructor(
         val query = DownloadManager.Query().setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL)
         val cursor = downloadManager.query(query) ?: return -1L
 
-        try {
+        cursor.use { cursor ->
             val uriCol = cursor.getColumnIndex(DownloadManager.COLUMN_URI)
             val idCol = cursor.getColumnIndex(DownloadManager.COLUMN_ID)
 
@@ -161,8 +163,6 @@ class MessageViewModel @Inject constructor(
                     }
                 }
             }
-        } finally {
-            cursor.close()
         }
         return -1L
     }

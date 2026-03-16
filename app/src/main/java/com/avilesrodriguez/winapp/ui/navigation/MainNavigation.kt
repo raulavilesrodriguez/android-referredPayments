@@ -1,8 +1,6 @@
 package com.avilesrodriguez.winapp.ui.navigation
 
 import android.content.res.Resources
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -46,7 +44,6 @@ import com.example.feature.home.ui.PoliciesScreen
 import kotlinx.coroutines.CoroutineScope
 
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MainNavigation(){
     WinAppTheme {
@@ -236,7 +233,6 @@ private fun NavGraphBuilder.addNewReferral(appState: AppState){
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun NavGraphBuilder.addMessages(appState: AppState){
     composable(
         route = NavRoutes.MESSAGES_SCREEN,

@@ -50,19 +50,19 @@ class MessagingFCMService: FirebaseMessagingService() {
 
         if(remoteMessage.data.isNotEmpty()){
             val senderName = remoteMessage.data["senderName"]
-            val messageContent = remoteMessage.data["content"]
+            val messageSubject = remoteMessage.data["subject"]
             val referralId = remoteMessage.data["referralId"]
 
             val notificationId = referralId?.hashCode() ?: System.currentTimeMillis().toInt()
 
             if(referralId !=null){
-                showNotification(senderName, messageContent, referralId, notificationId)
+                showNotification(senderName, messageSubject, referralId, notificationId)
             }
 
         }
     }
 
-    private fun showNotification(senderName: String?, messageContent: String?, referralId:String, notificationId: Int){
+    private fun showNotification(senderName: String?, messageSubject: String?, referralId:String, notificationId: Int){
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
         val channel = NotificationChannel(
@@ -92,7 +92,7 @@ class MessagingFCMService: FirebaseMessagingService() {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(notificationIconResId)
             .setContentTitle(senderName ?: "Unknown Sender")
-            .setContentText(messageContent)
+            .setContentText(messageSubject)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)

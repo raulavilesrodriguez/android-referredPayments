@@ -1,7 +1,5 @@
 package com.avilesrodriguez.feature.messages.ui.message
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,7 +38,6 @@ import com.avilesrodriguez.presentation.composables.ButtonWithIcon
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.time.formatTimeBasic
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MessageScreen(
     messageId: String?,

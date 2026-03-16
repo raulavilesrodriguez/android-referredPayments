@@ -1,8 +1,6 @@
 package com.avilesrodriguez.feature.messages.ui.messages
 
-import android.os.Build
 import androidx.activity.compose.BackHandler
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -80,7 +78,6 @@ sealed class MessagesContent{
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun MessagesScreen(
