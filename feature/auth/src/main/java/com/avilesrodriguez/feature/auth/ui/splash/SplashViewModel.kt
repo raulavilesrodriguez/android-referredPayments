@@ -1,6 +1,5 @@
 package com.avilesrodriguez.feature.auth.ui.splash
 
-import android.util.Log
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetAndStoreFCMToken
@@ -37,11 +36,12 @@ class SplashViewModel @Inject constructor(
     private val _navigationEvent = Channel<Pair<String, String>>()
     val navigationEvent = _navigationEvent.receiveAsFlow()
 
-    private val splashDelay = 3000L
+    // Delays diferenciados para una mejor UX
+    private val quickSplashDelay = 10L  // Para re-inicios rápidos (permisos, rotación)
+    private val normalSplashDelay = 2500L // Para la primera carga de marca
     private var isCheckStarted = false
 
-    val currentUserId
-        get() = currentUserIdUseCase()
+    val currentUserId get() = currentUserIdUseCase()
 
     fun alreadyLoggedIn() {
         // Evita que se ejecute de nuevo al rotar
@@ -55,22 +55,17 @@ class SplashViewModel @Inject constructor(
             if (hasUser()) {
                 val userId = currentUserId
                 val user = if (userId.isNotEmpty()) getUser(userId) else null
-
-                // FCM: Intentamos sincronizar el token una vez.
+                // FCM
                 launchCatching(snackbar = false) {
-                    val wasUpdated = getAndStoreFCMToken(userId)
-                    if (wasUpdated) {
-                        Log.d("FCM_TOKEN_UPDATE", "FCM Token sincronizado con éxito: $userId")
-                    } else {
-                        Log.d("FCM_TOKEN_UPDATE", "No fue necesario actualizar el token (ya estaba al día)")
-                    }
+                    getAndStoreFCMToken(userId)
                 }
                 
                 if (user?.name != null) {
                     _userDataStore.value = user
                 }
                 
-                waitDelay(startTime)
+                // Si el usuario ya está autenticado, el splash debe ser muy rápido
+                waitDelay(startTime, quickSplashDelay)
                 
                 if (user?.name != null) {
                     _navigationEvent.send(NavRoutes.HOME to NavRoutes.SPLASH)
@@ -79,7 +74,9 @@ class SplashViewModel @Inject constructor(
                 }
             } else {
                 val firstTime = isFirstTime()
-                waitDelay(startTime)
+                // Solo si es la primera vez mostramos la marca por más tiempo
+                val delayToUse = if (firstTime) normalSplashDelay else quickSplashDelay
+                waitDelay(startTime, delayToUse)
                 
                 if (firstTime) {
                     _navigationEvent.send(NavRoutes.SIGN_UP to NavRoutes.SPLASH)
@@ -90,8 +87,8 @@ class SplashViewModel @Inject constructor(
         }
     }
 
-    private suspend fun waitDelay(startTime: Long) {
-        val remainingTime = splashDelay - (System.currentTimeMillis() - startTime)
+    private suspend fun waitDelay(startTime: Long, duration: Long) {
+        val remainingTime = duration - (System.currentTimeMillis() - startTime)
         if (remainingTime > 0) delay(remainingTime)
     }
 }

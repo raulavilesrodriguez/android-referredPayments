@@ -106,8 +106,7 @@ fun ReferralsScreen(
     var showNotificationPermission by remember { mutableStateOf(false) }
 
     if (showNotificationPermission) {
-        NotificationPermissionHandler()
-        showNotificationPermission = false
+        NotificationPermissionHandler(onDismiss = { showNotificationPermission = false })
     }
 
     // 1. FUENTE DE VERDAD: Estado de la pestaña actual

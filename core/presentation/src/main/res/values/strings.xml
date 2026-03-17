@@ -286,4 +286,13 @@
     <string name="rejection_unreachable">Unable to establish contact after several attempts</string>
     <string name="rejection_not_qualified">Referred does not meet the minimum requirements</string>
 
+    <!-- Notifications -->
+    <string name="notifications_enabled_title">Notifications Active</string>
+    <string name="notifications_enabled_desc">Notifications are correctly configured. Do you want to go to system settings to disable them? The app will restart to apply the changes.</string>
+    <string name="notifications_needed_title">Permission Needed</string>
+    <string name="notifications_needed_desc">Notification permission is required to alert you about new messages and payments.</string>
+    <string name="go_to_settings">Go to Settings</string>
+    <string name="notifications_blocked_title">Notifications Blocked</string>
+    <string name="notifications_blocked_desc">You have denied notification permissions. Please enable them in system settings to receive updates.</string>
+
 </resources>

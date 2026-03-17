@@ -110,8 +110,7 @@ fun SettingsScreen(
     }
 
     if (showNotificationPermission) {
-        NotificationPermissionHandler()
-        showNotificationPermission = false
+        NotificationPermissionHandler(onDismiss = { showNotificationPermission = false })
     }
 
     val options = ActionOptionsHome.getOptions()

@@ -227,4 +227,11 @@
     <string name="rejection_out_of_area">El referido se encuentra fuera de la zona de servicio</string>
     <string name="rejection_unreachable">No se pudo establecer contacto tras varios intentos</string>
     <string name="rejection_not_qualified">El referido no cumple con los requisitos mínimos</string>
+    <string name="notifications_enabled_title">Notificaciones Activas</string>
+    <string name="notifications_enabled_desc">Las notificaciones están configuradas correctamente. ¿Deseas ir a los ajustes del sistema para desactivarlas? La app se reiniciará para aplicar los cambios.</string>
+    <string name="notifications_needed_title">Permiso Necesario</string>
+    <string name="notifications_needed_desc">Necesitamos el permiso de notificaciones para avisarte sobre tus nuevos mensajes y pagos.</string>
+    <string name="go_to_settings">Ir a Ajustes</string>
+    <string name="notifications_blocked_title">Notificaciones Bloqueadas</string>
+    <string name="notifications_blocked_desc">Has denegado el permiso de notificaciones. Por favor, actívalo en los ajustes del sistema para recibir actualizaciones.</string>
 </resources>

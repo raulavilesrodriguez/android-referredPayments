@@ -114,8 +114,7 @@ fun HomeScreen(
     var showNotificationPermission by remember { mutableStateOf(false) }
 
     if (showNotificationPermission) {
-        NotificationPermissionHandler()
-        showNotificationPermission = false
+        NotificationPermissionHandler(onDismiss = { showNotificationPermission = false })
     }
 
     val adaptiveInfo = currentWindowAdaptiveInfo()
