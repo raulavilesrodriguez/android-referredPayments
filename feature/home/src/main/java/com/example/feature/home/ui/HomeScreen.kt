@@ -33,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -54,6 +55,7 @@ import com.avilesrodriguez.presentation.industries.label
 import com.avilesrodriguez.presentation.industries.options
 import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
 import com.avilesrodriguez.presentation.navigation.generateTabs
+import com.avilesrodriguez.presentation.permissions.NotificationPermissionHandler
 import com.example.feature.home.models.UserAndReferralMetrics
 import com.example.feature.home.ui.details.DetailScreenUser
 import com.example.feature.home.ui.graphicsMetrics.GraphMetrics
@@ -109,6 +111,12 @@ fun HomeScreen(
     val options = ActionOptionsHome.getOptions()
     val industryOptions = IndustriesType.options(true)
     val referralsConversion = String.format(Locale.US, "%.2f", referralsConversionViewModel)
+    var showNotificationPermission by remember { mutableStateOf(false) }
+
+    if (showNotificationPermission) {
+        NotificationPermissionHandler()
+        showNotificationPermission = false
+    }
 
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val coroutineScope = rememberCoroutineScope()
@@ -201,6 +209,8 @@ fun HomeScreen(
                             TopBarMain(
                                 title = stringResource(R.string.app_name_presentation),
                                 options=options,
+                                iconNotification = R.drawable.notifications_twotone,
+                                onNotificationClick = { showNotificationPermission = true },
                                 onActionClick = { action ->
                                 viewModel.onActionClick(openScreen, restartApp, action)
                                 }

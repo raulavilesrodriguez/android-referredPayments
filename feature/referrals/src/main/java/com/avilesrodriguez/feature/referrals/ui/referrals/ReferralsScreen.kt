@@ -36,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -58,6 +59,7 @@ import com.avilesrodriguez.presentation.composables.TopBarMain
 import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
 import com.avilesrodriguez.presentation.navigation.generateTabs
+import com.avilesrodriguez.presentation.permissions.NotificationPermissionHandler
 import kotlinx.coroutines.launch
 
 sealed class ReferralsDetailContent{
@@ -101,6 +103,12 @@ fun ReferralsScreen(
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val coroutineScope = rememberCoroutineScope()
     val tabs = generateTabs()
+    var showNotificationPermission by remember { mutableStateOf(false) }
+
+    if (showNotificationPermission) {
+        NotificationPermissionHandler()
+        showNotificationPermission = false
+    }
 
     // 1. FUENTE DE VERDAD: Estado de la pestaña actual
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -200,10 +208,13 @@ fun ReferralsScreen(
                         topBar = {
                             TopBarMain(
                                 title = stringResource(R.string.app_name_presentation),
-                                options = options
-                            ) { action ->
-                                viewModel.onActionClick(openScreen, restartApp, action)
-                            }
+                                options = options,
+                                iconNotification = R.drawable.notifications_twotone,
+                                onNotificationClick = { showNotificationPermission = true },
+                                onActionClick = { action ->
+                                    viewModel.onActionClick(openScreen, restartApp, action)
+                                }
+                            )
                         },
                         bottomBar = {
                             if(!isTabletLandscape){

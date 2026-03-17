@@ -10,6 +10,7 @@ import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.ClearFCMToken
 import com.avilesrodriguez.domain.usecases.ClearLocalCache
 import com.avilesrodriguez.domain.usecases.CurrentUserId
+import com.avilesrodriguez.domain.usecases.GetAndStoreFCMToken
 import com.avilesrodriguez.domain.usecases.GetReferralsByClient
 import com.avilesrodriguez.domain.usecases.GetReferralsByClientByProvider
 import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
@@ -56,7 +57,8 @@ class HomeViewModel @Inject constructor(
     private val getReferralsByClient: GetReferralsByClient,
     private val getUserFlow: GetUserFlow,
     private val clearLocalCache: ClearLocalCache,
-    private val clearFCMToken: ClearFCMToken
+    private val clearFCMToken: ClearFCMToken,
+    private val getAndStoreFCMToken: GetAndStoreFCMToken
 ) : BaseViewModel() {
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
@@ -106,6 +108,9 @@ class HomeViewModel @Inject constructor(
                     }
                 }
                 val user = _userDataStore.filterNotNull().first()
+                launchCatching(snackbar = false) {
+                    getAndStoreFCMToken(user.uid)
+                }
                 when(user){
                     is UserData.Provider ->{
                         loadReferralsByProvider()

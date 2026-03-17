@@ -20,6 +20,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -100,7 +104,13 @@ fun BasicToolbar(title: String, modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarMain(title: String, options: List<Int>, onActionClick: (Int) -> Unit) {
+fun TopBarMain(
+    title: String,
+    options: List<Int>,
+    onActionClick: (Int) -> Unit,
+    @DrawableRes iconNotification: Int,
+    onNotificationClick: () -> Unit,
+) {
     TopAppBar(
         modifier = Modifier.height(TOOLBAR_HEIGHT),
         title = {
@@ -114,6 +124,14 @@ fun TopBarMain(title: String, options: List<Int>, onActionClick: (Int) -> Unit) 
         },
         windowInsets = WindowInsets(0, 0, 0, 0),
         actions = {
+            IconButton(onClick = onNotificationClick) {
+                Icon(
+                    painter = painterResource(iconNotification),
+                    contentDescription = "Notifications",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
             DropdownContextMenu(options = options) { action -> onActionClick(action) }
         },
         colors = TopAppBarDefaults.topAppBarColors(
