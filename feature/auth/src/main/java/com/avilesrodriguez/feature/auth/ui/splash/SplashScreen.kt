@@ -13,10 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,9 +60,12 @@ fun SplashScreen(
     SplashScreenContent()
 
     if (isLoading) {
-        LoadBottomSheet(
-            userData = userData
-        )
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            LoadBottomPanel(userData = userData)
+        }
     }
 }
 
@@ -99,7 +103,7 @@ fun SplashScreenContent(){
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(100.dp)
-                    .background(Color(0xFF0C2B4E), shape=CircleShape)
+                    .background(Color(0xFF0C2B4E), shape = CircleShape)
                     .clip(CircleShape)
             )
         }
@@ -108,29 +112,29 @@ fun SplashScreenContent(){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoadBottomSheet(
+fun LoadBottomPanel(
     userData: UserData?
 ){
-    ModalBottomSheet(
-        onDismissRequest = { },
-        containerColor = MaterialTheme.colorScheme.surface,
-        scrimColor = Color.Transparent, // Evita que el fondo se ponga gris
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .widthIn(max = 640.dp)
+            .widthIn(max = 640.dp),
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 1.dp
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp)
-                .padding(bottom = 48.dp),
+                .padding(top = 32.dp, bottom = 48.dp), // Espaciado profesional
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val textToShow = userData?.name?.let {
                 stringResource(R.string.welcome_name, it)
             } ?: ""
-            
+
             if (textToShow.isNotEmpty()) {
                 Text(
                     text = textToShow,
@@ -141,14 +145,12 @@ fun LoadBottomSheet(
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
             }
-            
+
             CircularProgressIndicator(
                 color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 6.dp,
+                strokeWidth = 5.dp,
                 strokeCap = StrokeCap.Round,
-                modifier = Modifier
-                    .size(48.dp)
-                    .padding(4.dp)
+                modifier = Modifier.size(44.dp)
             )
         }
     }
