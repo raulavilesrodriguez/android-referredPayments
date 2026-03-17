@@ -27,6 +27,27 @@ import com.google.accompanist.permissions.shouldShowRationale
 fun NotificationPermissionHandler(onDismiss: () -> Unit) {
     val context = LocalContext.current
 
+    @Composable
+    fun EnabledToDisableNotificationsDialog(title:String, text:String){
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(title) },
+            text = { Text(text) },
+            confirmButton = {
+                TextButton(onClick = {
+                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    }
+                    context.startActivity(intent)
+                    onDismiss()
+                }) { Text(stringResource(R.string.go_to_settings)) }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         val permissionState = rememberPermissionState(
             permission = Manifest.permission.POST_NOTIFICATIONS
@@ -43,22 +64,9 @@ fun NotificationPermissionHandler(onDismiss: () -> Unit) {
                     LaunchedEffect(Unit) { onDismiss() }
                 } else {
                     // Si ya lo tenía de antes y pulsó la campana, le damos opción de ir a ajustes
-                    AlertDialog(
-                        onDismissRequest = onDismiss,
-                        title = { Text(stringResource(R.string.notifications_enabled_title)) },
-                        text = { Text(stringResource(R.string.notifications_enabled_desc)) },
-                        confirmButton = {
-                            TextButton(onClick = {
-                                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                                }
-                                context.startActivity(intent)
-                                onDismiss()
-                            }) { Text(stringResource(R.string.go_to_settings)) }
-                        },
-                        dismissButton = {
-                            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
-                        }
+                    EnabledToDisableNotificationsDialog(
+                        title=stringResource(R.string.notifications_enabled_title),
+                        text=stringResource(R.string.notifications_enabled_desc)
                     )
                 }
             }
@@ -112,6 +120,9 @@ fun NotificationPermissionHandler(onDismiss: () -> Unit) {
             }
         }
     } else {
-        LaunchedEffect(Unit) { onDismiss() }
+        EnabledToDisableNotificationsDialog(
+            title = stringResource(R.string.notifications),
+            text = stringResource(R.string.turn_on_or_turn_off)
+        )
     }
 }

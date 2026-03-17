@@ -294,5 +294,7 @@
     <string name="go_to_settings">Go to Settings</string>
     <string name="notifications_blocked_title">Notifications Blocked</string>
     <string name="notifications_blocked_desc">You have denied notification permissions. Please enable them in system settings to receive updates.</string>
+    <string name="notifications">Notifications</string>
+    <string name="turn_on_or_turn_off">Turn notifications on or off in this app. Notification permission is required to alert you about new messages and payments.</string>
 
 </resources>

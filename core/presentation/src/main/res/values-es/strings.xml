@@ -234,4 +234,6 @@
     <string name="go_to_settings">Ir a Ajustes</string>
     <string name="notifications_blocked_title">Notificaciones Bloqueadas</string>
     <string name="notifications_blocked_desc">Has denegado el permiso de notificaciones. Por favor, actívalo en los ajustes del sistema para recibir actualizaciones.</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="turn_on_or_turn_off">Activa o desactiva las notificaciones en esta app. Necesitamos el permiso de notificaciones para avisarte sobre tus nuevos mensajes y pagos.</string>
 </resources>
