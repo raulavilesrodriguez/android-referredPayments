@@ -29,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -240,9 +241,9 @@ private fun NewEmail(
         else -> {""}
     }
 
-    var showProcessReferral by remember { mutableStateOf(true) }
-    var showPayReferral by remember { mutableStateOf(false) }
-    var showRejectReferral by remember { mutableStateOf(false) }
+    var showProcessReferral by rememberSaveable { mutableStateOf(true) }
+    var showPayReferral by rememberSaveable { mutableStateOf(false) }
+    var showRejectReferral by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -340,7 +341,7 @@ fun StatusProcess(
         ReferralStatus.REJECTED,
         ReferralStatus.PAID
     )
-    var colorStatus by remember { mutableStateOf(ReferralStatus.PROCESSING) }
+    var colorStatus by rememberSaveable { mutableStateOf(ReferralStatus.PROCESSING) }
 
     ElevatedCard(
         modifier = Modifier
