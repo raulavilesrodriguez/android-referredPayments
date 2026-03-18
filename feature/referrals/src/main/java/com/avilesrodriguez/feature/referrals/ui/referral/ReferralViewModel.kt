@@ -16,6 +16,7 @@ import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SaveMessage
 import com.avilesrodriguez.domain.usecases.UpdateReferralFields
+import com.avilesrodriguez.domain.usecases.UpdateUser
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.MIN_PASS_LENGTH_PHONE_ECUADOR
@@ -47,10 +48,13 @@ class ReferralViewModel @Inject constructor(
     private val getReferralById: GetReferralById,
     private val updateReferralFields: UpdateReferralFields,
     private val saveMessage: SaveMessage,
-    private val getMessagesByReferral: GetMessagesByReferral
+    private val getMessagesByReferral: GetMessagesByReferral,
+    private val updateUser: UpdateUser
 ) : BaseViewModel() {
     private val _referralState = MutableStateFlow<Referral?>(null)
     val referralState: StateFlow<Referral?> = _referralState.asStateFlow()
+    private val _referralRating = MutableStateFlow(0.0)
+    val referralRating: StateFlow<Double> = _referralRating.asStateFlow()
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
 
@@ -102,6 +106,7 @@ class ReferralViewModel @Inject constructor(
         val referral = getReferralById(referralId)
         if (referral != null) {
             _referralState.value = referral
+            _referralRating.value = referral.rating
             coroutineScope {
                 val clientDef = async { getUser(referral.clientId) }
                 val providerDef = async { getUser(referral.providerId) }
@@ -224,6 +229,31 @@ class ReferralViewModel @Inject constructor(
             val referralId = _referralState.value?.id?:""
             updateReferralFields(referralId, updates)
             popUp()
+        }
+    }
+
+    fun onRatingChanged(rating: Double){
+        val referralRating = _referralRating.value
+        if(referralRating>0.0) return
+        _referralState.value = _referralState.value?.copy(rating = rating)
+    }
+
+    fun saveRatings(){
+        val referralRating = _referralRating.value
+        val currentReferral = _referralState.value?:return
+        val currentProvider = providerThatReceived as? UserData.Provider ?: return
+        if(referralRating>0.0) return
+        launchCatching {
+            updateReferralFields(currentReferral.id, mapOf("rating" to currentReferral.rating))
+            val oldCount = currentProvider.ratingCount
+            val oldRating = currentProvider.paymentRating
+            val newCount = oldCount + 1
+            val newAverage = ((oldRating * oldCount) + referralRating) / newCount
+            val providerUpdates = mapOf(
+                "paymentRating" to newAverage,
+                "ratingCount" to newCount
+            )
+            updateUser(currentProvider.uid, providerUpdates)
         }
     }
 }

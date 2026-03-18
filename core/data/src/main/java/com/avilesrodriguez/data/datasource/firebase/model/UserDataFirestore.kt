@@ -50,6 +50,7 @@ sealed class UserDataFirestore {
         val industry: String? = null,
         val companyDescription: String? = null,
         val paymentRating: Double = 0.0,
+        val ratingCount: Int = 0,
         val totalPayouts: Int = 0, //pagos
         val website: String? = null
     ) : UserDataFirestore()
@@ -87,6 +88,7 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
             industry = industry.name,
             companyDescription = companyDescription,
             paymentRating = paymentRating,
+            ratingCount = ratingCount,
             totalPayouts = totalPayouts,
             website = website
         )
@@ -139,6 +141,7 @@ fun UserDataFirestore.toUserDataDomain(): UserData? {
                 industry = domainIndustriesType,
                 companyDescription = companyDescription,
                 paymentRating = paymentRating,
+                ratingCount = ratingCount,
                 totalPayouts = totalPayouts,
                 website = website
             )}

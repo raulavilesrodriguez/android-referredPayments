@@ -167,6 +167,7 @@
     <string name="emails_referral">Emails: %s</string>
     <string name="no_have_emails">No tienes mensajes</string>
     <string name="accept_and_view_contact">Aceptar y Ver Contacto</string>
+    <string name="pending_acceptance_referred">Pendiente de la aceptación de tu referido por parte de la Compañía</string>
     <string name="content_referral_accepted">He aceptado tu referido. A partir de este momento iniciaré el proceso de contacto y venta. Te mantendré informado por este medio.</string>
     <string name="view_process_details">Ver Proceso de Seguimiento</string>
     <string name="new_email">Nuevo Email</string>
@@ -181,6 +182,8 @@
     <string name="open_with">Abrir con</string>
     <string name="pay">Pagar</string>
     <string name="reason">Motivo</string>
+    <string name="rate_experience">¿Cómo fue tu experiencia con este pago?</string>
+    <string name="rating_given">Ya has calificado este pago</string>
     <string name="statistics">Estadísticas</string>
     <string name="all_referrals">Todos los Referidos</string>
     <string name="pending">Pendiente</string>

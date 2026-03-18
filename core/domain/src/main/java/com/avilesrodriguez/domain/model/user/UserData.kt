@@ -45,6 +45,7 @@ sealed class UserData {
         val industry: IndustriesType = IndustriesType.OTHER,
         val companyDescription: String? = null,
         val paymentRating: Double = 0.0,
+        val ratingCount: Int = 0,
         val totalPayouts: Int = 0, // Cuantas veces ha pagado con exito
         val website:String? = null,
     ) : UserData()

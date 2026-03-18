@@ -143,6 +143,7 @@
     <string name="no_have_emails">You don\'t have emails"</string>
     <string name="accept_and_view_contact">Accept and View Contact</string>
     <string name="subject_referral_accepted">Referral Accepted: </string>
+    <string name="pending_acceptance_referred">Pending acceptance of your referred by the Company</string>
     <string name="content_referral_accepted">I have accepted your referral. From this moment on,
         I will begin the contact and sales process. I will keep you informed through this channel.</string>
     <string name="view_process_details">View Process Details</string>
@@ -165,6 +166,8 @@
     <string name="reject">Reject</string>
     <string name="pay">Pay</string>
     <string name="reason">Reason</string>
+    <string name="rate_experience">How was your experience with this payment?</string>
+    <string name="rating_given">You have already qualified for this payment</string>
 
     <!-- Referral Metrics -->
     <string name="statistics">Statistics</string>
