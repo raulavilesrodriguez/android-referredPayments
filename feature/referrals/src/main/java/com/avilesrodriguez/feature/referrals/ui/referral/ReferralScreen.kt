@@ -406,7 +406,7 @@ fun ProfileReferral(
                         .padding(vertical = 12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if(referralRating>0.0){
+                    if((referral?.rating ?: 0.0) > 0.0){
                         Text(
                             text = stringResource(R.string.rating_performed, clientWhoReferred?.name?:""),
                             style = MaterialTheme.typography.titleMedium,

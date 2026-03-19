@@ -35,6 +35,10 @@ class ReferralRepository @Inject constructor(
         return data.getReferralById(referralId)
     }
 
+    override suspend fun getReferralByIdFlow(id: String): Flow<Referral?> {
+        return data.getReferralByIdFlow(id)
+    }
+
     override suspend fun updateReferralStatus(
         referralId: String,
         status: String,

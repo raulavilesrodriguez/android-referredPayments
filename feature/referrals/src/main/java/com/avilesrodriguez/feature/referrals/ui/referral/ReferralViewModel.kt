@@ -1,5 +1,6 @@
 package com.avilesrodriguez.feature.referrals.ui.referral
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,7 +12,7 @@ import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetMessagesByReferral
-import com.avilesrodriguez.domain.usecases.GetReferralById
+import com.avilesrodriguez.domain.usecases.GetReferralByIdFlow
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SaveMessage
@@ -45,11 +46,11 @@ class ReferralViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
     private val hasUser: HasUser,
     private val getUser: GetUser,
-    private val getReferralById: GetReferralById,
     private val updateReferralFields: UpdateReferralFields,
     private val saveMessage: SaveMessage,
     private val getMessagesByReferral: GetMessagesByReferral,
-    private val saveRatingWithTransaction: SaveRatingWithTransaction
+    private val saveRatingWithTransaction: SaveRatingWithTransaction,
+    private val getReferralByIdFlow: GetReferralByIdFlow
 ) : BaseViewModel() {
     private val _referralState = MutableStateFlow<Referral?>(null)
     val referralState: StateFlow<Referral?> = _referralState.asStateFlow()
@@ -95,22 +96,29 @@ class ReferralViewModel @Inject constructor(
         loadJob?.cancel()
         _isLoading.value = true
         loadJob = launchCatching {
-            fetchData(referralId) //al ser suspend se obliga a loadJob a esperar que se ejecute esta func
-            _isLoading.value = false
+            try {
+                getReferralByIdFlow(referralId).collect { referral ->
+                    if (referral != null) {
+                        _referralState.value = referral
+                        _referralRating.value = referral.rating
+                        if(clientWhoReferred == null || providerThatReceived == null){
+                            updateRelatedUsers(referral)
+                        }
+                    }
+                    _isLoading.value = false
+                }
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 
-    private suspend fun fetchData(referralId: String) {
-        val referral = getReferralById(referralId)
-        if (referral != null) {
-            _referralState.value = referral
-            _referralRating.value = referral.rating
-            coroutineScope {
-                val clientDef = async { getUser(referral.clientId) }
-                val providerDef = async { getUser(referral.providerId) }
-                clientWhoReferred = clientDef.await()
-                providerThatReceived = providerDef.await()
-            }
+    private suspend fun updateRelatedUsers(referral: Referral) {
+        coroutineScope {
+            val clientDef = async { getUser(referral.clientId) }
+            val providerDef = async { getUser(referral.providerId) }
+            clientWhoReferred = clientDef.await()
+            providerThatReceived = providerDef.await()
         }
     }
 
@@ -152,7 +160,6 @@ class ReferralViewModel @Inject constructor(
                 createdAt = System.currentTimeMillis()
             )
             saveMessage(systemMessage)
-            fetchData(referralId)
             _isLoading.value = false
         }
     }
@@ -260,7 +267,6 @@ class ReferralViewModel @Inject constructor(
                     providerId = currentProvider.uid,
                     ratingReferral = currentReferral.rating
                 )
-                fetchData(currentReferral.id)
             } finally {
                 _isLoadingRating.value = false
             }
