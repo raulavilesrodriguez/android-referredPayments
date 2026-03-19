@@ -14,4 +14,5 @@ interface IReferralRepository {
     suspend fun searchReferralsByClient(namePrefix: String, currentUserId: String): Flow<List<Referral>>
     suspend fun searchReferralsByProvider(namePrefix: String, currentUserId: String): Flow<List<Referral>>
     suspend fun searchReferralsByClientAndProvider(namePrefix: String, clientId: String, providerId: String): Flow<List<Referral>>
+    suspend fun saveRatingWithTransaction(referralId: String, referralUpdates: Map<String, Any>, providerId: String, ratingReferral: Double)
 }

@@ -141,13 +141,43 @@ class ReferralDataSource @Inject constructor(
         awaitClose { listenerRegistration.remove() }
     }
 
+    suspend fun saveRatingWithTransaction(
+        referralId: String,
+        referralUpdates: Map<String, Any>,
+        providerId: String,
+        ratingReferral: Double
+    ) {
+        firestore.runTransaction { transaction ->
+            val referralRef = firestore.collection(REFERRALS_COLLECTION).document(referralId)
+            val providerRef = firestore.collection(USERS_COLLECTION).document(providerId)
+
+            val providerSnapshot = transaction.get(providerRef)
+            val oldCount = providerSnapshot.getLong(RATING_COUNT_FIELD_USER) ?: 0L
+            val oldRating = providerSnapshot.getDouble(PAYMENT_RATING_FIELD_USER) ?: 0.0
+
+            // persistencia atómica
+            val newCount = oldCount + 1
+            val newAverage = ((oldRating * oldCount) + ratingReferral) / newCount
+
+            // 3. ESCRITURA
+            transaction.update(referralRef, referralUpdates)
+            transaction.update(providerRef, mapOf(
+                PAYMENT_RATING_FIELD_USER to newAverage,
+                RATING_COUNT_FIELD_USER to newCount
+            ))
+        }.await()
+    }
+
     companion object {
         private const val REFERRALS_COLLECTION = "referrals"
+        private const val USERS_COLLECTION = "users"
         private const val CLIENT_ID_FIELD = "clientId"
         private const val PROVIDER_ID_FIELD = "providerId"
         private const val STATUS_FIELD = "status"
         private const val VOUCHER_URL_FIELD = "voucherUrl"
         private const val ORDER_BY_FIELD_LOWER = "nameLowercase"
         private const val CREATED_AT_FIELD = "createdAt"
+        private const val RATING_COUNT_FIELD_USER = "ratingCount"
+        private const val PAYMENT_RATING_FIELD_USER = "paymentRating"
     }
 }

@@ -184,6 +184,7 @@
     <string name="reason">Motivo</string>
     <string name="rate_experience">¿Cómo fue tu experiencia con este pago?</string>
     <string name="rating_given">Ya has calificado este pago</string>
+    <string name="reason_on_time">A tiempo</string>
     <string name="statistics">Estadísticas</string>
     <string name="all_referrals">Todos los Referidos</string>
     <string name="pending">Pendiente</string>
@@ -239,4 +240,16 @@
     <string name="notifications_blocked_desc">Has denegado el permiso de notificaciones. Por favor, actívalo en los ajustes del sistema para recibir actualizaciones.</string>
     <string name="notifications">Notificaciones</string>
     <string name="turn_on_or_turn_off">Activa o desactiva las notificaciones en esta app. Necesitamos el permiso de notificaciones para avisarte sobre tus nuevos mensajes y pagos.</string>
+    <string name="save_rating">Guardar calificación</string>
+    <string name="rating_performed">Calificación realizada por: %s</string>
+    <string name="reason_no_payment">Sin pago</string>
+    <string name="reason_late_payment">Pago tardío</string>
+    <string name="reason_bad_communication">Mala comunicación</string>
+    <string name="reason_wrong_amount">Monto incorrecto</string>
+    <string name="reason_met_expectations">Cumplió expectativas</string>
+    <string name="reason_average_service">Servicio promedio</string>
+    <string name="reason_minor_issues">Problemas menores</string>
+    <string name="reason_fast_payment">Pago rápido</string>
+    <string name="reason_great_communication">Excelente comunicación</string>
+    <string name="reason_professional">Profesional</string>
 </resources>

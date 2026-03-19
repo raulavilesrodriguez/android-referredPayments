@@ -15,8 +15,8 @@ import com.avilesrodriguez.domain.usecases.GetReferralById
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SaveMessage
+import com.avilesrodriguez.domain.usecases.SaveRatingWithTransaction
 import com.avilesrodriguez.domain.usecases.UpdateReferralFields
-import com.avilesrodriguez.domain.usecases.UpdateUser
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.MIN_PASS_LENGTH_PHONE_ECUADOR
@@ -49,7 +49,7 @@ class ReferralViewModel @Inject constructor(
     private val updateReferralFields: UpdateReferralFields,
     private val saveMessage: SaveMessage,
     private val getMessagesByReferral: GetMessagesByReferral,
-    private val updateUser: UpdateUser
+    private val saveRatingWithTransaction: SaveRatingWithTransaction
 ) : BaseViewModel() {
     private val _referralState = MutableStateFlow<Referral?>(null)
     val referralState: StateFlow<Referral?> = _referralState.asStateFlow()
@@ -62,6 +62,8 @@ class ReferralViewModel @Inject constructor(
     var providerThatReceived by mutableStateOf<UserData?>(null)
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    private val _isLoadingRating = MutableStateFlow(false)
+    val isLoadingRating: StateFlow<Boolean> = _isLoadingRating.asStateFlow()
     private var loadJob: Job? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -79,10 +81,6 @@ class ReferralViewModel @Inject constructor(
 
     private val nameReferral
         get() = _referralState.value?.name?:""
-    private val emailReferral
-        get() = _referralState.value?.email?:""
-    private val numberPhoneReferral
-        get() = _referralState.value?.numberPhone?:""
 
     init {
         launchCatching {
@@ -238,22 +236,34 @@ class ReferralViewModel @Inject constructor(
         _referralState.value = _referralState.value?.copy(rating = rating)
     }
 
+    fun onFeedbackReasonChanged(reason:String){
+        _referralState.value = _referralState.value?.copy(feedbackReason = reason)
+    }
+
     fun saveRatings(){
-        val referralRating = _referralRating.value
+        if (_isLoadingRating.value) return
+        val currentRatingInDb = _referralRating.value
         val currentReferral = _referralState.value?:return
         val currentProvider = providerThatReceived as? UserData.Provider ?: return
-        if(referralRating>0.0) return
+        if(currentRatingInDb>0.0) return
         launchCatching {
-            updateReferralFields(currentReferral.id, mapOf("rating" to currentReferral.rating))
-            val oldCount = currentProvider.ratingCount
-            val oldRating = currentProvider.paymentRating
-            val newCount = oldCount + 1
-            val newAverage = ((oldRating * oldCount) + referralRating) / newCount
-            val providerUpdates = mapOf(
-                "paymentRating" to newAverage,
-                "ratingCount" to newCount
-            )
-            updateUser(currentProvider.uid, providerUpdates)
+            try {
+                _isLoadingRating.value = true
+                val referralUpdates = mapOf(
+                    "rating" to currentReferral.rating,
+                    "feedbackReason" to (currentReferral.feedbackReason ?: "")
+                )
+
+                saveRatingWithTransaction(
+                    referralId = currentReferral.id,
+                    referralUpdates = referralUpdates,
+                    providerId = currentProvider.uid,
+                    ratingReferral = currentReferral.rating
+                )
+                fetchData(currentReferral.id)
+            } finally {
+                _isLoadingRating.value = false
+            }
         }
     }
 }

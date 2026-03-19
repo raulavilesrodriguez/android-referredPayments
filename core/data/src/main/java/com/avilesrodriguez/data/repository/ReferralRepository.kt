@@ -64,4 +64,13 @@ class ReferralRepository @Inject constructor(
     ): Flow<List<Referral>> {
         return data.searchReferralsByClientAndProvider(namePrefix, clientId, providerId)
     }
+
+    override suspend fun saveRatingWithTransaction(
+        referralId: String,
+        referralUpdates: Map<String, Any>,
+        providerId: String,
+        ratingReferral: Double
+    ) {
+        data.saveRatingWithTransaction(referralId, referralUpdates, providerId, ratingReferral)
+    }
 }

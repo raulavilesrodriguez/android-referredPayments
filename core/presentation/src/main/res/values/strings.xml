@@ -168,6 +168,23 @@
     <string name="reason">Reason</string>
     <string name="rate_experience">How was your experience with this payment?</string>
     <string name="rating_given">You have already qualified for this payment</string>
+    <string name="save_rating">Save Rating</string>
+    <string name="rating_performed">Rating performed by: %s</string>
+
+    <string name="reason_no_payment">No payment</string>
+    <string name="reason_late_payment">Late payment</string>
+    <string name="reason_bad_communication">Poor communication</string>
+    <string name="reason_wrong_amount">Incorrect amount</string>
+
+    <string name="reason_met_expectations">Met expectations</string>
+    <string name="reason_average_service">Average service</string>
+    <string name="reason_minor_issues">Minor issues</string>
+
+    <string name="reason_fast_payment">Fast payment</string>
+    <string name="reason_great_communication">Great communication</string>
+    <string name="reason_professional">Professional</string>
+    <string name="reason_on_time">On time</string>
+
 
     <!-- Referral Metrics -->
     <string name="statistics">Statistics</string>

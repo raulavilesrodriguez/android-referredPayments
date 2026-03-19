@@ -1,10 +1,12 @@
 package com.avilesrodriguez.feature.referrals.ui.referral
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -20,13 +22,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Diamond
+import androidx.compose.material.icons.filled.SaveAlt
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,6 +72,8 @@ import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.fakeData.userProvider
 import com.avilesrodriguez.presentation.profile.ItemEditProfile
 import com.avilesrodriguez.presentation.profile.ItemProfile
+import com.avilesrodriguez.presentation.rating.RatingReason
+import com.avilesrodriguez.presentation.rating.getReasonsByRating
 import java.util.Locale
 
 @Composable
@@ -82,6 +91,7 @@ fun ReferralScreen(
     val referralRating by viewModel.referralRating.collectAsState()
     val user by viewModel.userDataStore.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val isLoadingRating by viewModel.isLoadingRating.collectAsState()
     val clientWhoReferred = viewModel.clientWhoReferred
     val providerThatReceived = viewModel.providerThatReceived
     val unReadMessages by viewModel.unReadMessages.collectAsState()
@@ -106,7 +116,9 @@ fun ReferralScreen(
         showTopBar = showTopBar,
         onRatingChanged = {viewModel.onRatingChanged(it)},
         referralRating = referralRating,
-        saveRatings = {viewModel.saveRatings()}
+        onFeedbackReasonChanged = {viewModel.onFeedbackReasonChanged(it)},
+        saveRatings = {viewModel.saveRatings()},
+        isLoadingRating = isLoadingRating
     )
 }
 
@@ -127,7 +139,9 @@ fun ReferralScreenContent(
     showTopBar: Boolean = true,
     onRatingChanged: (Double) -> Unit,
     referralRating: Double,
-    saveRatings: () -> Unit
+    onFeedbackReasonChanged: (String) -> Unit,
+    saveRatings: () -> Unit,
+    isLoadingRating: Boolean,
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -158,7 +172,9 @@ fun ReferralScreenContent(
                     unReadMessages = unReadMessages,
                     onRatingChanged = onRatingChanged,
                     referralRating = referralRating,
+                    onFeedbackReasonChanged = onFeedbackReasonChanged,
                     saveRatings = saveRatings,
+                    isLoadingRating = isLoadingRating,
                     modifier = Modifier.padding(paddingValues)
                 )
             } else{
@@ -186,7 +202,9 @@ fun ProfileReferral(
     unReadMessages: String,
     onRatingChanged: (Double) -> Unit,
     referralRating: Double,
+    onFeedbackReasonChanged: (String) -> Unit,
     saveRatings: () -> Unit,
+    isLoadingRating: Boolean,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -237,8 +255,8 @@ fun ProfileReferral(
                 val nameProvider = providerThatReceived?.name?.truncate(30)?:""
                 ItemProfile(R.drawable.step, title = R.string.referring, data = nameProvider)
                 if(referral?.status == ReferralStatus.PAID || referral?.status == ReferralStatus.REJECTED){
-                    val provider = providerThatReceived as UserData.Provider
                     var showFeedbackOptions by rememberSaveable { mutableStateOf(false) }
+                    var selectedReason by rememberSaveable { mutableStateOf<RatingReason?>(null) }
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -254,18 +272,69 @@ fun ProfileReferral(
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 RatingBar(
-                                    rating = provider.paymentRating,
+                                    rating = referral.rating,
                                     starSize = 32.dp,
                                     onRatingChanged = {
                                         onRatingChanged(it)
                                         showFeedbackOptions = true
+                                        selectedReason = null
                                     }
                                 )
                                 Spacer(Modifier.width(4.dp))
                                 Text(
-                                    text = String.format(Locale.US, "%.1f", provider.paymentRating),
+                                    text = String.format(Locale.US, "%.1f", referral.rating),
                                     style = MaterialTheme.typography.labelSmall
                                 )
+                            }
+                            AnimatedVisibility(visible = showFeedbackOptions) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally){
+                                    FlowRow(
+                                        modifier = Modifier.fillMaxWidth().padding(8.dp),
+                                        horizontalArrangement = Arrangement.Center,
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        val reasons = getReasonsByRating(referral.rating.toInt())
+                                        reasons.forEach { reason ->
+                                            val isSelectedReason = selectedReason == reason
+                                            val newSelection = if (isSelectedReason) null else reason
+                                            val reasonText = stringResource(reason.resId)
+                                            SuggestionChip(
+                                                onClick = {
+                                                    selectedReason = newSelection
+                                                    onFeedbackReasonChanged(if(newSelection != null) reasonText else "")
+                                                          },
+                                                label = { Text(text = stringResource(reason.resId)) },
+                                                colors = SuggestionChipDefaults.suggestionChipColors(
+                                                    containerColor = if (isSelectedReason) MaterialTheme.colorScheme.primaryContainer
+                                                    else MaterialTheme.colorScheme.surfaceVariant,
+                                                    labelColor = if (isSelectedReason) MaterialTheme.colorScheme.onPrimaryContainer
+                                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                                                ),
+                                                shape = RoundedCornerShape(16.dp),
+                                                border = null
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            Button(
+                                onClick = { saveRatings() },
+                                modifier = Modifier.padding(8.dp),
+                                enabled = referral.rating != 0.0 && !referral.feedbackReason.isNullOrBlank()
+                            ) {
+                                if(isLoadingRating){
+                                    CircularProgressIndicator(
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier.size(22.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Text(text = stringResource(R.string.save_rating))
+                                    Icon(
+                                        imageVector = Icons.Default.AutoAwesome,
+                                        contentDescription = null,
+                                    )
+                                }
                             }
                         }else{
                             Text(
@@ -276,13 +345,13 @@ fun ProfileReferral(
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 RatingBar(
-                                    rating = provider.paymentRating,
+                                    rating = referral.rating,
                                     starSize = 32.dp,
                                     onRatingChanged = { }
                                 )
                                 Spacer(Modifier.width(4.dp))
                                 Text(
-                                    text = String.format(Locale.US, "%.1f", provider.paymentRating),
+                                    text = String.format(Locale.US, "%.1f", referral.rating),
                                     style = MaterialTheme.typography.labelSmall
                                 )
                             }
@@ -330,6 +399,31 @@ fun ProfileReferral(
                 )
                 val nameClient = clientWhoReferred?.name?.truncate(30)?:""
                 ItemProfile(R.drawable.step, title = R.string.referral, data = nameClient)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.rating_performed, clientWhoReferred?.name?:""),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RatingBar(
+                            rating = referral?.rating?:0.0,
+                            starSize = 32.dp,
+                            onRatingChanged = { }
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            text = String.format(Locale.US, "%.1f", referral?.rating?:0.0),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
             }
             else -> {}
         }
@@ -427,7 +521,9 @@ fun ProfileReferralPreview(){
             showTopBar = true,
             onRatingChanged = {},
             referralRating = 0.0,
-            saveRatings = {}
+            onFeedbackReasonChanged = {},
+            saveRatings = {},
+            isLoadingRating = false
         )
     }
 }
