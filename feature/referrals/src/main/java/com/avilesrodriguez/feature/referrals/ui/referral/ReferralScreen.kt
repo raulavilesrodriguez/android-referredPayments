@@ -278,6 +278,7 @@ fun ProfileReferral(
                                         onRatingChanged(it)
                                         showFeedbackOptions = true
                                         selectedReason = null
+                                        onFeedbackReasonChanged("")
                                     }
                                 )
                                 Spacer(Modifier.width(4.dp))
@@ -405,23 +406,25 @@ fun ProfileReferral(
                         .padding(vertical = 12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = stringResource(R.string.rating_performed, clientWhoReferred?.name?:""),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RatingBar(
-                            rating = referral?.rating?:0.0,
-                            starSize = 32.dp,
-                            onRatingChanged = { }
-                        )
-                        Spacer(Modifier.width(4.dp))
+                    if(referralRating>0.0){
                         Text(
-                            text = String.format(Locale.US, "%.1f", referral?.rating?:0.0),
-                            style = MaterialTheme.typography.labelSmall
+                            text = stringResource(R.string.rating_performed, clientWhoReferred?.name?:""),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RatingBar(
+                                rating = referral?.rating?:0.0,
+                                starSize = 32.dp,
+                                onRatingChanged = { }
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = String.format(Locale.US, "%.1f", referral?.rating?:0.0),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
                     }
                 }
             }
