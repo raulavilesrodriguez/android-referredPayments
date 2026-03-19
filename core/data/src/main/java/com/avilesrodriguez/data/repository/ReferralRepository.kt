@@ -10,7 +10,7 @@ class ReferralRepository @Inject constructor(
     private val data: ReferralDataSource
 ): IReferralRepository {
 
-    override suspend fun saveReferral(referral: Referral)= data.saveReferral(referral)
+    override suspend fun saveReferral(referral: Referral): Boolean = data.saveReferral(referral)
 
     override suspend fun updateReferralFields(referralId: String, updates: Map<String, Any>) {
         data.updateReferralFields(referralId, updates)

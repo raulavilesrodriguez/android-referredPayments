@@ -1,5 +1,6 @@
 package com.avilesrodriguez.data.datasource.firebase
 
+import android.util.Log
 import com.avilesrodriguez.data.datasource.firebase.model.ReferralFirestore
 import com.avilesrodriguez.data.datasource.firebase.model.toReferralDomain
 import com.avilesrodriguez.data.datasource.firebase.model.toReferralFirestore
@@ -8,7 +9,6 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -19,15 +19,25 @@ import javax.inject.Inject
 class ReferralDataSource @Inject constructor(
     private val firestore: FirebaseFirestore,
 ) {
-    suspend fun saveReferral(referral: Referral) {
+    suspend fun saveReferral(referral: Referral): Boolean {
         val referralFirestore = referral.toReferralFirestore()
-        val docRef = if (referral.id.isEmpty()) {
-            firestore.collection(REFERRALS_COLLECTION).document()
-        } else {
-            firestore.collection(REFERRALS_COLLECTION).document(referral.id)
+        val docRef = firestore.collection(REFERRALS_COLLECTION)
+            .document(referral.numberPhone)
+        return try {
+            val transactionResult = firestore.runTransaction { transaction ->
+                val snapshot = transaction.get(docRef)
+                if (snapshot.exists()) {
+                    false
+                } else {
+                    transaction.set(docRef, referralFirestore.copy(id = docRef.id))
+                    true
+                }
+            }.await()
+            transactionResult == true
+        } catch (e: Exception){
+            Log.e("ReferralDataSource", "Error saving referral", e)
+            throw e
         }
-
-        docRef.set(referralFirestore.copy(id = docRef.id), SetOptions.merge()).await()
     }
 
     suspend fun updateReferralFields(referralId: String, updates: Map<String, Any>) {

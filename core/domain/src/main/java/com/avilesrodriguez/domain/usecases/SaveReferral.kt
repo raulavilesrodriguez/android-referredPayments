@@ -7,7 +7,7 @@ import javax.inject.Inject
 class SaveReferral @Inject constructor(
     private val repository: IReferralRepository
 ) {
-    suspend operator fun invoke(referral: Referral) {
-        repository.saveReferral(referral)
+    suspend operator fun invoke(referral: Referral) : Boolean {
+        return repository.saveReferral(referral)
     }
 }

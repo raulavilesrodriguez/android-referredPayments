@@ -90,6 +90,7 @@
     <string name="money_to_pay">Dinero Por pagar</string>
     <string name="total_payout">Pagos Totales</string>
     <string name="add_new_referral">Agregar nuevo Referido</string>
+    <string name="error_referral_exists">El referido ya existe. Por favor, introduzca un número de teléfono diferente.</string>
     <string name="information_referral">Información de Referido</string>
     <string name="invalid_phone_number">Inválido número telefónico</string>
     <string name="invalid_name">Inválido nombre</string>

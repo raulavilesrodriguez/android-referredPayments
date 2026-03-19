@@ -1,5 +1,6 @@
 package com.avilesrodriguez.feature.referrals.ui.addReferral
 
+import android.util.Log
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.SaveReferral
 import com.avilesrodriguez.feature.referrals.ui.model.AddReferralUiState
@@ -87,10 +88,17 @@ class AddReferralViewModel @Inject constructor(
                 providerId = providerId,
                 createdAt = System.currentTimeMillis()
             )
-            saveReferral(referral)
-
-            // navigate to home screen
-            openAndPopUp(NavRoutes.HOME, NavRoutes.NEW_REFERRAL)
+            try {
+                val isSuccess = saveReferral(referral)
+                if(isSuccess){
+                    openAndPopUp(NavRoutes.REFERRALS, NavRoutes.NEW_REFERRAL)
+                }else{
+                    SnackbarManager.showMessage(R.string.error_referral_exists)
+                }
+            } catch (e: Exception){
+                Log.e("AddReferralViewModel", "Error saving referral", e)
+                SnackbarManager.showMessage(R.string.generic_error)
+            }
         }.invokeOnCompletion { _addReferralState.value = _addReferralState.value.copy(isSaving = false) }
     }
 }
