@@ -57,6 +57,7 @@ fun DetailScreenProvider(
     provider: UserData.Provider,
     onBackClick: () -> Unit,
     onAddReferClick: (String) -> Unit,
+    isSaturated: Boolean,
     showTopBar: Boolean = true
 ){
     Scaffold(
@@ -72,7 +73,7 @@ fun DetailScreenProvider(
                 )
             }
         },
-        bottomBar = {ButtonToRefer(onReferClick = onAddReferClick, provider = provider)},
+        bottomBar = {ButtonToRefer(onReferClick = onAddReferClick, provider = provider, isSaturated = isSaturated)},
         content = { innerPadding ->
             ProfileProvider(
                 provider = provider,
@@ -86,6 +87,7 @@ fun DetailScreenProvider(
 fun ButtonToRefer(
     onReferClick: (String) -> Unit,
     provider: UserData.Provider,
+    isSaturated: Boolean
 ){
     Surface(
         color = MaterialTheme.colorScheme.surface,
@@ -95,6 +97,7 @@ fun ButtonToRefer(
     ) {
         Button(
             onClick = { onReferClick(provider.uid) },
+            enabled = !isSaturated,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 16.dp)
@@ -104,7 +107,7 @@ fun ButtonToRefer(
             Icon(Icons.Default.PersonAdd, contentDescription = null)
             Spacer(Modifier.width(8.dp))
             Text(
-                text = stringResource(R.string.refer_now),
+                text = if(isSaturated) stringResource(R.string.provider_saturated) else stringResource(R.string.refer_now),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -275,7 +278,8 @@ fun DetailScreenProviderPreview(){
         DetailScreenProvider(
             provider = userProvider,
             onBackClick = {},
-            onAddReferClick = {}
+            onAddReferClick = {},
+            isSaturated = false
         )
     }
 }

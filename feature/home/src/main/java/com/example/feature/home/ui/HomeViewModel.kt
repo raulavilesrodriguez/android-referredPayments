@@ -65,7 +65,6 @@ class HomeViewModel @Inject constructor(
 
     private val _users = MutableStateFlow<List<UserData>>(emptyList())
     val users: StateFlow<List<UserData>> = _users.asStateFlow()
-
     private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText.asStateFlow()
 
@@ -79,6 +78,11 @@ class HomeViewModel @Inject constructor(
     private val _usersAndMetrics = MutableStateFlow<List<UserAndReferralMetrics>>(emptyList())
     val usersAndMetrics: StateFlow<List<UserAndReferralMetrics>> = _usersAndMetrics.asStateFlow()
     private val _referralsProvider = MutableStateFlow<List<Referral>>(emptyList())
+    val processingCountReferralsProvider: StateFlow<Int> = _referralsProvider.map {referrals ->
+        val activeStatuses = listOf(ReferralStatus.PROCESSING, ReferralStatus.PENDING)
+        referrals.count { it.status in activeStatuses }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
     val referralsConversion: StateFlow<Double> = combine(
         _userDataStore,
         _referralsProvider

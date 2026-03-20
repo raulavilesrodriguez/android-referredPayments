@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.avilesrodriguez.domain.model.businessRules.BusinessRules
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
@@ -107,6 +108,8 @@ fun HomeScreen(
     val referralsMetrics by viewModel.uiStateReferralsMetrics.collectAsState()
     val usersAndMetrics by viewModel.usersAndMetrics.collectAsState()
     val referralsConversionViewModel by viewModel.referralsConversion.collectAsState()
+    val processingInfo by viewModel.processingCountReferralsProvider.collectAsState()
+    val isSaturated = (processingInfo) >= BusinessRules.MAX_PROCESSING_REFERRALS
 
     val options = ActionOptionsHome.getOptions()
     val industryOptions = IndustriesType.options(true)
@@ -250,7 +253,8 @@ fun HomeScreen(
                                     onGraphMetricsView = {
                                         detailContent = HomeDetailContent.GraphMetrics
                                         coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
-                                    }
+                                    },
+                                    isSaturated = isSaturated
                                 )
                                 else -> {
                                     Box(Modifier.fillMaxSize())
@@ -308,7 +312,8 @@ fun HomeMainContent(
     usersAndMetrics: List<UserAndReferralMetrics>,
     referralsConversion: String,
     onPaymentView: () -> Unit,
-    onGraphMetricsView: () -> Unit
+    onGraphMetricsView: () -> Unit,
+    isSaturated: Boolean
 ) {
     if (user != null) {
         when (user.type) {
@@ -336,7 +341,8 @@ fun HomeMainContent(
                 usersAndMetrics = usersAndMetrics,
                 referralsConversion = referralsConversion,
                 onPaymentView = onPaymentView,
-                onGraphMetricsView = onGraphMetricsView
+                onGraphMetricsView = onGraphMetricsView,
+                isSaturated = isSaturated
             )
         }
     } else {

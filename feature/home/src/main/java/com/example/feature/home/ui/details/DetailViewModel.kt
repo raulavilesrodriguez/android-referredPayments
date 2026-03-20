@@ -7,10 +7,12 @@ import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetReferralsByClientByProvider
+import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.presentation.ext.getById
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
+import com.example.feature.home.models.UserAndProcessingReferrals
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,10 +24,13 @@ import javax.inject.Inject
 class DetailViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
     private val getUser: GetUser,
-    private val getReferralsByClientByProvider: GetReferralsByClientByProvider
+    private val getReferralsByClientByProvider: GetReferralsByClientByProvider,
+    private val getReferralsByProvider: GetReferralsByProvider
 ) : BaseViewModel() {
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
+    private val _userProcessingReferrals = MutableStateFlow<UserAndProcessingReferrals?>(null)
+    val userProcessingReferrals: StateFlow<UserAndProcessingReferrals?> = _userProcessingReferrals.asStateFlow()
     private val _uiStateReferrals = MutableStateFlow<List<Referral>>(emptyList())
     val uiStateReferrals: StateFlow<List<Referral>> = _uiStateReferrals.asStateFlow()
     private val _allReferrals = MutableStateFlow<List<Referral>>(emptyList())
@@ -35,6 +40,8 @@ class DetailViewModel @Inject constructor(
     val selectedStatus: StateFlow<ReferralStatus?> = _selectedStatus
 
     private var referralsJob: Job? = null
+    private var countReferralsProcessingJob: Job? = null
+
 
     val currentUserId
         get() = currentUserIdUseCase()
@@ -46,6 +53,7 @@ class DetailViewModel @Inject constructor(
                 val user = getUser(uid)
                 _userDataStore.value = user
                 if(user is UserData.Client) loadReferralsByClientByProvider(user.uid)
+                if(user is UserData.Provider) countProcessingReferrals(user.uid)
             }
         } catch (ie: Throwable){
             Log.e("DetailViewModel", "Error loading user information", ie)
@@ -77,6 +85,23 @@ class DetailViewModel @Inject constructor(
                         rejectedReferrals = referrals.count { it.status == ReferralStatus.REJECTED },
                         paidReferrals = referrals.count { it.status == ReferralStatus.PAID }
                     )
+                }
+        }
+    }
+
+    private fun countProcessingReferrals(uidProvider: String){
+        countReferralsProcessingJob?.cancel()
+        countReferralsProcessingJob = launchCatching {
+            getReferralsByProvider(uidProvider)
+                .collect { referrals ->
+                    val userProvider = _userDataStore.value as? UserData.Provider
+                    if(userProvider != null) {
+                        val activeStatuses = listOf(ReferralStatus.PROCESSING, ReferralStatus.PENDING)
+                        _userProcessingReferrals.value = UserAndProcessingReferrals(
+                            user = userProvider,
+                            processingReferrals = referrals.count { it.status in activeStatuses }
+                        )
+                    }
                 }
         }
     }

@@ -37,7 +37,7 @@ fun StatItem(modifier: Modifier, title: String, value: String, icon: ImageVector
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(text = value, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
-                Text(text = title, fontSize = 12.sp, maxLines = 1)
+                Text(text = title, fontSize = 12.sp)
             }
         }
     }

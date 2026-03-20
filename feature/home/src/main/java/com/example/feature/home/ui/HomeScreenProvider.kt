@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Diamond
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material.icons.outlined.Payment
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -79,7 +80,8 @@ fun HomeScreenProvider(
     usersAndMetrics: List<UserAndReferralMetrics>,
     referralsConversion: String,
     onPaymentView: () -> Unit,
-    onGraphMetricsView: () -> Unit
+    onGraphMetricsView: () -> Unit,
+    isSaturated: Boolean
 ){
     val provider = user as UserData.Provider
 
@@ -188,6 +190,16 @@ fun HomeScreenProvider(
                     )
                 }
             }
+        }
+        if(isSaturated)
+        item{
+            StatItem(
+                modifier = Modifier.fillMaxWidth(),
+                title = stringResource(R.string.message_to_provider_saturated),
+                value = stringResource(R.string.warning),
+                icon = Icons.Default.WarningAmber,
+                color = MaterialTheme.colorScheme.errorContainer
+            )
         }
         item{
             Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -433,7 +445,8 @@ fun HomeScreenProviderPreview(){
             usersAndMetrics = generateFakeUserAndReferralMetrics(),
             referralsConversion = "10.00",
             onPaymentView = {},
-            onGraphMetricsView = {}
+            onGraphMetricsView = {},
+            isSaturated = true
         )
     }
 }
