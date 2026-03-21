@@ -191,15 +191,16 @@ fun HomeScreenProvider(
                 }
             }
         }
-        if(isSaturated)
-        item{
-            StatItem(
-                modifier = Modifier.fillMaxWidth(),
-                title = stringResource(R.string.message_to_provider_saturated),
-                value = stringResource(R.string.warning),
-                icon = Icons.Default.WarningAmber,
-                color = MaterialTheme.colorScheme.errorContainer
-            )
+        if(isSaturated){
+            item{
+                StatItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    title = stringResource(R.string.message_to_provider_saturated),
+                    value = stringResource(R.string.warning),
+                    icon = Icons.Default.WarningAmber,
+                    color = MaterialTheme.colorScheme.errorContainer
+                )
+            }
         }
         item{
             Column(modifier = Modifier.padding(vertical = 8.dp)) {

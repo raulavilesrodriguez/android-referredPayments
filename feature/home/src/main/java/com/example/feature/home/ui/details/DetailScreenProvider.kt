@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
+import com.avilesrodriguez.presentation.composables.StatItem
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.details.DetailMetricItem
 import com.avilesrodriguez.presentation.fakeData.userProvider
@@ -58,6 +60,7 @@ fun DetailScreenProvider(
     onBackClick: () -> Unit,
     onAddReferClick: (String) -> Unit,
     isSaturated: Boolean,
+    canReferUserClient: Boolean,
     showTopBar: Boolean = true
 ){
     Scaffold(
@@ -73,10 +76,17 @@ fun DetailScreenProvider(
                 )
             }
         },
-        bottomBar = {ButtonToRefer(onReferClick = onAddReferClick, provider = provider, isSaturated = isSaturated)},
+        bottomBar = {
+            ButtonToRefer(
+                onReferClick = onAddReferClick,
+                provider = provider,
+                isSaturated = isSaturated,
+                canReferUserClient = canReferUserClient
+            )},
         content = { innerPadding ->
             ProfileProvider(
                 provider = provider,
+                isSaturated = isSaturated,
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -87,7 +97,8 @@ fun DetailScreenProvider(
 fun ButtonToRefer(
     onReferClick: (String) -> Unit,
     provider: UserData.Provider,
-    isSaturated: Boolean
+    isSaturated: Boolean,
+    canReferUserClient: Boolean
 ){
     Surface(
         color = MaterialTheme.colorScheme.surface,
@@ -97,7 +108,7 @@ fun ButtonToRefer(
     ) {
         Button(
             onClick = { onReferClick(provider.uid) },
-            enabled = !isSaturated,
+            enabled = !isSaturated && canReferUserClient,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 16.dp)
@@ -107,7 +118,7 @@ fun ButtonToRefer(
             Icon(Icons.Default.PersonAdd, contentDescription = null)
             Spacer(Modifier.width(8.dp))
             Text(
-                text = if(isSaturated) stringResource(R.string.provider_saturated) else stringResource(R.string.refer_now),
+                text = stringResource(R.string.refer_now),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -118,6 +129,7 @@ fun ButtonToRefer(
 @Composable
 private fun ProfileProvider(
     provider: UserData.Provider,
+    isSaturated: Boolean,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -235,16 +247,26 @@ private fun ProfileProvider(
                 value = provider.website!!
             )
         }
+        /**
         InfoCard(
             icon = Icons.Default.Email,
             title = stringResource(R.string.email),
             value = provider.email
-        )
+        ) */
         InfoCard(
             icon = Icons.Default.Business,
             title = stringResource(R.string.settings_industry),
             value = stringResource(provider.industry.label())
         )
+        if(isSaturated){
+            StatItem(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 16.dp),
+                title = stringResource(R.string.provider_saturated),
+                value = stringResource(R.string.warning),
+                icon = Icons.Default.WarningAmber,
+                color = MaterialTheme.colorScheme.errorContainer
+            )
+        }
         Spacer(modifier = Modifier.height(100.dp))
     }
 }
@@ -279,7 +301,8 @@ fun DetailScreenProviderPreview(){
             provider = userProvider,
             onBackClick = {},
             onAddReferClick = {},
-            isSaturated = false
+            isSaturated = true,
+            canReferUserClient = true
         )
     }
 }

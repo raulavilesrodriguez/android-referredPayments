@@ -94,6 +94,7 @@
     <string name="error_referral_exists">El referido ya existe. Por favor, introduzca un número de teléfono diferente.</string>
     <string name="provider_saturated">La empresa no puede aceptar más referidos hasta que haya procesado los que están pendientes.</string>
     <string name="message_to_provider_saturated">No puedes aceptar más referidos hasta que hayas procesado todos los que están pendientes.</string>
+    <string name="refer_client_restriction">No podrás recomendar a nadie hasta que no hayas completado toda la información para tus pagos.</string>
     <string name="information_referral">Información de Referido</string>
     <string name="invalid_phone_number">Inválido número telefónico</string>
     <string name="invalid_name">Inválido nombre</string>

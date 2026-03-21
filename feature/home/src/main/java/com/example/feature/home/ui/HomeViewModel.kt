@@ -95,6 +95,14 @@ class HomeViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)  //5000 retraso de 5seg
 
+    val canReferUserClient: StateFlow<Boolean> = _userDataStore.map { user ->
+        user is UserData.Client
+                && user.isActive
+                && !user.identityCard.isNullOrBlank()
+                && !user.countNumberPay.isNullOrBlank()
+                && !user.bankName.isNullOrBlank()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
 
     private var searchJob: Job? = null
     private var referralsJob: Job? = null

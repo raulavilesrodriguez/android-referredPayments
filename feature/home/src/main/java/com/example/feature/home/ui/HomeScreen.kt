@@ -110,6 +110,7 @@ fun HomeScreen(
     val referralsConversionViewModel by viewModel.referralsConversion.collectAsState()
     val processingInfo by viewModel.processingCountReferralsProvider.collectAsState()
     val isSaturated = (processingInfo) >= BusinessRules.MAX_PROCESSING_REFERRALS
+    val canReferUserClient by viewModel.canReferUserClient.collectAsState()
 
     val options = ActionOptionsHome.getOptions()
     val industryOptions = IndustriesType.options(true)
@@ -254,7 +255,8 @@ fun HomeScreen(
                                         detailContent = HomeDetailContent.GraphMetrics
                                         coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
                                     },
-                                    isSaturated = isSaturated
+                                    isSaturated = isSaturated,
+                                    canReferUserClient = canReferUserClient
                                 )
                                 else -> {
                                     Box(Modifier.fillMaxSize())
@@ -313,7 +315,8 @@ fun HomeMainContent(
     referralsConversion: String,
     onPaymentView: () -> Unit,
     onGraphMetricsView: () -> Unit,
-    isSaturated: Boolean
+    isSaturated: Boolean,
+    canReferUserClient: Boolean
 ) {
     if (user != null) {
         when (user.type) {
@@ -329,7 +332,8 @@ fun HomeMainContent(
                 onUserClick = onUserClick,
                 referralsMetrics = referralsMetrics,
                 onPaymentView = onPaymentView,
-                onGraphMetricsView = onGraphMetricsView
+                onGraphMetricsView = onGraphMetricsView,
+                canReferUserClient = canReferUserClient
             )
             UserType.PROVIDER -> HomeScreenProvider(
                 user = user,

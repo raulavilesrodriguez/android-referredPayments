@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.BuildCircle
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -76,7 +77,8 @@ fun HomeScreenClient(
     onUserClick: (String) -> Unit,
     referralsMetrics: ReferralMetrics,
     onPaymentView: () -> Unit,
-    onGraphMetricsView: () -> Unit
+    onGraphMetricsView: () -> Unit,
+    canReferUserClient: Boolean,
 ) {
     val client = user as? UserData.Client
 
@@ -163,6 +165,13 @@ fun HomeScreenClient(
                 modifier = Modifier.padding(vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                StatItem(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    title = stringResource(R.string.refer_client_restriction),
+                    value = stringResource(R.string.warning),
+                    icon = Icons.Default.WarningAmber,
+                    color = MaterialTheme.colorScheme.errorContainer
+                )
                 Text(
                     text = stringResource(R.string.search_companies),
                     style = MaterialTheme.typography.titleMedium,
@@ -349,7 +358,8 @@ fun HomeScreenClientPreview() {
                 paidReferrals = 10
             ),
             onPaymentView = {},
-            onGraphMetricsView = {}
+            onGraphMetricsView = {},
+            canReferUserClient = false
         )
     }
 }

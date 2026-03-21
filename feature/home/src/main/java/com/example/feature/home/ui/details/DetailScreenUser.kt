@@ -33,9 +33,9 @@ fun DetailScreenUser(
     val referralsMetrics by viewModel.uiStateReferralsMetrics.collectAsState()
     val selectedStatus by viewModel.selectedStatus.collectAsState()
     val processingInfo by viewModel.userProcessingReferrals.collectAsState()
-    val isSaturated = (processingInfo?.processingReferrals ?: 0) >= BusinessRules.MAX_PROCESSING_REFERRALS
+    val isSaturated = (processingInfo) >= BusinessRules.MAX_PROCESSING_REFERRALS
+    val canReferUserClient by viewModel.canReferUserClient.collectAsState()
     val statusOptions = ReferralStatus.options(true)
-
 
     if(userData == null){
         Box(
@@ -52,6 +52,7 @@ fun DetailScreenUser(
                     onBackClick = popUp,
                     onAddReferClick = {uid -> viewModel.onAddReferClick(uid, openScreen)},
                     isSaturated = isSaturated,
+                    canReferUserClient = canReferUserClient,
                     showTopBar = showTopBar // Pasamos a la pantalla interna
                 )
             }

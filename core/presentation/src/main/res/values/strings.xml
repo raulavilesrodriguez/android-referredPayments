@@ -114,6 +114,7 @@
     <string name="error_referral_exists">The referral already exists. Please enter a different phone number</string>
     <string name="provider_saturated">The company cannot accept any more referrals until it has processed the pending ones.</string>
     <string name="message_to_provider_saturated">You cannot accept any more referrals until you have processed all the pending ones.</string>
+    <string name="refer_client_restriction">You won\'t be able to refer anyone until you\'ve filled in all your payment information.</string>
     <string name="information_referral">Referral Information</string>
     <string name="invalid_phone_number">Invalid phone number</string>
     <string name="invalid_name">Invalid name</string>
