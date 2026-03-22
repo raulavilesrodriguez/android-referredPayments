@@ -20,12 +20,12 @@ class TransactionsDataSource @Inject constructor(
     ){
         firestore.runTransaction { transaction ->
             val referralRef = firestore.collection(REFERRALS_COLLECTION).document(referralId)
-            val messageRef = firestore.collection(MESSAGES_COLLECTION).document(message.id)
+            val messageRef = firestore.collection(MESSAGES_COLLECTION).document()
             val clientRef = firestore.collection(USERS_COLLECTION).document(clientUid)
             val providerRef = firestore.collection(USERS_COLLECTION).document(providerUid)
 
             transaction.update(referralRef, referralUpdates)
-            val messageFirestore = message.toMessageFirestore()
+            val messageFirestore = message.toMessageFirestore().copy(id = messageRef.id)
             transaction.set(messageRef, messageFirestore)
             transaction.update(clientRef, mapOf(
                 MONEY_EARNED_CLIENT_FIELD to FieldValue.increment(amountPaid)
@@ -46,11 +46,11 @@ class TransactionsDataSource @Inject constructor(
     ){
         firestore.runTransaction { transaction ->
             val referralRef = firestore.collection(REFERRALS_COLLECTION).document(referralId)
-            val messageRef = firestore.collection(MESSAGES_COLLECTION).document(message.id)
+            val messageRef = firestore.collection(MESSAGES_COLLECTION).document()
             val providerRef = firestore.collection(USERS_COLLECTION).document(providerUid)
 
             transaction.update(referralRef, referralUpdates)
-            val messageFirestore = message.toMessageFirestore()
+            val messageFirestore = message.toMessageFirestore().copy(id = messageRef.id)
             transaction.set(messageRef, messageFirestore)
             transaction.update(providerRef, mapOf(
                 PROCESSING_REFERRALS_COUNT to FieldValue.increment(-1)
