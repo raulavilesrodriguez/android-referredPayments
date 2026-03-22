@@ -19,4 +19,5 @@ interface IStoreRepository {
     suspend fun getUsersClient(currentUserId: String): Flow<List<UserData>>
     suspend fun searchUsersClient(namePrefix: String, currentUserId: String): Flow<List<UserData>>
     suspend fun getUserFlow(uid: String): Flow<UserData?>
+    suspend fun updateProviderProcessingReferralsCount(uid: String, increment: Int)
 }

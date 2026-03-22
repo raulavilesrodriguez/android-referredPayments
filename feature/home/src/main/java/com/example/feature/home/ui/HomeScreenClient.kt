@@ -165,13 +165,15 @@ fun HomeScreenClient(
                 modifier = Modifier.padding(vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                StatItem(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                    title = stringResource(R.string.refer_client_restriction),
-                    value = stringResource(R.string.warning),
-                    icon = Icons.Default.WarningAmber,
-                    color = MaterialTheme.colorScheme.errorContainer
-                )
+                if(!canReferUserClient){
+                    StatItem(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        title = stringResource(R.string.refer_client_restriction),
+                        value = stringResource(R.string.warning),
+                        icon = Icons.Default.WarningAmber,
+                        color = MaterialTheme.colorScheme.errorContainer
+                    )
+                }
                 Text(
                     text = stringResource(R.string.search_companies),
                     style = MaterialTheme.typography.titleMedium,

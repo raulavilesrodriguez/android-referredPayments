@@ -69,4 +69,8 @@ class StoreRepository @Inject constructor(
     override suspend fun getUserFlow(uid: String): Flow<UserData?> {
         return data.getUserFlow(uid)
     }
+
+    override suspend fun updateProviderProcessingReferralsCount(uid: String, increment: Int) {
+        data.updateProviderProcessingReferralsCount(uid, increment)
+    }
 }

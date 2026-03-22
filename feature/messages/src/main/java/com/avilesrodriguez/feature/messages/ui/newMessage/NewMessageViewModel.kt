@@ -28,6 +28,7 @@ import javax.inject.Inject
 import androidx.core.net.toUri
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.usecases.GetUserFlow
+import com.avilesrodriguez.domain.usecases.UpdateProviderProcessingReferralsCount
 import com.avilesrodriguez.domain.usecases.UpdateReferralFields
 import com.avilesrodriguez.domain.usecases.UpdateUserClientMetrics
 import com.avilesrodriguez.domain.usecases.UpdateUserProviderMetrics
@@ -49,7 +50,8 @@ class NewMessageViewModel @Inject constructor(
     private val updateReferralFields: UpdateReferralFields,
     private val updateUserClientMetrics: UpdateUserClientMetrics,
     private val updateUserProviderMetrics: UpdateUserProviderMetrics,
-    private val getUserFlow: GetUserFlow
+    private val getUserFlow: GetUserFlow,
+    private val updateProviderProcessingReferralsCount: UpdateProviderProcessingReferralsCount
 ) : BaseViewModel() {
     private val _newMessageState = MutableStateFlow(Message())
     val newMessageState: StateFlow<Message> = _newMessageState.asStateFlow()
@@ -220,6 +222,8 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun onSendPay(subjectPaid:String, contentPaid: String, popUp: () -> Unit){
+        val referral = _referralState.value
+        if(referral.id.isEmpty()) return
         launchCatching {
             try{
                 _isLoading.value = true
@@ -258,6 +262,8 @@ class NewMessageViewModel @Inject constructor(
 
                 updateUserClientMetrics(uid = referral.clientId, amountPaid = amountPaid)
                 updateUserProviderMetrics(uid = referral.providerId, moneyPaid = amountPaid)
+                val providerId = referral.providerId
+                updateProviderProcessingReferralsCount(providerId, -1)
 
                 // Navigation
                 resetValues()
@@ -311,6 +317,9 @@ class NewMessageViewModel @Inject constructor(
                 )
 
                 saveMessage(message)
+
+                val providerId = referral.providerId
+                updateProviderProcessingReferralsCount(providerId, -1)
 
                 // Navigation
                 popUp()

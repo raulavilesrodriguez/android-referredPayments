@@ -298,6 +298,13 @@ class StoreDataSource @Inject constructor(
         userRef.update(FCM_TOKEN_FIELD, null).await()
     }
 
+    suspend fun updateProviderProcessingReferralsCount(uid: String, increment: Int) {
+        if (uid.isEmpty()) return
+        firestore.collection(USERS_COLLECTION).document(uid)
+            .update(PROCESSING_REFERRALS_COUNT, FieldValue.increment(increment.toLong()))
+            .await()
+    }
+
 
     companion object{
         private const val USERS_COLLECTION = "users"
@@ -310,5 +317,6 @@ class StoreDataSource @Inject constructor(
         private const val PROVIDER_ID_FIELD = "providerId"
         private const val REFERRALS_COLLECTION = "referrals"
         private const val FCM_TOKEN_FIELD = "fcmToken"
+        private const val PROCESSING_REFERRALS_COUNT = "processingReferralsCount"
     }
 }

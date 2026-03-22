@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.avilesrodriguez.domain.model.businessRules.BusinessRules
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.ext.options
@@ -32,8 +31,7 @@ fun DetailScreenUser(
     val referrals by viewModel.uiStateReferrals.collectAsState()
     val referralsMetrics by viewModel.uiStateReferralsMetrics.collectAsState()
     val selectedStatus by viewModel.selectedStatus.collectAsState()
-    val processingInfo by viewModel.userProcessingReferrals.collectAsState()
-    val isSaturated = (processingInfo) >= BusinessRules.MAX_PROCESSING_REFERRALS
+    val isSaturated by viewModel.isProviderSaturated.collectAsState()
     val canReferUserClient by viewModel.canReferUserClient.collectAsState()
     val statusOptions = ReferralStatus.options(true)
 

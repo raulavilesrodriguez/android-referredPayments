@@ -3,6 +3,7 @@ package com.avilesrodriguez.feature.referrals.ui.addReferral
 import android.util.Log
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.SaveReferral
+import com.avilesrodriguez.domain.usecases.UpdateProviderProcessingReferralsCount
 import com.avilesrodriguez.feature.referrals.ui.model.AddReferralUiState
 import com.avilesrodriguez.feature.referrals.ui.model.toReferral
 import com.avilesrodriguez.presentation.R
@@ -22,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AddReferralViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
-    private val saveReferral: SaveReferral
+    private val saveReferral: SaveReferral,
+    private val updateProviderProcessingReferralsCount: UpdateProviderProcessingReferralsCount
 ) : BaseViewModel() {
     private val _addReferralState = MutableStateFlow(AddReferralUiState())
     val addReferralState: StateFlow<AddReferralUiState> = _addReferralState.asStateFlow()
@@ -91,6 +93,7 @@ class AddReferralViewModel @Inject constructor(
             try {
                 val isSuccess = saveReferral(referral)
                 if(isSuccess){
+                    updateProviderProcessingReferralsCount(providerId, 1)
                     openAndPopUp(NavRoutes.REFERRALS, NavRoutes.NEW_REFERRAL)
                 }else{
                     SnackbarManager.showMessage(R.string.error_referral_exists)

@@ -48,5 +48,6 @@ sealed class UserData {
         val ratingCount: Int = 0,
         val totalPayouts: Int = 0, // Cuantas veces ha pagado con exito
         val website:String? = null,
+        val processingReferralsCount: Int = 0
     ) : UserData()
 }

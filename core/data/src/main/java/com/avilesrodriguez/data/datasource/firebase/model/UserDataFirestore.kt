@@ -52,7 +52,8 @@ sealed class UserDataFirestore {
         val paymentRating: Double = 0.0,
         val ratingCount: Int = 0,
         val totalPayouts: Int = 0, //pagos
-        val website: String? = null
+        val website: String? = null,
+        val processingReferralsCount: Int = 0
     ) : UserDataFirestore()
 }
 
@@ -90,7 +91,8 @@ fun UserData.toUserDataFirestore(): UserDataFirestore{
             paymentRating = paymentRating,
             ratingCount = ratingCount,
             totalPayouts = totalPayouts,
-            website = website
+            website = website,
+            processingReferralsCount = processingReferralsCount
         )
     }
 }
@@ -143,7 +145,8 @@ fun UserDataFirestore.toUserDataDomain(): UserData? {
                 paymentRating = paymentRating,
                 ratingCount = ratingCount,
                 totalPayouts = totalPayouts,
-                website = website
+                website = website,
+                processingReferralsCount = processingReferralsCount
             )}
     }
 }
