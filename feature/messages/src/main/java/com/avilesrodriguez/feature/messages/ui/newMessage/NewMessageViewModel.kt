@@ -28,10 +28,8 @@ import javax.inject.Inject
 import androidx.core.net.toUri
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.usecases.GetUserFlow
-import com.avilesrodriguez.domain.usecases.UpdateProviderProcessingReferralsCount
-import com.avilesrodriguez.domain.usecases.UpdateReferralFields
-import com.avilesrodriguez.domain.usecases.UpdateUserClientMetrics
-import com.avilesrodriguez.domain.usecases.UpdateUserProviderMetrics
+import com.avilesrodriguez.domain.usecases.RejectReferralTransaction
+import com.avilesrodriguez.domain.usecases.SendPayTransaction
 import com.avilesrodriguez.presentation.banksPays.BanksEcuador
 import com.avilesrodriguez.presentation.banksPays.getById
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
@@ -47,11 +45,9 @@ class NewMessageViewModel @Inject constructor(
     private val getReferralById: GetReferralById,
     private val uploadFile: UploadFile,
     @param:ApplicationContext private val context: Context,
-    private val updateReferralFields: UpdateReferralFields,
-    private val updateUserClientMetrics: UpdateUserClientMetrics,
-    private val updateUserProviderMetrics: UpdateUserProviderMetrics,
     private val getUserFlow: GetUserFlow,
-    private val updateProviderProcessingReferralsCount: UpdateProviderProcessingReferralsCount
+    private val sendPayTransaction: SendPayTransaction,
+    private val rejectReferralTransaction: RejectReferralTransaction
 ) : BaseViewModel() {
     private val _newMessageState = MutableStateFlow(Message())
     val newMessageState: StateFlow<Message> = _newMessageState.asStateFlow()
@@ -247,7 +243,6 @@ class NewMessageViewModel @Inject constructor(
                     "amountPaid" to amountPaid,
                     "paidAt" to System.currentTimeMillis()
                 )
-                updateReferralFields(referral.id, referralUpdates)
 
                 val confirmationMessage = Message(
                     referralId = referral.id,
@@ -258,24 +253,26 @@ class NewMessageViewModel @Inject constructor(
                     attachmentsUrl = remoteUrls,
                     createdAt = System.currentTimeMillis()
                 )
-                saveMessage(confirmationMessage)
 
-                updateUserClientMetrics(uid = referral.clientId, amountPaid = amountPaid)
-                updateUserProviderMetrics(uid = referral.providerId, moneyPaid = amountPaid)
-                val providerId = referral.providerId
-                updateProviderProcessingReferralsCount(providerId, -1)
+                sendPayTransaction(
+                    referralId = referral.id,
+                    referralUpdates = referralUpdates,
+                    message = confirmationMessage,
+                    clientUid = referral.clientId,
+                    providerUid = referral.providerId,
+                    amountPaid = amountPaid
+                )
 
                 // Navigation
                 resetValues()
                 popUp()
             } catch (e:Exception){
                 _isLoading.value = false
-                Log.e("NewMessageViewModel", "Error al subir el voucher", e)
+                Log.e("NewMessageViewModel", "Error en el registry del Pago", e)
             }
             finally {
                 _isLoading.value = false
             }
-
         }
     }
 
@@ -289,12 +286,6 @@ class NewMessageViewModel @Inject constructor(
                 _isLoading.value = true
                 val referral = _referralState.value
 
-                val updates = mapOf(
-                    "status" to ReferralStatus.REJECTED.name,
-                    "paidAt" to System.currentTimeMillis()
-                )
-                updateReferralFields(referral.id, updates)
-
                 val remoteUrls = _localFiles.value.mapIndexed { index, localUriString ->
                     async {
                         val uri = localUriString.toUri()
@@ -307,6 +298,11 @@ class NewMessageViewModel @Inject constructor(
                     }
                 }.awaitAll()
 
+                val updates = mapOf(
+                    "status" to ReferralStatus.REJECTED.name,
+                    "paidAt" to System.currentTimeMillis()
+                )
+
                 val message = _newMessageState.value.copy(
                     referralId = referral.id,
                     senderId = currentUserId,
@@ -316,10 +312,12 @@ class NewMessageViewModel @Inject constructor(
                     createdAt = System.currentTimeMillis()
                 )
 
-                saveMessage(message)
-
-                val providerId = referral.providerId
-                updateProviderProcessingReferralsCount(providerId, -1)
+                rejectReferralTransaction(
+                    referralId = referral.id,
+                    referralUpdates = updates,
+                    message = message,
+                    providerUid = referral.providerId
+                )
 
                 // Navigation
                 popUp()

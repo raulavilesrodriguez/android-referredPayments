@@ -9,6 +9,7 @@ import com.avilesrodriguez.data.repository.MessageRepository
 import com.avilesrodriguez.data.repository.ReferralRepository
 import com.avilesrodriguez.data.repository.StorageRepository
 import com.avilesrodriguez.data.repository.StoreRepository
+import com.avilesrodriguez.data.repository.TransactionsRepository
 import com.avilesrodriguez.domain.interfaces.IAccountRepository
 import com.avilesrodriguez.domain.interfaces.IAuthPreferences
 import com.avilesrodriguez.domain.interfaces.IFCMTokenRepository
@@ -18,6 +19,7 @@ import com.avilesrodriguez.domain.interfaces.IMessageRepository
 import com.avilesrodriguez.domain.interfaces.IReferralRepository
 import com.avilesrodriguez.domain.interfaces.IStorageRepository
 import com.avilesrodriguez.domain.interfaces.IStoreRepository
+import com.avilesrodriguez.domain.interfaces.ITransactionsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -53,4 +55,7 @@ abstract class DataModule {
 
     @Binds
     abstract fun provideIInternalTokenRepository(impl: InternalTokenRepository): IInternalTokenRepository
+
+    @Binds
+    abstract fun provideTransactionsRepository(impl: TransactionsRepository): ITransactionsRepository
 }
