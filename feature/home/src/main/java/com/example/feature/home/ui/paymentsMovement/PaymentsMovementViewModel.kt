@@ -5,7 +5,11 @@ import com.avilesrodriguez.domain.model.referral.ReferralWithNames
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetReferralsByClient
+import com.avilesrodriguez.domain.usecases.GetReferralsByClientPaged
+import com.avilesrodriguez.domain.usecases.GetReferralsByClientSince
 import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
+import com.avilesrodriguez.domain.usecases.GetReferralsByProviderPaged
+import com.avilesrodriguez.domain.usecases.GetReferralsByProviderSince
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.GetUserFlow
 import com.avilesrodriguez.domain.usecases.HasUser
@@ -32,7 +36,11 @@ class PaymentsMovementViewModel @Inject constructor(
     private val getReferralsByProvider: GetReferralsByProvider,
     private val getReferralsByClient: GetReferralsByClient,
     private val getUserFlow: GetUserFlow,
-    private val getUser: GetUser
+    private val getUser: GetUser,
+    private val getReferralsByClientSince: GetReferralsByClientSince,
+    private val getReferralsByClientPaged: GetReferralsByClientPaged,
+    private val getReferralsByProviderSince: GetReferralsByProviderSince,
+    private val getReferralsByProviderPaged: GetReferralsByProviderPaged
 ): BaseViewModel() {
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore

@@ -77,4 +77,34 @@ class ReferralRepository @Inject constructor(
     ) {
         data.saveRatingWithTransaction(referralId, referralUpdates, providerId, ratingReferral)
     }
+
+    override suspend fun getReferralsByClientSince(
+        clientId: String,
+        since: Long
+    ): Flow<List<Referral>> {
+        return data.getReferralsByClientSince(clientId, since)
+    }
+
+    override suspend fun getReferralsByProviderSince(
+        providerId: String,
+        since: Long
+    ): Flow<List<Referral>> {
+        return data.getReferralsByProviderSince(providerId, since)
+    }
+
+    override suspend fun getReferralsByClientPaged(
+        clientId: String,
+        pageSize: Long,
+        lastReferral: Referral?
+    ): Pair<List<Referral>, Referral?> {
+        return data.getReferralsByClientPaged(clientId, pageSize, lastReferral)
+    }
+
+    override suspend fun getReferralsByProviderPaged(
+        providerId: String,
+        pageSize: Long,
+        lastReferral: Referral?
+    ): Pair<List<Referral>, Referral?> {
+        return data.getReferralsByProviderPaged(providerId, pageSize, lastReferral)
+    }
 }

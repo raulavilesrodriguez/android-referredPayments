@@ -191,6 +191,83 @@ class ReferralDataSource @Inject constructor(
         }.await()
     }
 
+    fun getReferralsByClientSince(clientId: String, since: Long) : Flow<List<Referral>>{
+        val sinceTimestamp = Timestamp(Date(since))
+        val query = firestore.collection(REFERRALS_COLLECTION)
+            .whereEqualTo(CLIENT_ID_FIELD, clientId)
+            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING) // mas viejos al final
+            .whereGreaterThanOrEqualTo(CREATED_AT_FIELD, sinceTimestamp)
+
+        return createReferralFlow(query)
+    }
+
+    fun getReferralsByProviderSince(providerId: String, since: Long) : Flow<List<Referral>>{
+        val sinceTimestamp = Timestamp(Date(since))
+        val query = firestore.collection(REFERRALS_COLLECTION)
+            .whereEqualTo(PROVIDER_ID_FIELD, providerId)
+            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING) // mas viejos al final
+            .whereGreaterThanOrEqualTo(CREATED_AT_FIELD, sinceTimestamp)
+
+        return createReferralFlow(query)
+    }
+
+    suspend fun getReferralsByClientPaged(
+        clientId: String,
+        pageSize: Long,
+        lastReferral: Referral? = null
+    ) : Pair<List<Referral>, Referral?> {
+        var query = firestore.collection(REFERRALS_COLLECTION)
+            .whereEqualTo(CLIENT_ID_FIELD, clientId)
+            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING) //mas olds final
+            .limit(pageSize)
+
+        // continue the consult from the last referral
+        if (lastReferral != null) {
+            val lastReferralRef = firestore.collection(REFERRALS_COLLECTION).document(lastReferral.id)
+            val lastDocument = lastReferralRef.get().await()
+            if(lastDocument !=null) query = query.startAfter(lastDocument)
+        }
+
+        val snapshot = query.get().await()
+
+        val referrals = snapshot.documents.mapNotNull { doc ->
+            val referral = doc.toObject(ReferralFirestore::class.java)?.toReferralDomain()
+            referral
+        }
+
+        val lastVisibleDocument = snapshot?.documents?.lastOrNull()
+        val lastVisibleReferral = lastVisibleDocument?.toObject(ReferralFirestore::class.java)?.toReferralDomain()
+        return referrals to lastVisibleReferral
+    }
+
+    suspend fun getReferralsByProviderPaged(
+        providerId: String,
+        pageSize: Long,
+        lastReferral: Referral? = null
+    ) : Pair<List<Referral>, Referral?>{
+        var query = firestore.collection(REFERRALS_COLLECTION)
+            .whereEqualTo(PROVIDER_ID_FIELD, providerId)
+            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING) //mas olds final
+            .limit(pageSize)
+
+        // continue the consult from the last referral
+        if (lastReferral != null) {
+            val lastReferralRef = firestore.collection(REFERRALS_COLLECTION).document(lastReferral.id)
+            val lastDocument = lastReferralRef.get().await()
+            if(lastDocument !=null) query = query.startAfter(lastDocument)
+        }
+
+        val snapshot = query.get().await()
+
+        val referrals = snapshot.documents.mapNotNull { doc ->
+            val referral = doc.toObject(ReferralFirestore::class.java)?.toReferralDomain()
+            referral
+        }
+        val lastVisibleDocument = snapshot?.documents?.lastOrNull()
+        val lastVisibleReferral = lastVisibleDocument?.toObject(ReferralFirestore::class.java)?.toReferralDomain()
+        return referrals to lastVisibleReferral
+    }
+
     companion object {
         private const val REFERRALS_COLLECTION = "referrals"
         private const val USERS_COLLECTION = "users"
