@@ -20,8 +20,8 @@ fun PaymentsMovement(
     viewModel: PaymentsMovementViewModel = hiltViewModel()
 ) {
     val user by viewModel.userDataStore.collectAsState()
-    val referralsProvider by viewModel.filteredReferralsProvider.collectAsState(initial = emptyList())
-    val referralsClient by viewModel.filteredReferralsClient.collectAsState(initial = emptyList())
+    val referralsProvider by viewModel.referralsProvider.collectAsState()
+    val referralsClient by viewModel.referralsClient.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val dateFrom by viewModel.dateFrom.collectAsState()
     val dateTo by viewModel.dateTo.collectAsState()

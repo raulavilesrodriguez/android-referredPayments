@@ -214,58 +214,96 @@ class ReferralDataSource @Inject constructor(
     suspend fun getReferralsByClientPaged(
         clientId: String,
         pageSize: Long,
-        lastReferral: Referral? = null
+        lastReferral: Referral? = null,
+        fromDate: Long? = null,
+        toDate: Long? = null,
+        status: String? = null,
+        isPaymentsScreen: Boolean = false
     ) : Pair<List<Referral>, Referral?> {
+
+        val dateField = if (isPaymentsScreen) PAID_AT_FIELD else CREATED_AT_FIELD
+
         var query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(CLIENT_ID_FIELD, clientId)
-            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING) //mas olds final
-            .limit(pageSize)
+
+        if(!status.isNullOrBlank()){
+            query = query.whereEqualTo(STATUS_FIELD, status)
+        }
+
+        fromDate?.let {
+            query = query.whereGreaterThanOrEqualTo(dateField, Timestamp(Date(it)))
+        }
+        toDate?.let {
+            query = query.whereLessThanOrEqualTo(dateField, Timestamp(Date(it + 86399999)))
+        }
+
+        query = query.orderBy(dateField, Query.Direction.DESCENDING) //mas olds final
+
+        query = query.limit(pageSize)
 
         // continue the consult from the last referral
         if (lastReferral != null) {
-            val lastReferralRef = firestore.collection(REFERRALS_COLLECTION).document(lastReferral.id)
-            val lastDocument = lastReferralRef.get().await()
-            if(lastDocument !=null) query = query.startAfter(lastDocument)
+            val lastDateValue = if (isPaymentsScreen) lastReferral.paidAt else lastReferral.createdAt
+            if (lastDateValue > 0) {
+                query = query.startAfter(Timestamp(Date(lastDateValue)))
+            }
         }
 
         val snapshot = query.get().await()
 
         val referrals = snapshot.documents.mapNotNull { doc ->
-            val referral = doc.toObject(ReferralFirestore::class.java)?.toReferralDomain()
-            referral
+            doc.toObject(ReferralFirestore::class.java)?.toReferralDomain()
         }
 
-        val lastVisibleDocument = snapshot?.documents?.lastOrNull()
-        val lastVisibleReferral = lastVisibleDocument?.toObject(ReferralFirestore::class.java)?.toReferralDomain()
-        return referrals to lastVisibleReferral
+        return referrals to referrals.lastOrNull()
     }
 
     suspend fun getReferralsByProviderPaged(
         providerId: String,
         pageSize: Long,
-        lastReferral: Referral? = null
+        lastReferral: Referral? = null,
+        fromDate: Long? = null,
+        toDate: Long? = null,
+        status: String? = null,
+        isPaymentsScreen: Boolean = false
     ) : Pair<List<Referral>, Referral?>{
+
+        val dateField = if (isPaymentsScreen) PAID_AT_FIELD else CREATED_AT_FIELD
+
         var query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(PROVIDER_ID_FIELD, providerId)
-            .orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING) //mas olds final
-            .limit(pageSize)
+
+        if(!status.isNullOrBlank()){
+            query = query.whereEqualTo(STATUS_FIELD, status)
+        }
+
+        fromDate?.let {
+            query = query.whereGreaterThanOrEqualTo(dateField, Timestamp(Date(it)))
+        }
+        toDate?.let {
+            query = query.whereLessThanOrEqualTo(dateField, Timestamp(Date(it + 86399999)))
+        }
+
+        query = query.orderBy(dateField, Query.Direction.DESCENDING) //mas olds final
+
+        query = query.limit(pageSize)
 
         // continue the consult from the last referral
         if (lastReferral != null) {
-            val lastReferralRef = firestore.collection(REFERRALS_COLLECTION).document(lastReferral.id)
-            val lastDocument = lastReferralRef.get().await()
-            if(lastDocument !=null) query = query.startAfter(lastDocument)
+            val lastDateValue = if (isPaymentsScreen) lastReferral.paidAt else lastReferral.createdAt
+            if (lastDateValue > 0) {
+                query = query.startAfter(Timestamp(Date(lastDateValue)))
+            }
         }
 
         val snapshot = query.get().await()
 
         val referrals = snapshot.documents.mapNotNull { doc ->
-            val referral = doc.toObject(ReferralFirestore::class.java)?.toReferralDomain()
-            referral
+            doc.toObject(ReferralFirestore::class.java)?.toReferralDomain()
         }
-        val lastVisibleDocument = snapshot?.documents?.lastOrNull()
-        val lastVisibleReferral = lastVisibleDocument?.toObject(ReferralFirestore::class.java)?.toReferralDomain()
-        return referrals to lastVisibleReferral
+
+        return referrals to referrals.lastOrNull()
+
     }
 
     companion object {
@@ -277,6 +315,7 @@ class ReferralDataSource @Inject constructor(
         private const val VOUCHER_URL_FIELD = "voucherUrl"
         private const val ORDER_BY_FIELD_LOWER = "nameLowercase"
         private const val CREATED_AT_FIELD = "createdAt"
+        private const val PAID_AT_FIELD = "paidAt"
         private const val RATING_COUNT_FIELD_USER = "ratingCount"
         private const val PAYMENT_RATING_FIELD_USER = "paymentRating"
     }

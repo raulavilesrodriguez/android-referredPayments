@@ -95,16 +95,24 @@ class ReferralRepository @Inject constructor(
     override suspend fun getReferralsByClientPaged(
         clientId: String,
         pageSize: Long,
-        lastReferral: Referral?
+        lastReferral: Referral?,
+        fromDate: Long?,
+        toDate: Long?,
+        status: String?,
+        isPaymentsScreen: Boolean
     ): Pair<List<Referral>, Referral?> {
-        return data.getReferralsByClientPaged(clientId, pageSize, lastReferral)
+        return data.getReferralsByClientPaged(clientId, pageSize, lastReferral, fromDate, toDate, status, isPaymentsScreen)
     }
 
     override suspend fun getReferralsByProviderPaged(
         providerId: String,
         pageSize: Long,
-        lastReferral: Referral?
+        lastReferral: Referral?,
+        fromDate: Long?,
+        toDate: Long?,
+        status: String?,
+        isPaymentsScreen: Boolean
     ): Pair<List<Referral>, Referral?> {
-        return data.getReferralsByProviderPaged(providerId, pageSize, lastReferral)
+        return data.getReferralsByProviderPaged(providerId, pageSize, lastReferral, fromDate, toDate, status, isPaymentsScreen)
     }
 }
