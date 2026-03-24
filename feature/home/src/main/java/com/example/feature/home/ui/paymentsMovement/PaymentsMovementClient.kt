@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -28,10 +30,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +53,8 @@ import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.time.formatTimeBasic
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 @Composable
 fun PaymentsScreenClient(
@@ -88,6 +96,8 @@ fun PaymentsScreenClient(
                     dateTo = dateTo,
                     onDateFromChange = onDateFromChange,
                     onDateToChange = onDateToChange,
+                    onLoadMoreReferralsByClient = onLoadMoreReferralsByClient,
+                    isLoading = isLoading,
                     modifier = Modifier.padding(innerPadding)
                 )
             }
@@ -103,6 +113,8 @@ private fun PaymentsClient(
     dateTo: Long?,
     onDateFromChange: (Long?) -> Unit,
     onDateToChange: (Long?) -> Unit,
+    onLoadMoreReferralsByClient: () -> Unit,
+    isLoading: Boolean,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -116,7 +128,9 @@ private fun PaymentsClient(
             dateFrom = dateFrom,
             dateTo = dateTo,
             onDateFromChange = onDateFromChange,
-            onDateToChange = onDateToChange
+            onDateToChange = onDateToChange,
+            onLoadMoreReferralsByClient = onLoadMoreReferralsByClient,
+            isLoading = isLoading
         )
     }
 }
@@ -128,12 +142,44 @@ private fun ReferralsList(
     dateFrom: Long?,
     dateTo: Long?,
     onDateFromChange: (Long?) -> Unit,
-    onDateToChange: (Long?) -> Unit
+    onDateToChange: (Long?) -> Unit,
+    onLoadMoreReferralsByClient: () -> Unit,
+    isLoading: Boolean
 ){
+    val listState = rememberLazyListState()
+
+    // detecta cuando llega al tope de la lista
+    // lastVisibleItem.index es el índice del último item visible en la pantalla
+    // El número total de items que tenemos cargados actualmente.
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                ?: return@derivedStateOf false
+            // está cerca del final de nuestra lista de datos, es hora de cargar más.
+            lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - 5
+        }
+    }
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value) {
+            onLoadMoreReferralsByClient()
+        }
+    }
+
+    // Se dispara cada vez que la lista.
+    LaunchedEffect(referrals.firstOrNull()?.referral?.id) {
+        // Si el primer item de la lista (el más nuevo) no está completamente visible,
+        // Solo hacemos scroll al inicio si el usuario está viendo los primeros 2 items
+        if (referrals.isNotEmpty() && listState.firstVisibleItemIndex <= 2) {
+            // AnimateScrollToItem es más suave que scrollToItem
+            listState.animateScrollToItem(index = 0)
+        }
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        state = listState
     ) {
         item {
             AdvancedSearchSection(
@@ -144,7 +190,10 @@ private fun ReferralsList(
             )
         }
         if(!referrals.isEmpty()){
-            items(referrals) { item ->
+            items(
+                referrals,
+                key = { item -> item.referral.id }
+            ) { item ->
                 ReferralPaidItem(referral = item, client = client)
             }
         }else{
@@ -152,6 +201,16 @@ private fun ReferralsList(
                 Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center){
                     Text(text = stringResource(R.string.no_payments))
                 }
+            }
+        }
+        if (isLoading) {
+            item {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                )
             }
         }
     }
