@@ -89,11 +89,8 @@ class PaymentsMovementViewModel @Inject constructor(
         referrals:List<Referral>,
         isProvider: Boolean
     ): List<ReferralWithNames>{
-        val uniqueIds = if (isProvider) {
-            referrals.map { it.clientId }
-        } else {
-            referrals.map { it.providerId }
-        }.distinct()
+        val paidReferrals = referrals.filter { it.status == ReferralStatus.PAID }
+        val uniqueIds = paidReferrals.map { if (isProvider) it.clientId else it.providerId  }.distinct()
         val missingIds = uniqueIds.filter { !nameCache.containsKey(it) }
 
         if (missingIds.isNotEmpty()) {
@@ -106,11 +103,8 @@ class PaymentsMovementViewModel @Inject constructor(
             }
         }
 
-        return referrals
-            .filter { it.status == ReferralStatus.PAID }
-            .map { referral ->
+        return paidReferrals.map { referral ->
                 val otherId = if (isProvider) referral.clientId else referral.providerId
-
                 ReferralWithNames(
                     referral = referral,
                     otherPartyName = nameCache[otherId] ?: ""
@@ -123,22 +117,25 @@ class PaymentsMovementViewModel @Inject constructor(
         _isLoading.value = true
         paginationJob?.cancel()
         paginationJob = launchCatching {
-            val(referrals, lastReferral) = getReferralsByClientPaged(
-                clientId = currentUserId,
-                pageSize = pageSize,
-                lastReferral = null,
-                fromDate = _dateFrom.value,
-                toDate = _dateTo.value,
-                status = null,
-                isPaymentsScreen = true
-            )
-            val result = transformToReferralsWithName(referrals, false)
-            _referralsClient.value = result
-            lastReferralViewModel = lastReferral
-            allReferralsLoaded = result.size < pageSize
-            val lastTime = lastReferral?.paidAt ?: 0L
-            listenForNewReferralsByClient(currentUserId, lastTime)
-            _isLoading.value = false
+            try {
+                val(referrals, lastReferral) = getReferralsByClientPaged(
+                    clientId = currentUserId,
+                    pageSize = pageSize,
+                    lastReferral = null,
+                    fromDate = _dateFrom.value,
+                    toDate = _dateTo.value,
+                    status = ReferralStatus.PAID.name,
+                    isPaymentsScreen = true
+                )
+                val result = transformToReferralsWithName(referrals, false)
+                _referralsClient.value = result
+                lastReferralViewModel = lastReferral
+                allReferralsLoaded = result.size < pageSize
+                val lastTime = lastReferral?.paidAt ?: System.currentTimeMillis()
+                listenForNewReferralsByClient(currentUserId, lastTime)
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 
@@ -171,7 +168,7 @@ class PaymentsMovementViewModel @Inject constructor(
                 lastReferral = lastReferralViewModel,
                 fromDate = _dateFrom.value,
                 toDate = _dateTo.value,
-                status = null,
+                status = ReferralStatus.PAID.name,
                 isPaymentsScreen = true
             )
             if(olderReferrals.isNotEmpty()){
@@ -187,22 +184,25 @@ class PaymentsMovementViewModel @Inject constructor(
         _isLoading.value = true
         paginationJob?.cancel()
         paginationJob = launchCatching {
-            val(referrals, lastReferral) = getReferralsByProviderPaged(
-                providerId = currentUserId,
-                pageSize = pageSize,
-                lastReferral = null,
-                fromDate = _dateFrom.value,
-                toDate = _dateTo.value,
-                status = null,
-                isPaymentsScreen = true
-            )
-            val result = transformToReferralsWithName(referrals, false)
-            _referralsProvider.value = result
-            lastReferralViewModel = lastReferral
-            allReferralsLoaded = result.size < pageSize
-            val lastTime = lastReferral?.paidAt ?: 0L
-            listenForNewReferralsByProvider(currentUserId, lastTime)
-            _isLoading.value = false
+            try {
+                val(referrals, lastReferral) = getReferralsByProviderPaged(
+                    providerId = currentUserId,
+                    pageSize = pageSize,
+                    lastReferral = null,
+                    fromDate = _dateFrom.value,
+                    toDate = _dateTo.value,
+                    status = ReferralStatus.PAID.name,
+                    isPaymentsScreen = true
+                )
+                val result = transformToReferralsWithName(referrals, true)
+                _referralsProvider.value = result
+                lastReferralViewModel = lastReferral
+                allReferralsLoaded = result.size < pageSize
+                val lastTime = lastReferral?.paidAt ?: System.currentTimeMillis()
+                listenForNewReferralsByProvider(currentUserId, lastTime)
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 
@@ -214,14 +214,14 @@ class PaymentsMovementViewModel @Inject constructor(
                 .collect { newReferrals ->
                     if(newReferrals.isNotEmpty()){
                         val currentReferrals = _referralsProvider.value
-                        val updatedReferrals = (transformToReferralsWithName(newReferrals, false) + currentReferrals).distinctBy { it.referral.id }
+                        val updatedReferrals = (transformToReferralsWithName(newReferrals, true) + currentReferrals).distinctBy { it.referral.id }
                         _referralsProvider.value = updatedReferrals
                     }
                 }
         }
     }
 
-    fun loadMoreReferralsByProvider(pageSize: Long){
+    fun loadMoreReferralsByProvider(pageSize: Long = 2){
         if(allReferralsLoaded || paginationJob?.isActive == true) return
         paginationJob?.cancel()
         paginationJob = launchCatching {
@@ -235,12 +235,12 @@ class PaymentsMovementViewModel @Inject constructor(
                 lastReferral = lastReferralViewModel,
                 fromDate = _dateFrom.value,
                 toDate = _dateTo.value,
-                status = null,
+                status = ReferralStatus.PAID.name,
                 isPaymentsScreen = true
             )
             if(olderReferrals.isNotEmpty()){
                 val currentReferrals = _referralsProvider.value
-                _referralsProvider.value = (currentReferrals + transformToReferralsWithName(olderReferrals, false)).distinctBy { it.referral.id }
+                _referralsProvider.value = (currentReferrals + transformToReferralsWithName(olderReferrals, true)).distinctBy { it.referral.id }
             }
             lastReferralViewModel = lastReferral
             allReferralsLoaded = olderReferrals.size < pageSize

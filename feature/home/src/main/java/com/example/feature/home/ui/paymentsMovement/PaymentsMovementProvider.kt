@@ -61,7 +61,8 @@ fun PaymentsScreenProvider(
     dateTo: Long?,
     onDateFromChange: (Long?) -> Unit,
     onDateToChange: (Long?) -> Unit,
-    showTopBar: Boolean = true // Añadido para soporte adaptativo
+    showTopBar: Boolean = true, // Añadido para soporte adaptativo
+    onLoadMoreReferralsByProvider: () -> Unit
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,

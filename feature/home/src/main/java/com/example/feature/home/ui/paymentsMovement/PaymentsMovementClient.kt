@@ -58,7 +58,8 @@ fun PaymentsScreenClient(
     dateTo: Long?,
     onDateFromChange: (Long?) -> Unit,
     onDateToChange: (Long?) -> Unit,
-    showTopBar: Boolean = true
+    showTopBar: Boolean = true,
+    onLoadMoreReferralsByClient: () -> Unit
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,

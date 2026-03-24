@@ -45,7 +45,8 @@ fun PaymentsMovement(
                     dateTo = dateTo,
                     onDateFromChange = viewModel::onDateFromChange,
                     onDateToChange = viewModel::onDateToChange,
-                    showTopBar = showTopBar // Lo pasamos a la pantalla interna
+                    showTopBar = showTopBar, // Lo pasamos a la pantalla interna
+                    onLoadMoreReferralsByProvider = { viewModel.loadMoreReferralsByProvider()}
                 )
             }
             is UserData.Client -> {
@@ -58,7 +59,8 @@ fun PaymentsMovement(
                     dateTo = dateTo,
                     onDateFromChange = viewModel::onDateFromChange,
                     onDateToChange = viewModel::onDateToChange,
-                    showTopBar = showTopBar // Lo pasamos a la pantalla interna
+                    showTopBar = showTopBar, // Lo pasamos a la pantalla interna
+                    onLoadMoreReferralsByClient = { viewModel.loadMoreReferralsByClient()}
                 )
             }
             else -> {
