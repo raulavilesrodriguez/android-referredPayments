@@ -22,6 +22,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
@@ -65,12 +66,7 @@ class PaymentsMovementViewModel @Inject constructor(
             if(hasUser()){
                 val user = getUser(currentUserId)
                 _userDataStore.value = user
-                if(user != null){
-                    when (user) {
-                        is UserData.Provider -> loadInitialReferralsByProvider()
-                        is UserData.Client -> loadInitialReferralsByClient()
-                    }
-                }
+
                 launch {
                     getUserFlow(currentUserId)
                         .filterNotNull()
@@ -78,6 +74,20 @@ class PaymentsMovementViewModel @Inject constructor(
                             _userDataStore.value = it
                         }
                 }
+                launch{
+                    combine(_dateFrom, _dateTo){_, _ -> Unit}
+                        .collect {
+                            lastReferralViewModel = null
+                            allReferralsLoaded = false
+
+                            val currentUser = _userDataStore.value ?: return@collect
+                            when (currentUser) {
+                                is UserData.Provider -> loadInitialReferralsByProvider()
+                                is UserData.Client -> loadInitialReferralsByClient()
+                            }
+                        }
+                }
+
             }
         }
     }
@@ -142,7 +152,12 @@ class PaymentsMovementViewModel @Inject constructor(
     private fun listenForNewReferralsByClient(clientId: String, since: Long){
         realTimeJob?.cancel()
         realTimeJob = launchCatching {
-            getReferralsByClientSince(clientId, since)
+            getReferralsByClientSince(
+                clientId = clientId,
+                since = since,
+                toDate = _dateTo.value,
+                isPaymentsScreen = true
+            )
                 .flowOn(Dispatchers.IO)
                 .collect { newReferrals ->
                     if(newReferrals.isNotEmpty()){
@@ -209,7 +224,12 @@ class PaymentsMovementViewModel @Inject constructor(
     private fun listenForNewReferralsByProvider(providerId: String, since: Long){
         realTimeJob?.cancel()
         realTimeJob = launchCatching {
-            getReferralsByProviderSince(providerId, since)
+            getReferralsByProviderSince(
+                providerId = providerId,
+                since = since,
+                toDate = _dateTo.value,
+                isPaymentsScreen = true
+            )
                 .flowOn(Dispatchers.IO)
                 .collect { newReferrals ->
                     if(newReferrals.isNotEmpty()){
