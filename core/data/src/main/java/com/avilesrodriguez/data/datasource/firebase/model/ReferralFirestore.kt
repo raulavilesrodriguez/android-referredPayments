@@ -15,9 +15,9 @@ data class ReferralFirestore(
     val email: String? = null,
     val numberPhone: String? = null,
     val status: String? = null,
-    val createdAt: Timestamp? = null,
+    val createdAt: Any? = null,
     val amountPaid: Double? = null,
-    val paidAt: Timestamp? = null,
+    val paidAt: Any? = null,
     val rating: Double = 0.0,
     val feedbackReason: String? = null
 )
@@ -34,7 +34,7 @@ fun Referral.toReferralFirestore(): ReferralFirestore {
         status = status.name, // "PENDING", "PAID", etc.
         createdAt = Timestamp(Date(createdAt)),
         amountPaid = amountPaid,
-        paidAt = Timestamp(Date(paidAt)),
+        paidAt = paidAt?.let { Timestamp(Date(it)) },
         rating = rating,
         feedbackReason = feedbackReason
     )
@@ -47,6 +47,22 @@ fun ReferralFirestore.toReferralDomain(): Referral{
         Log.e("ReferralFirestore", "Error al convertir el estado de referencia: ${e.message}")
         ReferralStatus.PENDING
     }
+
+    fun toLong(value: Any?): Long {
+        return when (value) {
+            is Timestamp -> value.toDate().time
+            is Long -> value
+            else -> System.currentTimeMillis()
+        }
+    }
+
+    fun toNullableLong(value: Any?): Long? {
+        return when (value) {
+            is Timestamp -> value.toDate().time
+            is Long -> value
+            else -> null
+        }
+    }
     return Referral(
         id = id ?: "",
         clientId = clientId ?: "",
@@ -56,9 +72,9 @@ fun ReferralFirestore.toReferralDomain(): Referral{
         email = email ?: "",
         numberPhone = numberPhone ?: "",
         status = referralStatusType,
-        createdAt = createdAt?.toDate()?.time ?: System.currentTimeMillis(),
+        createdAt = toLong(createdAt),
         amountPaid = amountPaid ?: 0.0,
-        paidAt = paidAt?.toDate()?.time ?: System.currentTimeMillis(),
+        paidAt = toNullableLong(paidAt),
         rating = rating,
         feedbackReason = feedbackReason
     )

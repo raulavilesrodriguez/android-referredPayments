@@ -35,7 +35,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -54,7 +53,7 @@ import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.time.formatTimeBasic
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
 fun PaymentsScreenClient(
@@ -84,9 +83,9 @@ fun PaymentsScreenClient(
             }
         },
         content = { innerPadding ->
-            if(isLoading){
-                Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
+            if (isLoading && referrals.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             } else {
                 PaymentsClient(
@@ -148,29 +147,29 @@ private fun ReferralsList(
 ){
     val listState = rememberLazyListState()
 
-    // detecta cuando llega al tope de la lista
-    // lastVisibleItem.index es el índice del último item visible en la pantalla
-    // El número total de items que tenemos cargados actualmente.
-    val shouldLoadMore = remember {
-        derivedStateOf {
-            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
-                ?: return@derivedStateOf false
-            // está cerca del final de nuestra lista de datos, es hora de cargar más.
-            lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - 5
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            val layoutInfo = listState.layoutInfo
+            val lastItem = layoutInfo.visibleItemsInfo.lastOrNull()
+            val isAtEnd = lastItem != null && lastItem.index >= layoutInfo.totalItemsCount - 1
+
+            // Solo nos interesa el momento en que estamos al final Y el usuario está moviendo la lista
+            isAtEnd && listState.isScrollInProgress
         }
-    }
-    LaunchedEffect(shouldLoadMore.value) {
-        if (shouldLoadMore.value) {
-            onLoadMoreReferralsByClient()
-        }
+            .distinctUntilChanged()
+            .collect { shouldLoad ->
+                // Solo disparamos la carga si la condición es verdadera, no estamos cargando ya,
+                // y hay elementos previos (para no disparar en lista vacía)
+                if (shouldLoad && !isLoading && referrals.isNotEmpty()) {
+                    onLoadMoreReferralsByClient()
+                }
+            }
     }
 
-    // Se dispara cada vez que la lista.
+
+    // Solo scroll al inicio cuando hay cambios en el primer elemento (nuevos referidos reales)
     LaunchedEffect(referrals.firstOrNull()?.referral?.id) {
-        // Si el primer item de la lista (el más nuevo) no está completamente visible,
-        // Solo hacemos scroll al inicio si el usuario está viendo los primeros 2 items
-        if (referrals.isNotEmpty() && listState.firstVisibleItemIndex <= 2) {
-            // AnimateScrollToItem es más suave que scrollToItem
+        if (referrals.isNotEmpty() && listState.firstVisibleItemIndex <= 1) {
             listState.animateScrollToItem(index = 0)
         }
     }
@@ -189,21 +188,24 @@ private fun ReferralsList(
                 onDateToChange = onDateToChange
             )
         }
-        if(!referrals.isEmpty()){
+        
+        if (referrals.isNotEmpty()) {
             items(
                 referrals,
                 key = { item -> item.referral.id }
             ) { item ->
                 ReferralPaidItem(referral = item, client = client)
             }
-        }else{
-            item{
-                Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center){
+        } else if (!isLoading) {
+            item {
+                Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
                     Text(text = stringResource(R.string.no_payments))
                 }
             }
         }
-        if (isLoading) {
+
+        // Cargador al final de la lista para indicar paginación
+        if (isLoading && referrals.isNotEmpty()) {
             item {
                 CircularProgressIndicator(
                     modifier = Modifier
@@ -221,7 +223,7 @@ private fun ReferralPaidItem(
     referral: ReferralWithNames,
     client: UserData.Client,
 ){
-    val paidAt = formatTimeBasic(referral.referral.paidAt)
+    val paidAt = formatTimeBasic(referral.referral.paidAt ?: 0L)
     var expanded by remember { mutableStateOf(false) }
 
     Card(

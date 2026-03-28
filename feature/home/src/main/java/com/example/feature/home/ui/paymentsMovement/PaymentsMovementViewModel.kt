@@ -123,7 +123,7 @@ class PaymentsMovementViewModel @Inject constructor(
             .sortedByDescending { it.referral.paidAt }
     }
 
-    private fun loadInitialReferralsByClient(pageSize: Long=10){
+    private fun loadInitialReferralsByClient(pageSize: Long=3){
         _isLoading.value = true
         paginationJob?.cancel()
         paginationJob = launchCatching {
@@ -149,7 +149,7 @@ class PaymentsMovementViewModel @Inject constructor(
         }
     }
 
-    private fun listenForNewReferralsByClient(clientId: String, since: Long){
+    private fun listenForNewReferralsByClient(clientId: String, since: Long) {
         realTimeJob?.cancel()
         realTimeJob = launchCatching {
             getReferralsByClientSince(
@@ -169,29 +169,31 @@ class PaymentsMovementViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreReferralsByClient(pageSize: Long=2){
-        if(allReferralsLoaded || paginationJob?.isActive == true) return
-        paginationJob?.cancel()
+    fun loadMoreReferralsByClient(pageSize: Long = 1) {
+        if (allReferralsLoaded || paginationJob?.isActive == true || lastReferralViewModel == null) return
+
+        _isLoading.value = true
         paginationJob = launchCatching {
-            if(lastReferralViewModel == null) {
-                allReferralsLoaded = true
-                return@launchCatching
+            try {
+                val (olderReferrals, lastReferral) = getReferralsByClientPaged(
+                    clientId = currentUserId,
+                    pageSize = pageSize,
+                    lastReferral = lastReferralViewModel,
+                    fromDate = _dateFrom.value,
+                    toDate = _dateTo.value,
+                    status = ReferralStatus.PAID.name,
+                    isPaymentsScreen = true
+                )
+                if (olderReferrals.isNotEmpty()) {
+                    val currentReferrals = _referralsClient.value
+                    val enriched = transformToReferralsWithName(olderReferrals, false)
+                    _referralsClient.value = (currentReferrals + enriched).distinctBy { it.referral.id }
+                }
+                lastReferralViewModel = lastReferral
+                allReferralsLoaded = olderReferrals.size < pageSize
+            } finally {
+                _isLoading.value = false
             }
-            val (olderReferrals, lastReferral) = getReferralsByClientPaged(
-                clientId = currentUserId,
-                pageSize = pageSize,
-                lastReferral = lastReferralViewModel,
-                fromDate = _dateFrom.value,
-                toDate = _dateTo.value,
-                status = ReferralStatus.PAID.name,
-                isPaymentsScreen = true
-            )
-            if(olderReferrals.isNotEmpty()){
-                val currentReferrals = _referralsClient.value
-                _referralsClient.value = (currentReferrals + transformToReferralsWithName(olderReferrals, false)).distinctBy { it.referral.id }
-            }
-            lastReferralViewModel = lastReferral
-            allReferralsLoaded = olderReferrals.size < pageSize
         }
     }
 
@@ -221,7 +223,7 @@ class PaymentsMovementViewModel @Inject constructor(
         }
     }
 
-    private fun listenForNewReferralsByProvider(providerId: String, since: Long){
+    private fun listenForNewReferralsByProvider(providerId: String, since: Long) {
         realTimeJob?.cancel()
         realTimeJob = launchCatching {
             getReferralsByProviderSince(
@@ -241,29 +243,31 @@ class PaymentsMovementViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreReferralsByProvider(pageSize: Long = 2){
-        if(allReferralsLoaded || paginationJob?.isActive == true) return
-        paginationJob?.cancel()
+    fun loadMoreReferralsByProvider(pageSize: Long = 5) {
+        if (allReferralsLoaded || paginationJob?.isActive == true || lastReferralViewModel == null) return
+
+        _isLoading.value = true
         paginationJob = launchCatching {
-            if(lastReferralViewModel == null) {
-                allReferralsLoaded = true
-                return@launchCatching
+            try {
+                val (olderReferrals, lastReferral) = getReferralsByProviderPaged(
+                    providerId = currentUserId,
+                    pageSize = pageSize,
+                    lastReferral = lastReferralViewModel,
+                    fromDate = _dateFrom.value,
+                    toDate = _dateTo.value,
+                    status = ReferralStatus.PAID.name,
+                    isPaymentsScreen = true
+                )
+                if (olderReferrals.isNotEmpty()) {
+                    val currentReferrals = _referralsProvider.value
+                    val enriched = transformToReferralsWithName(olderReferrals, true)
+                    _referralsProvider.value = (currentReferrals + enriched).distinctBy { it.referral.id }
+                }
+                lastReferralViewModel = lastReferral
+                allReferralsLoaded = olderReferrals.size < pageSize
+            } finally {
+                _isLoading.value = false
             }
-            val (olderReferrals, lastReferral) = getReferralsByProviderPaged(
-                providerId = currentUserId,
-                pageSize = pageSize,
-                lastReferral = lastReferralViewModel,
-                fromDate = _dateFrom.value,
-                toDate = _dateTo.value,
-                status = ReferralStatus.PAID.name,
-                isPaymentsScreen = true
-            )
-            if(olderReferrals.isNotEmpty()){
-                val currentReferrals = _referralsProvider.value
-                _referralsProvider.value = (currentReferrals + transformToReferralsWithName(olderReferrals, true)).distinctBy { it.referral.id }
-            }
-            lastReferralViewModel = lastReferral
-            allReferralsLoaded = olderReferrals.size < pageSize
         }
     }
 }

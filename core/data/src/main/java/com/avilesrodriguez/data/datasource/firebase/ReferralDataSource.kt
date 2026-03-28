@@ -46,7 +46,7 @@ class ReferralDataSource @Inject constructor(
         if (referralId.isEmpty()) return
 
         val firestoreUpdates = updates.mapValues { entry ->
-            if (entry.key == CREATED_AT_FIELD && entry.value is Long) {
+            if ((entry.key == CREATED_AT_FIELD || entry.key == PAID_AT_FIELD) && entry.value is Long) {
                 Timestamp(Date(entry.value as Long))
             } else {
                 entry.value

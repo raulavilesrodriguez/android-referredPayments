@@ -2,9 +2,11 @@ package com.avilesrodriguez.data.datasource.firebase
 
 import com.avilesrodriguez.data.datasource.firebase.model.toMessageFirestore
 import com.avilesrodriguez.domain.model.message.Message
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import java.util.Date
 import javax.inject.Inject
 
 class TransactionsDataSource @Inject constructor(
@@ -24,7 +26,10 @@ class TransactionsDataSource @Inject constructor(
             val clientRef = firestore.collection(USERS_COLLECTION).document(clientUid)
             val providerRef = firestore.collection(USERS_COLLECTION).document(providerUid)
 
-            transaction.update(referralRef, referralUpdates)
+            // Convertimos cualquier Long de fecha a Timestamp para Firestore
+            val referralUpdatesFirestore = sanitizeMap(referralUpdates)
+
+            transaction.update(referralRef, referralUpdatesFirestore)
             val messageFirestore = message.toMessageFirestore().copy(id = messageRef.id)
             transaction.set(messageRef, messageFirestore)
             transaction.update(clientRef, mapOf(
@@ -49,13 +54,26 @@ class TransactionsDataSource @Inject constructor(
             val messageRef = firestore.collection(MESSAGES_COLLECTION).document()
             val providerRef = firestore.collection(USERS_COLLECTION).document(providerUid)
 
-            transaction.update(referralRef, referralUpdates)
+            // Convertimos cualquier Long de fecha a Timestamp para Firestore
+            val referralUpdatesFirestore = sanitizeMap(referralUpdates)
+
+            transaction.update(referralRef, referralUpdatesFirestore)
             val messageFirestore = message.toMessageFirestore().copy(id = messageRef.id)
             transaction.set(messageRef, messageFirestore)
             transaction.update(providerRef, mapOf(
                 PROCESSING_REFERRALS_COUNT to FieldValue.increment(-1)
             ))
         }.await()
+    }
+
+    private fun sanitizeMap(map: Map<String, Any>): Map<String, Any> {
+        return map.mapValues { entry ->
+            if ((entry.key == PAID_AT_FIELD || entry.key == CREATED_AT_FIELD) && entry.value is Long) {
+                Timestamp(Date(entry.value as Long))
+            } else {
+                entry.value
+            }
+        }
     }
 
     companion object{
@@ -66,5 +84,7 @@ class TransactionsDataSource @Inject constructor(
         private const val MONEY_PAID_PROVIDER_FIELD = "moneyPaid"
         private const val TOTAL_PAYOUTS_PROVIDER_FIELD = "totalPayouts"
         private const val PROCESSING_REFERRALS_COUNT = "processingReferralsCount"
+        private const val PAID_AT_FIELD = "paidAt"
+        private const val CREATED_AT_FIELD = "createdAt"
     }
 }
