@@ -2,6 +2,7 @@ package com.example.feature.home.ui.paymentsMovement
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,7 +54,7 @@ import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.time.formatTimeBasic
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.filter
 
 @Composable
 fun PaymentsScreenClient(
@@ -146,30 +147,27 @@ private fun ReferralsList(
     isLoading: Boolean
 ){
     val listState = rememberLazyListState()
+    
+    // Detectamos si el usuario tiene el dedo en la pantalla moviendo la lista
+    val isDragged by listState.interactionSource.collectIsDraggedAsState()
 
     LaunchedEffect(listState) {
         snapshotFlow {
-            val layoutInfo = listState.layoutInfo
-            val lastItem = layoutInfo.visibleItemsInfo.lastOrNull()
-            val isAtEnd = lastItem != null && lastItem.index >= layoutInfo.totalItemsCount - 1
+            val atBottom = !listState.canScrollForward
 
-            // Solo nos interesa el momento en que estamos al final Y el usuario está moviendo la lista
-            isAtEnd && listState.isScrollInProgress
+            isDragged && atBottom
         }
             .distinctUntilChanged()
             .collect { shouldLoad ->
-                // Solo disparamos la carga si la condición es verdadera, no estamos cargando ya,
-                // y hay elementos previos (para no disparar en lista vacía)
                 if (shouldLoad && !isLoading && referrals.isNotEmpty()) {
                     onLoadMoreReferralsByClient()
                 }
             }
     }
 
-
-    // Solo scroll al inicio cuando hay cambios en el primer elemento (nuevos referidos reales)
+    // Scroll automático al inicio solo ante nuevos referidos principales (no por paginación)
     LaunchedEffect(referrals.firstOrNull()?.referral?.id) {
-        if (referrals.isNotEmpty() && listState.firstVisibleItemIndex <= 1) {
+        if (referrals.isNotEmpty() && listState.firstVisibleItemIndex <= 2) {
             listState.animateScrollToItem(index = 0)
         }
     }
@@ -204,7 +202,7 @@ private fun ReferralsList(
             }
         }
 
-        // Cargador al final de la lista para indicar paginación
+        // Cargador al final para indicar que se está trayendo más data
         if (isLoading && referrals.isNotEmpty()) {
             item {
                 CircularProgressIndicator(
