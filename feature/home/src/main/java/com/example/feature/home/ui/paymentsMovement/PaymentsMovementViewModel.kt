@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
@@ -123,7 +124,7 @@ class PaymentsMovementViewModel @Inject constructor(
             .sortedByDescending { it.referral.paidAt }
     }
 
-    private fun loadInitialReferralsByClient(pageSize: Long=3){
+    private fun loadInitialReferralsByClient(pageSize: Long=20){
         _isLoading.value = true
         paginationJob?.cancel()
         paginationJob = launchCatching {
@@ -169,7 +170,7 @@ class PaymentsMovementViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreReferralsByClient(pageSize: Long = 1) {
+    fun loadMoreReferralsByClient(pageSize: Long = 20) {
         if (allReferralsLoaded || paginationJob?.isActive == true || lastReferralViewModel == null) return
 
         _isLoading.value = true
@@ -197,7 +198,7 @@ class PaymentsMovementViewModel @Inject constructor(
         }
     }
 
-    private fun loadInitialReferralsByProvider(pageSize: Long=10){
+    private fun loadInitialReferralsByProvider(pageSize: Long=20){
         _isLoading.value = true
         paginationJob?.cancel()
         paginationJob = launchCatching {
@@ -243,7 +244,7 @@ class PaymentsMovementViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreReferralsByProvider(pageSize: Long = 5) {
+    fun loadMoreReferralsByProvider(pageSize: Long = 20) {
         if (allReferralsLoaded || paginationJob?.isActive == true || lastReferralViewModel == null) return
 
         _isLoading.value = true

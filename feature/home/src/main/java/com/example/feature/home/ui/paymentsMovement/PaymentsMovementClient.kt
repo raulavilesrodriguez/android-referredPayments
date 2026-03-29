@@ -153,7 +153,7 @@ private fun ReferralsList(
 
     LaunchedEffect(listState) {
         snapshotFlow {
-            val atBottom = !listState.canScrollForward
+            val atBottom = !listState.canScrollForward  //ya no hay más contenido abajo → estoy en el final
 
             isDragged && atBottom
         }
