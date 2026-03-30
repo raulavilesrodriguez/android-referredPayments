@@ -142,7 +142,8 @@ class PaymentsMovementViewModel @Inject constructor(
                 lastReferralViewModel = lastReferral
                 allReferralsLoaded = result.size < pageSize
                 val newestTime = referrals.firstOrNull()?.paidAt ?: System.currentTimeMillis()
-                listenForNewReferralsByClient(currentUserId, newestTime)
+                val toDate = _dateTo.value
+                if(toDate == null) listenForNewReferralsByClient(currentUserId, newestTime)
             } finally {
                 _isLoading.value = false
             }
@@ -215,7 +216,8 @@ class PaymentsMovementViewModel @Inject constructor(
                 lastReferralViewModel = lastReferral
                 allReferralsLoaded = result.size < pageSize
                 val newestTime = referrals.firstOrNull()?.paidAt ?: System.currentTimeMillis()
-                listenForNewReferralsByProvider(currentUserId, newestTime)
+                val toDate = _dateTo.value
+                if(toDate == null) listenForNewReferralsByProvider(currentUserId, newestTime)
             } finally {
                 _isLoading.value = false
             }
@@ -241,7 +243,7 @@ class PaymentsMovementViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreReferralsByProvider(pageSize: Long = 2) {
+    fun loadMoreReferralsByProvider(pageSize: Long = 1) {
         if (allReferralsLoaded || paginationJob?.isActive == true || lastReferralViewModel == null) return
 
         _isLoading.value = true

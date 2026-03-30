@@ -1,6 +1,5 @@
 package com.avilesrodriguez.feature.referrals.ui.referrals
 
-import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.referral.ReferralWithNames
@@ -8,20 +7,19 @@ import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.ClearFCMToken
 import com.avilesrodriguez.domain.usecases.ClearLocalCache
 import com.avilesrodriguez.domain.usecases.CurrentUserId
-import com.avilesrodriguez.domain.usecases.GetReferralsByClient
 import com.avilesrodriguez.domain.usecases.GetReferralsByClientPaged
 import com.avilesrodriguez.domain.usecases.GetReferralsByClientSince
-import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
 import com.avilesrodriguez.domain.usecases.GetReferralsByProviderPaged
 import com.avilesrodriguez.domain.usecases.GetReferralsByProviderSince
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SignOut
-import com.avilesrodriguez.feature.referrals.ui.referral.ReferralStatus
+import com.avilesrodriguez.presentation.ext.getById
 import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -32,9 +30,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
-import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -42,8 +40,6 @@ class ReferralsViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
     private val hasUser: HasUser,
     private val getUser: GetUser,
-    private val getReferralsByClient: GetReferralsByClient,
-    private val getReferralsByProvider: GetReferralsByProvider,
     private val signOut: SignOut,
     private val clearLocalCache: ClearLocalCache,
     private val clearFCMToken: ClearFCMToken,
@@ -52,7 +48,6 @@ class ReferralsViewModel @Inject constructor(
     private val getReferralsByProviderSince: GetReferralsByProviderSince,
     private val getReferralsByProviderPaged: GetReferralsByProviderPaged
 ) : BaseViewModel(){
-    private val _allReferrals = MutableStateFlow<List<ReferralWithNames>>(emptyList())
     private val _uiState = MutableStateFlow<List<ReferralWithNames>>(emptyList())
     val uiState: StateFlow<List<ReferralWithNames>> = _uiState.asStateFlow()
     private val _searchText = MutableStateFlow("")
@@ -66,8 +61,6 @@ class ReferralsViewModel @Inject constructor(
     val referralStatus: StateFlow<ReferralStatus?> = _referralStatus.asStateFlow()
     private var allReferralsLoaded = false
     private var lastReferralViewModel: Referral? = null
-
-    private var referralsJob: Job? = null
     private var paginationJob: Job? = null
     private var realTimeJob: Job? = null
     //ConcurrentHashMap guarantees that writings y readings en el caché no corrompan los datos ni lancen una ConcurrentModificationException
@@ -80,23 +73,25 @@ class ReferralsViewModel @Inject constructor(
         launchCatching {
             if(hasUser()){
                 _userDataStore.value = getUser(currentUserId)
-                fetchAllReferrals()
-            }
-            _searchText
-                .debounce(300)
-                .distinctUntilChanged()
-                .collect { query ->
-                    filterReferralsLocally(query)
+                _referralStatus
+                    .debounce(300)
+                    .distinctUntilChanged()
+                    .collect {
+                        lastReferralViewModel = null
+                        allReferralsLoaded = false
+                        val userData = _userDataStore.value ?: return@collect
+                        when(userData) {
+                            is UserData.Client -> loadInitialReferralsByClient()
+                            is UserData.Provider -> loadInitialReferralsByProvider()
+                        }
                 }
+            }
         }
     }
 
-    fun updateSearchText(newText: String) {
-        _searchText.value = newText
-    }
-
-    fun updateReferralStatus(newStatus: ReferralStatus?) {
-        _referralStatus.value = newStatus
+    fun updateReferralStatus(newStatus: Int) {
+        val status = ReferralStatus.getById(newStatus)
+        _referralStatus.value = status
     }
 
     private  suspend fun transformToReferralsWithOtherName(
@@ -126,48 +121,6 @@ class ReferralsViewModel @Inject constructor(
         }
     }
 
-    private fun fetchAllReferrals(){
-        _isLoading.value = true
-        referralsJob?.cancel()
-        referralsJob =launchCatching {
-            val userData = _userDataStore.value
-            val flow = when(userData) {
-                is UserData.Client -> getReferralsByClient(currentUserId)
-                is UserData.Provider -> getReferralsByProvider(currentUserId)
-                else -> null
-            }
-
-            flow?.collect { referrals ->
-                val uniqueIds = referrals.map { referral ->
-                    val otherId = if (userData is UserData.Client) referral.providerId else referral.clientId
-                     otherId
-                }.distinct()
-                val missingIds = uniqueIds.filter { !nameCache.containsKey(it) }
-                if (missingIds.isNotEmpty()) {
-                    coroutineScope {
-                        missingIds.map{id ->
-                            async { id to (getUser(id)?.name ?: "") }
-                        }.awaitAll().forEach { (id, name) ->
-                            nameCache[id] = name
-                        }
-                    }
-                }
-                val referralsWithNames = referrals.map { referral ->
-                    val otherId = if (userData is UserData.Client) referral.providerId else referral.clientId
-                    ReferralWithNames(
-                        referral = referral,
-                        otherPartyName = nameCache[otherId] ?: ""
-                    )
-                }
-                _allReferrals.value = referralsWithNames
-                //si there was algo escrito
-                filterReferralsLocally(_searchText.value)
-                _isLoading.value = false
-            }
-        }
-        referralsJob?.invokeOnCompletion { if (it is CancellationException) _isLoading.value = false }
-    }
-
     private fun loadInitialReferralsByClient(pageSize: Long=3){
         _isLoading.value = true
         paginationJob?.cancel()
@@ -184,10 +137,11 @@ class ReferralsViewModel @Inject constructor(
                     isPaymentsScreen = false
                 )
                 val result = transformToReferralsWithOtherName(referrals, false)
-                _allReferrals.value = result
+                _uiState.value = result
                 lastReferralViewModel = lastReferral
                 allReferralsLoaded = result.size < pageSize
-                val lastTime = lastReferral?.createdAt ?: System.currentTimeMillis()
+                val newestTime = referrals.firstOrNull()?.createdAt ?: System.currentTimeMillis()
+                listenForNewReferralsByClient(currentUserId, newestTime)
             } finally {
                 _isLoading.value = false
             }
@@ -197,19 +151,128 @@ class ReferralsViewModel @Inject constructor(
     private fun listenForNewReferralsByClient(clientId: String, since: Long) {
         realTimeJob?.cancel()
         realTimeJob = launchCatching {
-
+            getReferralsByClientSince(
+                clientId = clientId,
+                since = since,
+                isPaymentsScreen = false
+            )
+                .flowOn(Dispatchers.IO)
+                .collect { newReferrals ->
+                    if(newReferrals.isNotEmpty()){
+                        val currentReferrals = _uiState.value
+                        val updatedReferrals = (transformToReferralsWithOtherName(newReferrals, false) + currentReferrals).distinctBy { it.referral.id }
+                        _uiState.value = updatedReferrals
+                    }
+                }
         }
     }
 
-    private fun filterReferralsLocally(query: String) {
-        val queryNormalized = query.normalizeName()
-        val allEnriched = _allReferrals.value
-        if (queryNormalized.isEmpty()) {
-            _uiState.value = allEnriched
-        } else {
-            // Busca en cualquier parte del nombre (contains)
-            _uiState.value = _allReferrals.value.filter { item ->
-                item.referral.nameLowercase.contains(queryNormalized)
+    fun loadMoreReferrals(pageSize: Long = 1) {
+        val user = _userDataStore.value ?: return
+        when(user){
+            is UserData.Client -> loadMoreReferralsByClient(pageSize)
+            is UserData.Provider -> loadMoreReferralsByProvider(pageSize)
+        }
+    }
+
+    private fun loadMoreReferralsByClient(pageSize: Long) {
+        if (allReferralsLoaded || paginationJob?.isActive == true || lastReferralViewModel == null) return
+        _isLoading.value = true
+        paginationJob = launchCatching {
+            val status = _referralStatus.value?.name
+            try {
+                val (olderReferrals, lastReferral) = getReferralsByClientPaged(
+                    clientId = currentUserId,
+                    pageSize = pageSize,
+                    lastReferral = lastReferralViewModel,
+                    fromDate = null,
+                    toDate = null,
+                    status = status,
+                    isPaymentsScreen = false
+                )
+                if (olderReferrals.isNotEmpty()) {
+                    val currentReferrals = _uiState.value
+                    val enriched = transformToReferralsWithOtherName(olderReferrals, false)
+                    _uiState.value = (currentReferrals + enriched).distinctBy { it.referral.id }
+                }
+                lastReferralViewModel = lastReferral
+                allReferralsLoaded = olderReferrals.size < pageSize
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private fun loadInitialReferralsByProvider(pageSize: Long=3){
+        _isLoading.value = true
+        paginationJob?.cancel()
+        paginationJob = launchCatching {
+            val status = _referralStatus.value?.name
+            try {
+                val(referrals, lastReferral) = getReferralsByProviderPaged(
+                    providerId = currentUserId,
+                    pageSize = pageSize,
+                    lastReferral = null,
+                    fromDate = null,
+                    toDate = null,
+                    status = status,
+                    isPaymentsScreen = false
+                )
+                val result = transformToReferralsWithOtherName(referrals, true)
+                _uiState.value = result
+                lastReferralViewModel = lastReferral
+                allReferralsLoaded = result.size < pageSize
+                val newestTime = referrals.firstOrNull()?.createdAt ?: System.currentTimeMillis()
+                listenForNewReferralsByProvider(currentUserId, newestTime)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private fun listenForNewReferralsByProvider(providerId: String, since: Long) {
+        realTimeJob?.cancel()
+        realTimeJob = launchCatching {
+            getReferralsByProviderSince(
+                providerId = providerId,
+                since = since,
+                isPaymentsScreen = false
+            )
+                .flowOn(Dispatchers.IO)
+                .collect { newReferrals ->
+                    if(newReferrals.isNotEmpty()){
+                        val currentReferrals = _uiState.value
+                        val updatedReferrals = (transformToReferralsWithOtherName(newReferrals, true) + currentReferrals).distinctBy { it.referral.id }
+                        _uiState.value = updatedReferrals
+                    }
+                }
+        }
+    }
+
+    private fun loadMoreReferralsByProvider(pageSize: Long){
+        if (allReferralsLoaded || paginationJob?.isActive == true || lastReferralViewModel == null) return
+        _isLoading.value = true
+        paginationJob = launchCatching {
+            val status = _referralStatus.value?.name
+            try {
+                val (olderReferrals, lastReferral) = getReferralsByProviderPaged(
+                    providerId = currentUserId,
+                    pageSize = pageSize,
+                    lastReferral = lastReferralViewModel,
+                    fromDate = null,
+                    toDate = null,
+                    status = status,
+                    isPaymentsScreen = false
+                )
+                if (olderReferrals.isNotEmpty()) {
+                    val currentReferrals = _uiState.value
+                    val enriched = transformToReferralsWithOtherName(olderReferrals, true)
+                    _uiState.value = (currentReferrals + enriched).distinctBy { it.referral.id }
+                }
+                lastReferralViewModel = lastReferral
+                allReferralsLoaded = olderReferrals.size < pageSize
+            } finally {
+                _isLoading.value = false
             }
         }
     }

@@ -56,6 +56,7 @@ import com.avilesrodriguez.feature.referrals.ui.referral.ReferralScreen
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.BottomBarNavigation
 import com.avilesrodriguez.presentation.composables.TopBarMain
+import com.avilesrodriguez.presentation.ext.toDisplayName
 import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
 import com.avilesrodriguez.presentation.navigation.generateTabs
@@ -95,7 +96,7 @@ fun ReferralsScreen(
     viewModel: ReferralsViewModel = hiltViewModel()
 ){
     val uiState by viewModel.uiState.collectAsState()
-    val searchText by viewModel.searchText.collectAsState()
+    val selectedStatus by viewModel.referralStatus.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val user by viewModel.userDataStore.collectAsState()
 
@@ -231,15 +232,16 @@ fun ReferralsScreen(
                             .clipToBounds()){
                             when(selectedTabIndex){
                                 0 -> ReferralsScreenContent(
-                                    searchText = searchText,
-                                    onValueChange = viewModel::updateSearchText,
+                                    selectedStatus = selectedStatus?.toDisplayName(),
+                                    filterReferralsByStatus = {status -> viewModel.updateReferralStatus(status)},
                                     onReferralClick = { referral ->
                                         detailContent = ReferralsDetailContent.ReferralDetail(referral.id)
                                         coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
                                                       },
                                     referrals = uiState,
                                     user = user,
-                                    isLoading = isLoading
+                                    isLoading = isLoading,
+                                    onLoadMoreReferrals = viewModel::loadMoreReferrals
                                 )
                                 else -> {
                                     Box(Modifier.fillMaxSize())
@@ -273,33 +275,35 @@ fun ReferralsScreen(
 
 @Composable
 private fun ReferralsScreenContent(
-    searchText: String,
-    onValueChange: (String) -> Unit,
+    selectedStatus: Int?,
+    filterReferralsByStatus: (Int) -> Unit,
     onReferralClick: (Referral) -> Unit,
     referrals: List<ReferralWithNames>,
     user: UserData?,
-    isLoading: Boolean
+    isLoading: Boolean,
+    onLoadMoreReferrals: () -> Unit
 ){
     val focusManager = LocalFocusManager.current
 
     Column(modifier = Modifier.fillMaxSize()){
-        if(!isLoading){
-            ReferralsList(
-                searchText = searchText,
-                onValueChange = onValueChange,
-                onReferralClick = onReferralClick,
-                referrals = referrals,
-                user = user,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-        } else {
+        if(isLoading && referrals.isEmpty()){
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(8.dp)
                 )
             }
+        } else {
+            ReferralsList(
+                selectedStatus = selectedStatus,
+                filterReferralsByStatus = filterReferralsByStatus,
+                onReferralClick = onReferralClick,
+                referrals = referrals,
+                user = user,
+                isLoading = isLoading,
+                onLoadMoreReferrals = onLoadMoreReferrals,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
         }
     }
 
@@ -316,12 +320,13 @@ private fun ReferralsScreenContent(
 fun ReferralsScreenPreview(){
     MaterialTheme {
         ReferralsScreenContent(
-            searchText = "",
-            onValueChange = {},
+            selectedStatus = null,
+            filterReferralsByStatus = {},
             onReferralClick = {},
             referrals = listOf(),
             user = userClient,
-            isLoading = false
+            isLoading = false,
+            onLoadMoreReferrals = {}
         )
     }
 }
