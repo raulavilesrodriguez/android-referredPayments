@@ -1,16 +1,23 @@
 package com.avilesrodriguez.feature.referrals.ui.referrals
 
 import com.avilesrodriguez.domain.ext.normalizeName
+import com.avilesrodriguez.domain.model.referral.Referral
+import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.referral.ReferralWithNames
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.ClearFCMToken
 import com.avilesrodriguez.domain.usecases.ClearLocalCache
 import com.avilesrodriguez.domain.usecases.CurrentUserId
 import com.avilesrodriguez.domain.usecases.GetReferralsByClient
+import com.avilesrodriguez.domain.usecases.GetReferralsByClientPaged
+import com.avilesrodriguez.domain.usecases.GetReferralsByClientSince
 import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
+import com.avilesrodriguez.domain.usecases.GetReferralsByProviderPaged
+import com.avilesrodriguez.domain.usecases.GetReferralsByProviderSince
 import com.avilesrodriguez.domain.usecases.GetUser
 import com.avilesrodriguez.domain.usecases.HasUser
 import com.avilesrodriguez.domain.usecases.SignOut
+import com.avilesrodriguez.feature.referrals.ui.referral.ReferralStatus
 import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
@@ -39,7 +46,11 @@ class ReferralsViewModel @Inject constructor(
     private val getReferralsByProvider: GetReferralsByProvider,
     private val signOut: SignOut,
     private val clearLocalCache: ClearLocalCache,
-    private val clearFCMToken: ClearFCMToken
+    private val clearFCMToken: ClearFCMToken,
+    private val getReferralsByClientSince: GetReferralsByClientSince,
+    private val getReferralsByClientPaged: GetReferralsByClientPaged,
+    private val getReferralsByProviderSince: GetReferralsByProviderSince,
+    private val getReferralsByProviderPaged: GetReferralsByProviderPaged
 ) : BaseViewModel(){
     private val _allReferrals = MutableStateFlow<List<ReferralWithNames>>(emptyList())
     private val _uiState = MutableStateFlow<List<ReferralWithNames>>(emptyList())
@@ -51,7 +62,14 @@ class ReferralsViewModel @Inject constructor(
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
 
+    private val _referralStatus = MutableStateFlow<ReferralStatus?>(null)
+    val referralStatus: StateFlow<ReferralStatus?> = _referralStatus.asStateFlow()
+    private var allReferralsLoaded = false
+    private var lastReferralViewModel: Referral? = null
+
     private var referralsJob: Job? = null
+    private var paginationJob: Job? = null
+    private var realTimeJob: Job? = null
     //ConcurrentHashMap guarantees that writings y readings en el caché no corrompan los datos ni lancen una ConcurrentModificationException
     private val nameCache = ConcurrentHashMap<String, String>()
 
@@ -75,6 +93,37 @@ class ReferralsViewModel @Inject constructor(
 
     fun updateSearchText(newText: String) {
         _searchText.value = newText
+    }
+
+    fun updateReferralStatus(newStatus: ReferralStatus?) {
+        _referralStatus.value = newStatus
+    }
+
+    private  suspend fun transformToReferralsWithOtherName(
+        referrals:List<Referral>,
+        isProvider: Boolean
+    ): List<ReferralWithNames> {
+        val uniqueIds = referrals.map { referral ->
+            val otherId = if (isProvider) referral.clientId else referral.providerId
+            otherId
+        }.distinct()
+        val missingIds = uniqueIds.filter { !nameCache.containsKey(it) }
+        if (missingIds.isNotEmpty()) {
+            coroutineScope {
+                missingIds.map{id ->
+                    async { id to (getUser(id)?.name ?: "") }
+                }.awaitAll().forEach { (id, name) ->
+                    nameCache[id] = name
+                }
+            }
+        }
+        return referrals.map { referral ->
+            val otherId = if (isProvider) referral.clientId else referral.providerId
+            ReferralWithNames(
+                referral = referral,
+                otherPartyName = nameCache[otherId] ?: ""
+            )
+        }
     }
 
     private fun fetchAllReferrals(){
@@ -117,6 +166,39 @@ class ReferralsViewModel @Inject constructor(
             }
         }
         referralsJob?.invokeOnCompletion { if (it is CancellationException) _isLoading.value = false }
+    }
+
+    private fun loadInitialReferralsByClient(pageSize: Long=3){
+        _isLoading.value = true
+        paginationJob?.cancel()
+        paginationJob = launchCatching {
+            val status = _referralStatus.value?.name
+            try {
+                val(referrals, lastReferral) = getReferralsByClientPaged(
+                    clientId = currentUserId,
+                    pageSize = pageSize,
+                    lastReferral = null,
+                    fromDate = null,
+                    toDate = null,
+                    status = status,
+                    isPaymentsScreen = false
+                )
+                val result = transformToReferralsWithOtherName(referrals, false)
+                _allReferrals.value = result
+                lastReferralViewModel = lastReferral
+                allReferralsLoaded = result.size < pageSize
+                val lastTime = lastReferral?.createdAt ?: System.currentTimeMillis()
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private fun listenForNewReferralsByClient(clientId: String, since: Long) {
+        realTimeJob?.cancel()
+        realTimeJob = launchCatching {
+
+        }
     }
 
     private fun filterReferralsLocally(query: String) {

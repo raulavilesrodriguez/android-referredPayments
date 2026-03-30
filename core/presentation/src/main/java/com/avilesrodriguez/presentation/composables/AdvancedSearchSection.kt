@@ -66,7 +66,8 @@ fun AdvancedSearchSection(
             text = stringResource(R.string.advanced_search),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
         )
         Row(
             modifier = Modifier.fillMaxWidth(),

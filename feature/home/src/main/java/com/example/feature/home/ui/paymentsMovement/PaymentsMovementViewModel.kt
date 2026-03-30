@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
@@ -142,8 +141,8 @@ class PaymentsMovementViewModel @Inject constructor(
                 _referralsClient.value = result
                 lastReferralViewModel = lastReferral
                 allReferralsLoaded = result.size < pageSize
-                val lastTime = lastReferral?.paidAt ?: System.currentTimeMillis()
-                listenForNewReferralsByClient(currentUserId, lastTime)
+                val newestTime = referrals.firstOrNull()?.paidAt ?: System.currentTimeMillis()
+                listenForNewReferralsByClient(currentUserId, newestTime)
             } finally {
                 _isLoading.value = false
             }
@@ -156,7 +155,6 @@ class PaymentsMovementViewModel @Inject constructor(
             getReferralsByClientSince(
                 clientId = clientId,
                 since = since,
-                toDate = _dateTo.value,
                 isPaymentsScreen = true
             )
                 .flowOn(Dispatchers.IO)
@@ -198,7 +196,7 @@ class PaymentsMovementViewModel @Inject constructor(
         }
     }
 
-    private fun loadInitialReferralsByProvider(pageSize: Long=20){
+    private fun loadInitialReferralsByProvider(pageSize: Long=3){
         _isLoading.value = true
         paginationJob?.cancel()
         paginationJob = launchCatching {
@@ -216,8 +214,8 @@ class PaymentsMovementViewModel @Inject constructor(
                 _referralsProvider.value = result
                 lastReferralViewModel = lastReferral
                 allReferralsLoaded = result.size < pageSize
-                val lastTime = lastReferral?.paidAt ?: System.currentTimeMillis()
-                listenForNewReferralsByProvider(currentUserId, lastTime)
+                val newestTime = referrals.firstOrNull()?.paidAt ?: System.currentTimeMillis()
+                listenForNewReferralsByProvider(currentUserId, newestTime)
             } finally {
                 _isLoading.value = false
             }
@@ -230,7 +228,6 @@ class PaymentsMovementViewModel @Inject constructor(
             getReferralsByProviderSince(
                 providerId = providerId,
                 since = since,
-                toDate = _dateTo.value,
                 isPaymentsScreen = true
             )
                 .flowOn(Dispatchers.IO)
@@ -244,7 +241,7 @@ class PaymentsMovementViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreReferralsByProvider(pageSize: Long = 20) {
+    fun loadMoreReferralsByProvider(pageSize: Long = 2) {
         if (allReferralsLoaded || paginationJob?.isActive == true || lastReferralViewModel == null) return
 
         _isLoading.value = true

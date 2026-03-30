@@ -2,6 +2,7 @@ package com.example.feature.home.ui.paymentsMovement
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,11 +33,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,6 +53,7 @@ import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.time.formatTimeBasic
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,12 +85,8 @@ fun PaymentsScreenProvider(
             }
         },
         content = { innerPadding ->
-            if(isLoading){
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth().height(200.dp),
-                    contentAlignment = Alignment.Center
-                ) {
+            if(isLoading && referrals.isEmpty()){
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.padding(8.dp)
@@ -154,29 +152,26 @@ private fun ReferralsList(
 ){
     val listState = rememberLazyListState()
 
-    // detecta cuando llega al tope de la lista
-    // lastVisibleItem.index es el índice del último item visible en la pantalla
-    // El número total de items que tenemos cargados actualmente.
-    val shouldLoadMore = remember {
-        derivedStateOf {
-            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
-                ?: return@derivedStateOf false
-            // está cerca del final de nuestra lista de datos, es hora de cargar más.
-            lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - 5
+    // Detectamos si el usuario tiene el dedo en la pantalla moviendo la lista
+    val isDragged by listState.interactionSource.collectIsDraggedAsState()
+
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            val atBottom = !listState.canScrollForward  //ya no hay más contenido abajo → estoy en el final
+
+            isDragged && atBottom
         }
-    }
-    LaunchedEffect(shouldLoadMore.value) {
-        if (shouldLoadMore.value) {
-            onLoadMoreReferralsByProvider()
-        }
+            .distinctUntilChanged()
+            .collect { shouldLoad ->
+                if (shouldLoad && !isLoading && referrals.isNotEmpty()) {
+                    onLoadMoreReferralsByProvider()
+                }
+            }
     }
 
-    // Se dispara cada vez que la lista.
+    // Scroll automático al inicio solo ante nuevos referidos principales (no por paginación)
     LaunchedEffect(referrals.firstOrNull()?.referral?.id) {
-        // Si el primer item de la lista (el más nuevo) no está completamente visible,
-        // Solo hacemos scroll al inicio si el usuario está viendo los primeros 2 items
         if (referrals.isNotEmpty() && listState.firstVisibleItemIndex <= 2) {
-            // AnimateScrollToItem es más suave que scrollToItem
             listState.animateScrollToItem(index = 0)
         }
     }
@@ -195,21 +190,21 @@ private fun ReferralsList(
                 onDateToChange = onDateToChange
             )
         }
-        if(!referrals.isEmpty()){
+        if(referrals.isNotEmpty()){
             items(
                 referrals,
                 key = { item -> item.referral.id }
             ){ item ->
                 ReferralPaidItem(referral = item, provider = provider)
             }
-        }else{
+        }else if (!isLoading){
             item{
                 Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center){
                     Text(text = stringResource(R.string.no_payments))
                 }
             }
         }
-        if (isLoading) {
+        if (isLoading && referrals.isNotEmpty()) {
             item {
                 CircularProgressIndicator(
                     modifier = Modifier
@@ -227,7 +222,7 @@ private fun ReferralPaidItem(
     referral: ReferralWithNames,
     provider: UserData.Provider,
 ){
-    val paidAt = formatTimeBasic(referral.referral.paidAt)
+    val paidAt = formatTimeBasic(referral.referral.paidAt ?: 0L)
     var expanded by remember { mutableStateOf(false) }
 
     Card(
@@ -272,7 +267,7 @@ private fun ReferralPaidItem(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center

@@ -194,18 +194,14 @@ class ReferralDataSource @Inject constructor(
     fun getReferralsByClientSince(
         clientId: String,
         since: Long,
-        toDate: Long? = null,
         isPaymentsScreen: Boolean = false
     ) : Flow<List<Referral>>{
         val dateField = if (isPaymentsScreen) PAID_AT_FIELD else CREATED_AT_FIELD
-        val sinceTimestamp = Timestamp(Date(since))
+        val sinceTimestamp = Timestamp(Date(since + 1))
         var query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(CLIENT_ID_FIELD, clientId)
             .whereGreaterThanOrEqualTo(dateField, sinceTimestamp)
 
-        toDate?.let {
-            query = query.whereLessThanOrEqualTo(dateField, toLocalEndOfDayTimestamp(it))
-        }
         query = query.orderBy(dateField, Query.Direction.DESCENDING)
 
         return createReferralFlow(query)
@@ -214,18 +210,14 @@ class ReferralDataSource @Inject constructor(
     fun getReferralsByProviderSince(
         providerId: String,
         since: Long,
-        toDate: Long? = null,
         isPaymentsScreen: Boolean = false
     ) : Flow<List<Referral>>{
         val dateField = if (isPaymentsScreen) PAID_AT_FIELD else CREATED_AT_FIELD
-        val sinceTimestamp = Timestamp(Date(since))
+        val sinceTimestamp = Timestamp(Date(since + 1))
         var query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(PROVIDER_ID_FIELD, providerId)
             .whereGreaterThanOrEqualTo(dateField, sinceTimestamp)
 
-        toDate?.let {
-            query = query.whereLessThanOrEqualTo(dateField, toLocalEndOfDayTimestamp(it))
-        }
         query = query.orderBy(dateField, Query.Direction.DESCENDING)
 
         return createReferralFlow(query)

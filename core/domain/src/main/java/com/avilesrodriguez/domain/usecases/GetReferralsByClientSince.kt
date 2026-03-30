@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetReferralsByClientSince @Inject constructor(
     private val repository: IReferralRepository
 ) {
-    suspend operator fun invoke(clientId: String, since: Long, toDate: Long?, isPaymentsScreen: Boolean) : Flow<List<Referral>> {
-        return repository.getReferralsByClientSince(clientId, since, toDate, isPaymentsScreen)
+    suspend operator fun invoke(clientId: String, since: Long, isPaymentsScreen: Boolean) : Flow<List<Referral>> {
+        return repository.getReferralsByClientSince(clientId, since, isPaymentsScreen)
     }
 }
