@@ -151,7 +151,10 @@ class StoreDataSource @Inject constructor(
         return createUsersFlow(query)
     }
 
-    fun searchUsersProvider(namePrefix: String, industry: String? = null): Flow<List<UserData>> {
+    fun searchUsersProvider(
+        namePrefix: String,
+        industry: String? = null
+    ): Flow<List<UserData>> {
         var query: Query = firestore.collection(USERS_COLLECTION)
             .whereEqualTo(TYPE_FIELD, TYPE_FIELD_PROVIDER)
 
@@ -172,7 +175,10 @@ class StoreDataSource @Inject constructor(
     fun getUsersClient(currentUserId: String): Flow<List<UserData>> =
         searchUsersClient("", currentUserId = currentUserId)
 
-    fun searchUsersClient(namePrefix: String, currentUserId: String): Flow<List<UserData>> = callbackFlow {
+    fun searchUsersClient(
+        namePrefix: String,
+        currentUserId: String
+    ): Flow<List<UserData>> = callbackFlow {
         val query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(PROVIDER_ID_FIELD, currentUserId)
 
@@ -232,6 +238,94 @@ class StoreDataSource @Inject constructor(
 
                 } catch (e: Exception) {
                     Log.e("StoreDataSource", "Error en el flujo de usuarios: ${e.message}")
+                }
+            }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    fun getUsersClientPaged(
+        namePrefix: String,
+        currentUserId: String,
+        pageSize: Long,
+        lastUser: UserData? = null
+    ): Flow<Pair<List<UserData>, UserData?>> = callbackFlow {
+        val query = firestore.collection(REFERRALS_COLLECTION)
+            .whereEqualTo(PROVIDER_ID_FIELD, currentUserId)
+
+        val listener: ListenerRegistration = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
+            }
+
+            val referrals = snapshot?.documents?.mapNotNull { document ->
+                document.toObject(ReferralFirestore::class.java)?.toReferralDomain()
+            } ?: emptyList()
+
+            if (referrals.isEmpty()) {
+                trySend(emptyList<UserData>() to null).isSuccess
+                return@addSnapshotListener
+            }
+
+            launch {
+                try {
+                    // 1. Obtener IDs únicos de clientes que pertenecen a este proveedor
+                    val uniqueClientIds = referrals.map { it.clientId }.distinct()
+
+                    // 2. Obtener los documentos de usuario en paralelo
+                    val deferredUsers = uniqueClientIds.map { clientId ->
+                        async {
+                            try {
+                                val userDoc = firestore.collection(USERS_COLLECTION)
+                                    .document(clientId)
+                                    .get()
+                                    .await()
+
+                                if (userDoc.exists()) {
+                                    val type = userDoc.getString("type")
+                                    val firestoreUser = when (type) {
+                                        "CLIENT" -> userDoc.toObject(UserDataFirestore.Client::class.java)
+                                        "PROVIDER" -> userDoc.toObject(UserDataFirestore.Provider::class.java)
+                                        else -> null
+                                    }
+                                    firestoreUser?.toUserDataDomain()
+                                } else null
+                            } catch (e: Exception) {
+                                null
+                            }
+                        }
+                    }
+
+                    // 3. Filtrar y ordenar la lista completa de clientes del proveedor
+                    val allUsers = deferredUsers.awaitAll()
+                        .filterNotNull()
+                        .filter { if (namePrefix.isBlank()) true else it.nameLowercase?.startsWith(namePrefix.lowercase()) == true }
+                        .sortedBy { it.nameLowercase }
+
+                    // 4. Aplicar Lógica de Paginación Local
+                    // Buscamos la posición del último usuario de la página anterior
+                    val startIndex = if (lastUser == null) {
+                        0
+                    } else {
+                        val index = allUsers.indexOfFirst { it.uid == lastUser.uid }
+                        if (index == -1) 0 else index + 1
+                    }
+
+                    // Calculamos el final de la página
+                    val endIndex = (startIndex + pageSize.toInt()).coerceAtMost(allUsers.size)
+
+                    val pagedUsers = if (startIndex < allUsers.size) {
+                        allUsers.subList(startIndex, endIndex)
+                    } else {
+                        emptyList()
+                    }
+
+                    // 5. Enviar el par (Lista de la página, Último usuario para la siguiente carga)
+                    trySend(pagedUsers to pagedUsers.lastOrNull()).isSuccess
+
+                } catch (e: Exception) {
+                    Log.e("StoreDataSource", "Error en paginación de clientes: ${e.message}")
                 }
             }
         }

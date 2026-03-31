@@ -20,4 +20,6 @@ interface IReferralRepository {
     suspend fun getReferralsByProviderSince(providerId: String, since: Long, status: String?, isPaymentsScreen: Boolean) : Flow<List<Referral>>
     suspend fun getReferralsByClientPaged(clientId: String, pageSize: Long, lastReferral: Referral?, fromDate: Long?, toDate: Long?, status: String?, isPaymentsScreen: Boolean) : Pair<List<Referral>, Referral?>
     suspend fun getReferralsByProviderPaged(providerId: String, pageSize: Long, lastReferral: Referral?, fromDate: Long?, toDate: Long?, status: String?, isPaymentsScreen: Boolean) : Pair<List<Referral>, Referral?>
+    suspend fun getReferralsByClientRealTimePagination(clientId: String, limit: Long, status: String?): Flow<List<Referral>>
+    suspend fun getReferralsByProviderRealTimePagination(providerId: String, limit: Long, status: String?) : Flow<List<Referral>>
 }

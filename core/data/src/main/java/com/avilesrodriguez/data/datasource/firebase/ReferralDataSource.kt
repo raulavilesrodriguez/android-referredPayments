@@ -191,6 +191,43 @@ class ReferralDataSource @Inject constructor(
         }.await()
     }
 
+    fun getReferralsByClientRealTimePagination(
+        clientId: String,
+        limit: Long,
+        status: String? = null
+    ): Flow<List<Referral>> {
+        var query: Query = firestore.collection(REFERRALS_COLLECTION)
+            .whereEqualTo(CLIENT_ID_FIELD, clientId)
+
+        if (!status.isNullOrBlank()) {
+            query = query.whereEqualTo(STATUS_FIELD, status)
+        }
+
+        // Ordenamos por creación y limitamos a la cantidad actual de la página
+        query = query.orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING)
+            .limit(limit)
+
+        return createReferralFlow(query)
+    }
+
+    fun getReferralsByProviderRealTimePagination(
+        providerId: String,
+        limit: Long,
+        status: String? = null
+    ) : Flow<List<Referral>>{
+        var query: Query = firestore.collection(REFERRALS_COLLECTION)
+            .whereEqualTo(PROVIDER_ID_FIELD, providerId)
+
+        if (!status.isNullOrBlank()) {
+            query = query.whereEqualTo(STATUS_FIELD, status)
+        }
+
+        query = query.orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING)
+            .limit(limit)
+
+        return createReferralFlow(query)
+    }
+
     fun getReferralsByClientSince(
         clientId: String,
         since: Long,

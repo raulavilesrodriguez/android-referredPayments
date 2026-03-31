@@ -119,4 +119,20 @@ class ReferralRepository @Inject constructor(
     ): Pair<List<Referral>, Referral?> {
         return data.getReferralsByProviderPaged(providerId, pageSize, lastReferral, fromDate, toDate, status, isPaymentsScreen)
     }
+
+    override suspend fun getReferralsByClientRealTimePagination(
+        clientId: String,
+        limit: Long,
+        status: String?
+    ): Flow<List<Referral>> {
+        return data.getReferralsByClientRealTimePagination(clientId, limit, status)
+    }
+
+    override suspend fun getReferralsByProviderRealTimePagination(
+        providerId: String,
+        limit: Long,
+        status: String?
+    ): Flow<List<Referral>> {
+        return data.getReferralsByProviderRealTimePagination(providerId, limit, status)
+    }
 }
