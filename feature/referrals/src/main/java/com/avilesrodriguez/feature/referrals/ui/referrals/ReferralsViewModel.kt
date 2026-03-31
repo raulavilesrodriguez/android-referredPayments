@@ -120,7 +120,7 @@ class ReferralsViewModel @Inject constructor(
         }
     }
 
-    private fun loadInitialReferralsByClient(pageSize: Long=3){
+    private fun loadInitialReferralsByClient(pageSize: Long=20){
         _isLoading.value = true
         paginationJob?.cancel()
         paginationJob = launchCatching {
@@ -168,7 +168,7 @@ class ReferralsViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreReferrals(pageSize: Long = 1) {
+    fun loadMoreReferrals(pageSize: Long = 20) {
         val user = _userDataStore.value ?: return
         when(user){
             is UserData.Client -> loadMoreReferralsByClient(pageSize)
@@ -204,7 +204,7 @@ class ReferralsViewModel @Inject constructor(
         }
     }
 
-    private fun loadInitialReferralsByProvider(pageSize: Long=3){
+    private fun loadInitialReferralsByProvider(pageSize: Long=20){
         _isLoading.value = true
         paginationJob?.cancel()
         paginationJob = launchCatching {

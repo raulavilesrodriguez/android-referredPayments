@@ -198,7 +198,7 @@ class PaymentsMovementViewModel @Inject constructor(
         }
     }
 
-    private fun loadInitialReferralsByProvider(pageSize: Long=3){
+    private fun loadInitialReferralsByProvider(pageSize: Long=20){
         _isLoading.value = true
         paginationJob?.cancel()
         paginationJob = launchCatching {
@@ -245,7 +245,7 @@ class PaymentsMovementViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreReferralsByProvider(pageSize: Long = 1) {
+    fun loadMoreReferralsByProvider(pageSize: Long = 20) {
         if (allReferralsLoaded || paginationJob?.isActive == true || lastReferralViewModel == null) return
 
         _isLoading.value = true
