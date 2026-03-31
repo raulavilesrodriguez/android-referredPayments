@@ -156,6 +156,7 @@ class PaymentsMovementViewModel @Inject constructor(
             getReferralsByClientSince(
                 clientId = clientId,
                 since = since,
+                status = null,
                 isPaymentsScreen = true
             )
                 .flowOn(Dispatchers.IO)
@@ -230,6 +231,7 @@ class PaymentsMovementViewModel @Inject constructor(
             getReferralsByProviderSince(
                 providerId = providerId,
                 since = since,
+                status = null,
                 isPaymentsScreen = true
             )
                 .flowOn(Dispatchers.IO)

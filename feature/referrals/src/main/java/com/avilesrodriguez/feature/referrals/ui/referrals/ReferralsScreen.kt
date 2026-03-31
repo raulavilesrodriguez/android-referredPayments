@@ -241,7 +241,7 @@ fun ReferralsScreen(
                                     referrals = uiState,
                                     user = user,
                                     isLoading = isLoading,
-                                    onLoadMoreReferrals = viewModel::loadMoreReferrals
+                                    onLoadMoreReferrals = { viewModel.loadMoreReferrals() }
                                 )
                                 else -> {
                                     Box(Modifier.fillMaxSize())

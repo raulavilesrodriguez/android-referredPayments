@@ -1,5 +1,6 @@
 package com.avilesrodriguez.feature.referrals.ui.referrals
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -54,12 +55,11 @@ fun ReferralsList(
     LaunchedEffect(listState) {
         snapshotFlow {
             val atBottom = !listState.canScrollForward  //ya no hay más contenido abajo → estoy en el final
-
             isDragged && atBottom
         }
             .distinctUntilChanged()
             .collect { shouldLoad ->
-                if (shouldLoad && !isLoading && referrals.isNotEmpty()) {
+                if(shouldLoad && !isLoading && referrals.isNotEmpty()){
                     onLoadMoreReferrals()
                 }
             }
@@ -75,7 +75,8 @@ fun ReferralsList(
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        state = listState
     ) {
         item{
             //To suppress focus
@@ -118,9 +119,7 @@ fun ReferralsList(
         }else if(!isLoading){
             item{
                 Box(
-                    modifier = Modifier
-                        .fillParentMaxHeight(0.7f)
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().height(200.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

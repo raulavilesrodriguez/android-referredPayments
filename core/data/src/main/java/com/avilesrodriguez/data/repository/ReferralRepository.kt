@@ -81,17 +81,19 @@ class ReferralRepository @Inject constructor(
     override suspend fun getReferralsByClientSince(
         clientId: String,
         since: Long,
+        status: String?,
         isPaymentsScreen: Boolean
     ): Flow<List<Referral>> {
-        return data.getReferralsByClientSince(clientId, since, isPaymentsScreen)
+        return data.getReferralsByClientSince(clientId, since, status, isPaymentsScreen)
     }
 
     override suspend fun getReferralsByProviderSince(
         providerId: String,
         since: Long,
+        status: String?,
         isPaymentsScreen: Boolean
     ): Flow<List<Referral>> {
-        return data.getReferralsByProviderSince(providerId, since, isPaymentsScreen)
+        return data.getReferralsByProviderSince(providerId, since, status, isPaymentsScreen)
     }
 
     override suspend fun getReferralsByClientPaged(

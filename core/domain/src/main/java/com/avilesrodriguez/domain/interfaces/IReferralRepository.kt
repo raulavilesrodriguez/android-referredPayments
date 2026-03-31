@@ -16,8 +16,8 @@ interface IReferralRepository {
     suspend fun searchReferralsByProvider(namePrefix: String, currentUserId: String): Flow<List<Referral>>
     suspend fun searchReferralsByClientAndProvider(namePrefix: String, clientId: String, providerId: String): Flow<List<Referral>>
     suspend fun saveRatingWithTransaction(referralId: String, referralUpdates: Map<String, Any>, providerId: String, ratingReferral: Double)
-    suspend fun getReferralsByClientSince(clientId: String, since: Long, isPaymentsScreen: Boolean) : Flow<List<Referral>>
-    suspend fun getReferralsByProviderSince(providerId: String, since: Long, isPaymentsScreen: Boolean) : Flow<List<Referral>>
+    suspend fun getReferralsByClientSince(clientId: String, since: Long, status: String?, isPaymentsScreen: Boolean) : Flow<List<Referral>>
+    suspend fun getReferralsByProviderSince(providerId: String, since: Long, status: String?, isPaymentsScreen: Boolean) : Flow<List<Referral>>
     suspend fun getReferralsByClientPaged(clientId: String, pageSize: Long, lastReferral: Referral?, fromDate: Long?, toDate: Long?, status: String?, isPaymentsScreen: Boolean) : Pair<List<Referral>, Referral?>
     suspend fun getReferralsByProviderPaged(providerId: String, pageSize: Long, lastReferral: Referral?, fromDate: Long?, toDate: Long?, status: String?, isPaymentsScreen: Boolean) : Pair<List<Referral>, Referral?>
 }

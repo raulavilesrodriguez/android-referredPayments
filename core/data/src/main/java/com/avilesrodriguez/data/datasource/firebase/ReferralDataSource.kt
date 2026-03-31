@@ -194,6 +194,7 @@ class ReferralDataSource @Inject constructor(
     fun getReferralsByClientSince(
         clientId: String,
         since: Long,
+        status: String? = null,
         isPaymentsScreen: Boolean = false
     ) : Flow<List<Referral>>{
         val dateField = if (isPaymentsScreen) PAID_AT_FIELD else CREATED_AT_FIELD
@@ -201,6 +202,10 @@ class ReferralDataSource @Inject constructor(
         var query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(CLIENT_ID_FIELD, clientId)
             .whereGreaterThanOrEqualTo(dateField, sinceTimestamp)
+
+        if (!status.isNullOrBlank()) {
+            query = query.whereEqualTo(STATUS_FIELD, status)
+        }
 
         query = query.orderBy(dateField, Query.Direction.DESCENDING)
 
@@ -210,6 +215,7 @@ class ReferralDataSource @Inject constructor(
     fun getReferralsByProviderSince(
         providerId: String,
         since: Long,
+        status: String? = null,
         isPaymentsScreen: Boolean = false
     ) : Flow<List<Referral>>{
         val dateField = if (isPaymentsScreen) PAID_AT_FIELD else CREATED_AT_FIELD
@@ -217,6 +223,10 @@ class ReferralDataSource @Inject constructor(
         var query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(PROVIDER_ID_FIELD, providerId)
             .whereGreaterThanOrEqualTo(dateField, sinceTimestamp)
+
+        if (!status.isNullOrBlank()) {
+            query = query.whereEqualTo(STATUS_FIELD, status)
+        }
 
         query = query.orderBy(dateField, Query.Direction.DESCENDING)
 

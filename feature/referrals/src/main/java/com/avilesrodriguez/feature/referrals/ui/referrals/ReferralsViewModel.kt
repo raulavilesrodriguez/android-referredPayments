@@ -28,9 +28,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
@@ -50,8 +50,6 @@ class ReferralsViewModel @Inject constructor(
 ) : BaseViewModel(){
     private val _uiState = MutableStateFlow<List<ReferralWithNames>>(emptyList())
     val uiState: StateFlow<List<ReferralWithNames>> = _uiState.asStateFlow()
-    private val _searchText = MutableStateFlow("")
-    val searchText: StateFlow<String> = _searchText.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     private val _userDataStore = MutableStateFlow<UserData?>(null)
@@ -73,16 +71,17 @@ class ReferralsViewModel @Inject constructor(
         launchCatching {
             if(hasUser()){
                 _userDataStore.value = getUser(currentUserId)
-                _referralStatus
-                    .debounce(300)
-                    .distinctUntilChanged()
-                    .collect {
-                        lastReferralViewModel = null
-                        allReferralsLoaded = false
-                        val userData = _userDataStore.value ?: return@collect
-                        when(userData) {
-                            is UserData.Client -> loadInitialReferralsByClient()
-                            is UserData.Provider -> loadInitialReferralsByProvider()
+                launch{
+                    _referralStatus
+                        .map { Unit }
+                        .collect {
+                            lastReferralViewModel = null
+                            allReferralsLoaded = false
+                            val userData = _userDataStore.value ?: return@collect
+                            when(userData) {
+                                is UserData.Client -> loadInitialReferralsByClient()
+                                is UserData.Provider -> loadInitialReferralsByProvider()
+                            }
                         }
                 }
             }
@@ -149,11 +148,13 @@ class ReferralsViewModel @Inject constructor(
     }
 
     private fun listenForNewReferralsByClient(clientId: String, since: Long) {
+        val currentStatus = _referralStatus.value?.name
         realTimeJob?.cancel()
         realTimeJob = launchCatching {
             getReferralsByClientSince(
                 clientId = clientId,
                 since = since,
+                status = currentStatus,
                 isPaymentsScreen = false
             )
                 .flowOn(Dispatchers.IO)
@@ -231,11 +232,13 @@ class ReferralsViewModel @Inject constructor(
     }
 
     private fun listenForNewReferralsByProvider(providerId: String, since: Long) {
+        val currentStatus = _referralStatus.value?.name
         realTimeJob?.cancel()
         realTimeJob = launchCatching {
             getReferralsByProviderSince(
                 providerId = providerId,
                 since = since,
+                status = currentStatus,
                 isPaymentsScreen = false
             )
                 .flowOn(Dispatchers.IO)
