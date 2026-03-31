@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
@@ -55,6 +56,7 @@ fun NotificationPermissionHandler(onDismiss: () -> Unit) {
 
         // Indica si acabamos de intentar pedir el permiso en esta sesión
         var hasAttemptedRequest by rememberSaveable { mutableStateOf(false) }
+        var isLaunchingRequest by remember { mutableStateOf(false) }
 
         when {
             // CASO 1: Ya tiene el permiso
@@ -94,10 +96,11 @@ fun NotificationPermissionHandler(onDismiss: () -> Unit) {
                 if (!hasAttemptedRequest) {
                     // Lanzamos la petición de Android por primera vez
                     LaunchedEffect(Unit) {
+                        isLaunchingRequest = true
                         permissionState.launchPermissionRequest()
                         hasAttemptedRequest = true
                     }
-                } else {
+                } else if(!isLaunchingRequest) {
                     // Si ya se lanzó y seguimos aquí, es que el usuario lo denegó permanentemente
                     AlertDialog(
                         onDismissRequest = onDismiss,
