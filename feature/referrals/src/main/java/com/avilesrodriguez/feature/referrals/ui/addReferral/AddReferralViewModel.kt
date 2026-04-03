@@ -1,9 +1,9 @@
 package com.avilesrodriguez.feature.referrals.ui.addReferral
 
 import android.util.Log
-import com.avilesrodriguez.domain.usecases.CurrentUserId
-import com.avilesrodriguez.domain.usecases.SaveReferral
-import com.avilesrodriguez.domain.usecases.UpdateProviderProcessingReferralsCount
+import com.avilesrodriguez.domain.usecases.account.CurrentUserId
+import com.avilesrodriguez.domain.usecases.referral.SaveReferral
+import com.avilesrodriguez.domain.usecases.user.UpdateProviderProcessingReferralsCount
 import com.avilesrodriguez.feature.referrals.ui.model.AddReferralUiState
 import com.avilesrodriguez.feature.referrals.ui.model.toReferral
 import com.avilesrodriguez.presentation.R

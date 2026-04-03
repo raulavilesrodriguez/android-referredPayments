@@ -6,8 +6,8 @@ import android.app.PendingIntent
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
-import com.avilesrodriguez.domain.usecases.CurrentUserId
-import com.avilesrodriguez.domain.usecases.GetAndStoreFCMToken
+import com.avilesrodriguez.domain.usecases.account.CurrentUserId
+import com.avilesrodriguez.domain.usecases.fcm.GetAndStoreFCMToken
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.navigation.DeepLinks
 import com.google.firebase.messaging.FirebaseMessagingService

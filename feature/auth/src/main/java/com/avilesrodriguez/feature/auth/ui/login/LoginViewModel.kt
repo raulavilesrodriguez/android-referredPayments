@@ -1,8 +1,8 @@
 package com.avilesrodriguez.feature.auth.ui.login
 
-import com.avilesrodriguez.domain.usecases.SendRecoveryEmail
-import com.avilesrodriguez.domain.usecases.SetNotFirstTime
-import com.avilesrodriguez.domain.usecases.SignIn
+import com.avilesrodriguez.domain.usecases.account.SendRecoveryEmail
+import com.avilesrodriguez.domain.usecases.authPreferences.SetNotFirstTime
+import com.avilesrodriguez.domain.usecases.account.SignIn
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.ext.isValidEmail
 import com.avilesrodriguez.presentation.navigation.NavRoutes

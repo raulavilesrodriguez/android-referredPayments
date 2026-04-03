@@ -1,11 +1,11 @@
 package com.avilesrodriguez.feature.auth.ui.splash
 
 import com.avilesrodriguez.domain.model.user.UserData
-import com.avilesrodriguez.domain.usecases.CurrentUserId
-import com.avilesrodriguez.domain.usecases.GetAndStoreFCMToken
-import com.avilesrodriguez.domain.usecases.GetUser
-import com.avilesrodriguez.domain.usecases.HasUser
-import com.avilesrodriguez.domain.usecases.IsFirstTime
+import com.avilesrodriguez.domain.usecases.account.CurrentUserId
+import com.avilesrodriguez.domain.usecases.fcm.GetAndStoreFCMToken
+import com.avilesrodriguez.domain.usecases.user.GetUser
+import com.avilesrodriguez.domain.usecases.account.HasUser
+import com.avilesrodriguez.domain.usecases.authPreferences.IsFirstTime
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

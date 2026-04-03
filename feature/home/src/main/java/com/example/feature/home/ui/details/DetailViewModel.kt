@@ -6,9 +6,9 @@ import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
-import com.avilesrodriguez.domain.usecases.CurrentUserId
-import com.avilesrodriguez.domain.usecases.GetReferralsByClientByProvider
-import com.avilesrodriguez.domain.usecases.GetUser
+import com.avilesrodriguez.domain.usecases.account.CurrentUserId
+import com.avilesrodriguez.domain.usecases.referral.GetReferralsByClientByProvider
+import com.avilesrodriguez.domain.usecases.user.GetUser
 import com.avilesrodriguez.presentation.ext.getById
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel

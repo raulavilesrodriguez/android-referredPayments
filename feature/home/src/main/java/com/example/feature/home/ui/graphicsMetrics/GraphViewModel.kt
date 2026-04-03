@@ -5,11 +5,11 @@ import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
-import com.avilesrodriguez.domain.usecases.CurrentUserId
-import com.avilesrodriguez.domain.usecases.GetReferralsByClient
-import com.avilesrodriguez.domain.usecases.GetReferralsByProvider
-import com.avilesrodriguez.domain.usecases.GetUserFlow
-import com.avilesrodriguez.domain.usecases.HasUser
+import com.avilesrodriguez.domain.usecases.account.CurrentUserId
+import com.avilesrodriguez.domain.usecases.referral.GetReferralsByClient
+import com.avilesrodriguez.domain.usecases.referral.GetReferralsByProvider
+import com.avilesrodriguez.domain.usecases.user.GetUserFlow
+import com.avilesrodriguez.domain.usecases.account.HasUser
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import com.example.feature.home.models.ReferralPercentageMetrics
 import dagger.hilt.android.lifecycle.HiltViewModel

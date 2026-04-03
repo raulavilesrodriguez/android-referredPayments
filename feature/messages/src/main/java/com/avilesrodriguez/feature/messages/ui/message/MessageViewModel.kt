@@ -15,11 +15,11 @@ import androidx.core.content.ContextCompat
 import com.avilesrodriguez.domain.model.message.Message
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.user.UserData
-import com.avilesrodriguez.domain.usecases.CurrentUserId
-import com.avilesrodriguez.domain.usecases.GetMessageById
-import com.avilesrodriguez.domain.usecases.GetReferralById
-import com.avilesrodriguez.domain.usecases.GetUser
-import com.avilesrodriguez.domain.usecases.HasUser
+import com.avilesrodriguez.domain.usecases.account.CurrentUserId
+import com.avilesrodriguez.domain.usecases.message.GetMessageById
+import com.avilesrodriguez.domain.usecases.referral.GetReferralById
+import com.avilesrodriguez.domain.usecases.user.GetUser
+import com.avilesrodriguez.domain.usecases.account.HasUser
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

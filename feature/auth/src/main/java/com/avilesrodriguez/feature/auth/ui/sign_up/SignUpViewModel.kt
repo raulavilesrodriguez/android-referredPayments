@@ -3,11 +3,11 @@ package com.avilesrodriguez.feature.auth.ui.sign_up
 import android.util.Log
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
-import com.avilesrodriguez.domain.usecases.CurrentUserId
-import com.avilesrodriguez.domain.usecases.IsAuthorizedProvider
-import com.avilesrodriguez.domain.usecases.SaveUser
-import com.avilesrodriguez.domain.usecases.SetNotFirstTime
-import com.avilesrodriguez.domain.usecases.SignUp
+import com.avilesrodriguez.domain.usecases.account.CurrentUserId
+import com.avilesrodriguez.domain.usecases.user.IsAuthorizedProvider
+import com.avilesrodriguez.domain.usecases.user.SaveUser
+import com.avilesrodriguez.domain.usecases.authPreferences.SetNotFirstTime
+import com.avilesrodriguez.domain.usecases.account.SignUp
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.isValidEmail
