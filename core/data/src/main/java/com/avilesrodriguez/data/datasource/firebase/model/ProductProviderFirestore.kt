@@ -1,5 +1,8 @@
 package com.avilesrodriguez.data.datasource.firebase.model
 
+import android.util.Log
+import com.avilesrodriguez.domain.ext.normalizeName
+import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.google.firebase.Timestamp
 import java.util.Date
@@ -13,6 +16,8 @@ data class ProductProviderFirestore(
     val payByReferral: Double? = null,
     val isActive: Boolean? = null,
     val createdAt: Any? = null,
+    val updatedAt: Any? = null,
+    val industry: String? = null,
     // --- DATOS DENORMALIZADOS (Para la UI del Cliente) ---
     val providerName: String? = null,
     val providerPhotoUrl: String? = null,
@@ -29,6 +34,8 @@ fun ProductProvider.toProductProviderFirestore(): ProductProviderFirestore {
         payByReferral = payByReferral,
         isActive = isActive,
         createdAt = Timestamp(Date(createdAt)),
+        updatedAt = Timestamp(Date(updatedAt)),
+        industry = industry.name,
         providerName = providerName,
         providerPhotoUrl = providerPhotoUrl,
         providerRating = providerRating
@@ -44,15 +51,32 @@ fun ProductProviderFirestore.toProductProviderDomain(): ProductProvider {
         }
     }
 
+    val domainIndustriesType = try {
+        IndustriesType.valueOf(industry?.uppercase() ?: "OTHER")
+    } catch (e: Exception) {
+        Log.e("ProductProviderFirestore", "Error al convertir el tipo de industria: ${e.message}")
+        IndustriesType.OTHER
+    }
+
+    fun toDouble(value: Any?): Double {
+        return when (value) {
+            is Double -> value
+            is Long -> value.toDouble()
+            else -> 0.0
+        }
+    }
+
     return ProductProvider(
         id = id ?: "",
         providerId = providerId ?: "",
         name = name ?: "",
-        nameLowercase = nameLowercase ?: "",
+        nameLowercase = nameLowercase ?: (name ?: "").normalizeName(),
         description = description,
-        payByReferral = payByReferral ?: 0.0,
+        payByReferral = toDouble(payByReferral),
         isActive = isActive ?: true,
         createdAt = toLong(createdAt),
+        updatedAt = toLong(updatedAt),
+        industry = domainIndustriesType,
         providerName = providerName ?: "",
         providerPhotoUrl = providerPhotoUrl ?: "",
         providerRating = providerRating ?: 0.0

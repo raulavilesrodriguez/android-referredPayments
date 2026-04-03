@@ -3,6 +3,7 @@ package com.avilesrodriguez.data.datasource.firebase
 import com.avilesrodriguez.data.datasource.firebase.model.ProductProviderFirestore
 import com.avilesrodriguez.data.datasource.firebase.model.toProductProviderDomain
 import com.avilesrodriguez.data.datasource.firebase.model.toProductProviderFirestore
+import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -75,36 +76,67 @@ class ProductProviderDataSource @Inject constructor(
         awaitClose { listener.remove() }
     }
 
+    fun getProductsRealTime(
+        limit: Long
+    ) : Flow<List<ProductProvider>>{
+        val query: Query = firestore.collection(PRODUCTS_PROVIDER_COLLECTION)
+            .whereEqualTo(IS_ACTIVE_FIELD, true)
+            .orderBy(UPDATED_AT_FIELD, Query.Direction.DESCENDING)
+            .limit(limit)
+
+        return getProductsFlow(query)
+    }
+
+    fun getProductsByProviderRealTime(
+        providerId: String,
+        limit: Long
+    ) : Flow<List<ProductProvider>>{
+        val query: Query = firestore.collection(PRODUCTS_PROVIDER_COLLECTION)
+            .whereEqualTo(IS_ACTIVE_FIELD, true)
+            .whereEqualTo(PROVIDER_ID_FIELD, providerId)
+            .orderBy(UPDATED_AT_FIELD, Query.Direction.DESCENDING)
+            .limit(limit)
+        return getProductsFlow(query)
+    }
+
     suspend fun getAllProducts(
         pageSize: Long,
-        valuePayByReferral: Double? = null,
+        industry: String? = null,
+        namePrefix: String,
         lastProduct: ProductProvider? = null
     ) : Pair<List<ProductProvider>, ProductProvider?> {
         var query: Query = firestore.collection(PRODUCTS_PROVIDER_COLLECTION)
             .whereEqualTo(IS_ACTIVE_FIELD, true)
 
-        query = if (valuePayByReferral != null) {
-            query
-                .whereEqualTo(PAY_BY_REFERRAL_FIELD, valuePayByReferral)
+        if (!industry.isNullOrBlank()) {
+            query = query.whereEqualTo(INDUSTRY_FIELD, industry)
+        }
+
+        if (namePrefix.isNotEmpty()) {
+            val normalizedPrefix = namePrefix.normalizeName()
+            query = query.orderBy(NAME_LOWER_CASE_FIELD)
+                .whereGreaterThanOrEqualTo(NAME_LOWER_CASE_FIELD, normalizedPrefix)
+                .whereLessThanOrEqualTo(NAME_LOWER_CASE_FIELD, normalizedPrefix + "\uf8ff")
+                .orderBy(ID_FIELD)
         } else {
-            query.orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING)
+            query = query.orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING).orderBy(ID_FIELD)
         }
 
         if (lastProduct != null) {
-            if (valuePayByReferral != null) {
-                query = query.startAfter(lastProduct.payByReferral, lastProduct.id)
-            } else {
-                val lastTimestamp = Timestamp(Date(lastProduct.createdAt))
-                query = query.startAfter(lastTimestamp, lastProduct.id)
-            }
+            val lastTimestamp = Timestamp(Date(lastProduct.createdAt))
+            query = query.startAfter(lastTimestamp, lastProduct.id)
         }
 
-        val snapshot = query.limit(pageSize).get().await()
-        val products = snapshot.documents.mapNotNull { doc ->
-            doc.toObject(ProductProviderFirestore::class.java)?.toProductProviderDomain()
+        query = query.limit(pageSize)
+        val snapshot = query.get().await()
+
+        val products = snapshot.documents.mapNotNull {
+            it.toObject(ProductProviderFirestore::class.java)
+                ?.toProductProviderDomain()
         }
 
-        return products to products.lastOrNull()
+        val last = products.lastOrNull()
+        return products to last
     }
 
     suspend fun getProductsByProvider(
@@ -117,37 +149,60 @@ class ProductProviderDataSource @Inject constructor(
             .whereEqualTo(PROVIDER_ID_FIELD, providerId)
             .whereEqualTo(IS_ACTIVE_FIELD, true)
 
-        query = if (namePrefix.isNotBlank()) {
-            query.orderBy(NAME_LOWER_CASE_FIELD)
-                .startAt(namePrefix)
-                .endAt(namePrefix + "\uf8ff")
+        if (namePrefix.isNotEmpty()) {
+            val normalizedPrefix = namePrefix.normalizeName()
+            query = query.orderBy(NAME_LOWER_CASE_FIELD)
+                .whereGreaterThanOrEqualTo(NAME_LOWER_CASE_FIELD, normalizedPrefix)
+                .whereLessThanOrEqualTo(NAME_LOWER_CASE_FIELD, normalizedPrefix + "\uf8ff")
+                .orderBy(ID_FIELD)
         } else {
-            query.orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING)
+            query = query.orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING).orderBy(ID_FIELD)
         }
 
         if (lastProduct != null) {
-            if (namePrefix.isNotBlank()) {
-                query = query.startAfter(lastProduct.name, lastProduct.id)
-            } else {
-                val lastTimestamp = Timestamp(Date(lastProduct.createdAt))
-                query = query.startAfter(lastTimestamp, lastProduct.id)
+            val lastTimestamp = Timestamp(Date(lastProduct.createdAt))
+            query = query.startAfter(lastTimestamp, lastProduct.id)
+        }
+
+        query = query.limit(pageSize)
+        val snapshot = query.get().await()
+
+        val products = snapshot.documents.mapNotNull {
+            it.toObject(ProductProviderFirestore::class.java)
+                ?.toProductProviderDomain()
+        }
+
+        val last = products.lastOrNull()
+        return products to last
+
+    }
+
+    private fun getProductsFlow(query: Query): Flow<List<ProductProvider>> = callbackFlow {
+        val listener = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
             }
-        }
 
-        val snapshot = query.limit(pageSize).get().await()
-        val products = snapshot.documents.mapNotNull { doc ->
-            doc.toObject(ProductProviderFirestore::class.java)?.toProductProviderDomain()
-        }
+            val products = snapshot?.documents?.mapNotNull { doc ->
+                doc.toObject(ProductProviderFirestore::class.java)
+                    ?.toProductProviderDomain()
+            } ?: emptyList()
 
-        return products to products.lastOrNull()
+            trySend(products).isSuccess
+        }
+        awaitClose { listener.remove() }
     }
 
     companion object{
         private const val PRODUCTS_PROVIDER_COLLECTION = "products_provider"
         private const val IS_ACTIVE_FIELD = "isActive"
         private const val CREATED_AT_FIELD = "createdAt"
+        private const val UPDATED_AT_FIELD = "updatedAt"
         private const val PROVIDER_ID_FIELD = "providerId"
         private const val  NAME_LOWER_CASE_FIELD = "nameLowercase"
-        private const val PAY_BY_REFERRAL_FIELD = "payByReferral"
+        private const val INDUSTRY_FIELD = "industry"
+        private const val ID_FIELD = "id"
+
     }
 }
