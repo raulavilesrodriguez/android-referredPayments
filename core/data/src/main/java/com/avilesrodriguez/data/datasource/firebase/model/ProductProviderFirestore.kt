@@ -34,7 +34,7 @@ fun ProductProvider.toProductProviderFirestore(): ProductProviderFirestore {
         payByReferral = payByReferral,
         isActive = isActive,
         createdAt = Timestamp(Date(createdAt)),
-        updatedAt = Timestamp(Date(updatedAt)),
+        updatedAt = updatedAt?.let { Timestamp(Date(it)) },
         industry = industry.name,
         providerName = providerName,
         providerPhotoUrl = providerPhotoUrl,
@@ -48,6 +48,13 @@ fun ProductProviderFirestore.toProductProviderDomain(): ProductProvider {
             is Timestamp -> value.toDate().time
             is Long -> value
             else -> System.currentTimeMillis()
+        }
+    }
+    fun toNullableLong(value: Any?): Long? {
+        return when (value) {
+            is Timestamp -> value.toDate().time
+            is Long -> value
+            else -> null
         }
     }
 
@@ -75,7 +82,7 @@ fun ProductProviderFirestore.toProductProviderDomain(): ProductProvider {
         payByReferral = toDouble(payByReferral),
         isActive = isActive ?: true,
         createdAt = toLong(createdAt),
-        updatedAt = toLong(updatedAt),
+        updatedAt = toNullableLong(updatedAt),
         industry = domainIndustriesType,
         providerName = providerName ?: "",
         providerPhotoUrl = providerPhotoUrl ?: "",

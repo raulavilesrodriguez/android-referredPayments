@@ -6,6 +6,7 @@ data class Referral(
     val id: String = "",
     val clientId: String = "",      // Quién lo refirió
     val providerId: String = "",    // A qué empresa se refirió
+    val productId: String = "",    // Qué producto se referió
     val name: String = "",
     val nameLowercase: String = name.normalizeName(),
     val email: String = "",

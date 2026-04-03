@@ -6,6 +6,7 @@ import com.avilesrodriguez.data.repository.FCMTokenRepository
 import com.avilesrodriguez.data.repository.InternalTokenRepository
 import com.avilesrodriguez.data.repository.LocalFCMPreferenceRepository
 import com.avilesrodriguez.data.repository.MessageRepository
+import com.avilesrodriguez.data.repository.ProductProviderRepository
 import com.avilesrodriguez.data.repository.ReferralRepository
 import com.avilesrodriguez.data.repository.StorageRepository
 import com.avilesrodriguez.data.repository.StoreRepository
@@ -16,6 +17,7 @@ import com.avilesrodriguez.domain.interfaces.IFCMTokenRepository
 import com.avilesrodriguez.domain.interfaces.IInternalTokenRepository
 import com.avilesrodriguez.domain.interfaces.ILocalFCMPreference
 import com.avilesrodriguez.domain.interfaces.IMessageRepository
+import com.avilesrodriguez.domain.interfaces.IProductProviderRepository
 import com.avilesrodriguez.domain.interfaces.IReferralRepository
 import com.avilesrodriguez.domain.interfaces.IStorageRepository
 import com.avilesrodriguez.domain.interfaces.IStoreRepository
@@ -58,4 +60,7 @@ abstract class DataModule {
 
     @Binds
     abstract fun provideTransactionsRepository(impl: TransactionsRepository): ITransactionsRepository
+
+    @Binds
+    abstract fun provideProductProviderRepository(impl: ProductProviderRepository): IProductProviderRepository
 }
