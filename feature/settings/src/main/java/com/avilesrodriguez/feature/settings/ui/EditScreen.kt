@@ -49,6 +49,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
+import com.avilesrodriguez.domain.model.validationRules.ValidationRules
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.avatar.DEFAULT_AVATAR_USER
@@ -59,16 +60,10 @@ import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.FormButtons
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.composables.TextFieldProfile
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COUNT_NUMBER_BANK
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_IDENTITY_CARD
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_RUC
 import com.avilesrodriguez.presentation.ext.fieldModifier
 import com.avilesrodriguez.presentation.industries.options
 import com.avilesrodriguez.presentation.composables.MenuDropdownBox
 import com.avilesrodriguez.presentation.composables.MenuDropdownBoxLeadIcon
-import com.avilesrodriguez.presentation.composables.ToolbarPlaceholder
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COMPANY_DESCRIPTION
 import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.industries.label
 import com.avilesrodriguez.presentation.photo.MyCropImageContract
@@ -218,7 +213,7 @@ fun EditScreenContent(
         TextFieldProfile(
             value = userData?.name?:"",
             onNewValue = onNameChange,
-            maxLength = MAX_LENGTH_NAME,
+            maxLength = ValidationRules.MAX_LENGTH_NAME,
             icon = R.drawable.name,
             title = R.string.settings_name,
             Modifier.fieldModifier()
@@ -228,7 +223,7 @@ fun EditScreenContent(
                 TextFieldProfile(
                     value = userData.identityCard?:"",
                     onNewValue = onIdentityCardChange,
-                    maxLength = MAX_LENGTH_IDENTITY_CARD,
+                    maxLength = ValidationRules.MAX_LENGTH_IDENTITY_CARD,
                     icon = R.drawable.id_card,
                     title = R.string.settings_identity_card_client,
                     Modifier.fieldModifier()
@@ -251,7 +246,7 @@ fun EditScreenContent(
                 TextFieldProfile(
                     value = userData.countNumberPay?:"",
                     onNewValue = onCountNumberBankChange,
-                    maxLength = MAX_LENGTH_COUNT_NUMBER_BANK,
+                    maxLength = ValidationRules.MAX_LENGTH_COUNT_NUMBER_BANK,
                     icon = R.drawable.account,
                     title = R.string.account,
                     modifier = Modifier.fieldModifier()
@@ -261,7 +256,7 @@ fun EditScreenContent(
                 TextFieldProfile(
                     value = userData.ciOrRuc?: "",
                     onNewValue = onIdentityCardChange,
-                    maxLength = MAX_LENGTH_RUC,
+                    maxLength = ValidationRules.MAX_LENGTH_RUC,
                     icon = R.drawable.id_card,
                     title = R.string.settings_identity_card_provider,
                     modifier = Modifier.fieldModifier()
@@ -298,7 +293,7 @@ fun EditScreenContent(
                         )
                     )
                     Text(
-                        text = "${userData.companyDescription?.length}/$MAX_LENGTH_COMPANY_DESCRIPTION",
+                        text = "${userData.companyDescription?.length}/${ValidationRules.MAX_LENGTH_COMPANY_DESCRIPTION}",
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.fieldModifier(),
                         textAlign = TextAlign.End,

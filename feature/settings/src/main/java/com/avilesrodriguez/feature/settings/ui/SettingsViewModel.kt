@@ -5,6 +5,7 @@ import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.user.UserData
+import com.avilesrodriguez.domain.model.validationRules.ValidationRules
 import com.avilesrodriguez.domain.usecases.fcm.ClearFCMToken
 import com.avilesrodriguez.domain.usecases.fcm.ClearLocalCache
 import com.avilesrodriguez.domain.usecases.account.CurrentUserId
@@ -18,11 +19,6 @@ import com.avilesrodriguez.domain.usecases.storage.UploadPhoto
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.banksPays.BanksEcuador
 import com.avilesrodriguez.presentation.banksPays.getById
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COMPANY_DESCRIPTION
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_COUNT_NUMBER_BANK
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_IDENTITY_CARD
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_RUC
 import com.avilesrodriguez.presentation.ext.isValidUrl
 import com.avilesrodriguez.presentation.industries.getById
 import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
@@ -111,7 +107,7 @@ class SettingsViewModel @Inject constructor(
 
         val filteredName = newName
             .filter { it.isLetter() || it.isDigit() || it.isWhitespace() || allowedSymbols.contains(it) }
-            .take(MAX_LENGTH_NAME)
+            .take(ValidationRules.MAX_LENGTH_NAME)
         val currentState = _uiState.value
         if(currentState != null){
             _uiState.value = when(currentState){
@@ -154,11 +150,13 @@ class SettingsViewModel @Inject constructor(
         if(currentState != null){
             _uiState.value = when(currentState){
                 is UserData.Client -> {
-                    val filteredIdentityCard = identityCard.filter { it.isDigit() }.take(MAX_LENGTH_IDENTITY_CARD)
+                    val filteredIdentityCard = identityCard.filter { it.isDigit() }.take(
+                        ValidationRules.MAX_LENGTH_IDENTITY_CARD)
                     currentState.copy(identityCard = filteredIdentityCard)
                 }
                 is UserData.Provider -> {
-                    val filteredIdentityCardRuc = identityCard.filter { it.isDigit() }.take(MAX_LENGTH_RUC)
+                    val filteredIdentityCardRuc = identityCard.filter { it.isDigit() }.take(
+                        ValidationRules.MAX_LENGTH_RUC)
                     currentState.copy(ciOrRuc = filteredIdentityCardRuc)
                 }
             }
@@ -167,7 +165,7 @@ class SettingsViewModel @Inject constructor(
 
     fun updateCountNumberBank(countNumberBank: String){
         val currentState = _uiState.value
-        val filteredCountNumberBank = countNumberBank.filter { it.isDigit() }.take(MAX_LENGTH_COUNT_NUMBER_BANK)
+        val filteredCountNumberBank = countNumberBank.filter { it.isDigit() }.take(ValidationRules.MAX_LENGTH_COUNT_NUMBER_BANK)
         if(currentState != null){
             _uiState.value = when(currentState){
                 is UserData.Client -> currentState.copy(countNumberPay = filteredCountNumberBank)
@@ -196,7 +194,7 @@ class SettingsViewModel @Inject constructor(
     fun updateDescriptionProvider(description: String){
         val currentState = _uiState.value
         if(currentState is UserData.Provider){
-            val filteredDescription = description.take(MAX_LENGTH_COMPANY_DESCRIPTION)
+            val filteredDescription = description.take(ValidationRules.MAX_LENGTH_COMPANY_DESCRIPTION)
             _uiState.value = currentState.copy(companyDescription = filteredDescription)
         }
     }

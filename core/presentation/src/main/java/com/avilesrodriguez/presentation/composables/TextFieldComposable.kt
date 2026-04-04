@@ -38,9 +38,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.avilesrodriguez.domain.model.validationRules.ValidationRules
 import com.avilesrodriguez.presentation.R
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
-import com.avilesrodriguez.presentation.ext.MIN_PASS_LENGTH_PHONE_ECUADOR
 
 @Composable
 fun NameField(
@@ -56,7 +55,7 @@ fun NameField(
         OutlinedTextField(
             value = value,
             onValueChange = {
-                if(it.length <= MAX_LENGTH_NAME)
+                if(it.length <= ValidationRules.MAX_LENGTH_NAME)
                 onNewValue(it)
                             },
             shape = RoundedCornerShape(16.dp),
@@ -79,7 +78,7 @@ fun NameField(
             )
         )
         Text(
-            text = "${value.length}/$MAX_LENGTH_NAME",
+            text = "${value.length}/${ValidationRules.MAX_LENGTH_NAME}",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp, end = 8.dp),
@@ -166,7 +165,7 @@ fun NameTextFieldCursor(
         OutlinedTextField(
             value = textFieldValue,
             onValueChange = { newValue ->
-                if (newValue.text.length <= MAX_LENGTH_NAME) {
+                if (newValue.text.length <= ValidationRules.MAX_LENGTH_NAME) {
                     textFieldValue = newValue
                     onNewValue(newValue.text)
                 }
@@ -188,7 +187,7 @@ fun NameTextFieldCursor(
             )
         )
         Text(
-            text = "${textFieldValue.text.length}/$MAX_LENGTH_NAME",
+            text = "${textFieldValue.text.length}/${ValidationRules.MAX_LENGTH_NAME}",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp, end = 8.dp),
@@ -278,7 +277,7 @@ fun PhoneField(value: String, onNewValue: (String) -> Unit, modifier: Modifier =
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             value = value,
-            onValueChange = { if(it.length <= MIN_PASS_LENGTH_PHONE_ECUADOR) onNewValue(it) },
+            onValueChange = { if(it.length <= ValidationRules.MIN_PASS_LENGTH_PHONE_ECUADOR) onNewValue(it) },
             placeholder = { Text(stringResource(R.string.mobile_number))},
             leadingIcon = {
                 Icon(
@@ -297,7 +296,7 @@ fun PhoneField(value: String, onNewValue: (String) -> Unit, modifier: Modifier =
             )
         )
         Text(
-            text = "${value.length}/$MIN_PASS_LENGTH_PHONE_ECUADOR",
+            text = "${value.length}/${ValidationRules.MIN_PASS_LENGTH_PHONE_ECUADOR}",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp, end = 8.dp),
@@ -330,7 +329,7 @@ fun PhoneFieldCursor(
             value = textFieldValue,
             onValueChange = { newValue ->
                 val filteredText = newValue.text.filter { it.isDigit() }
-                if (filteredText.length <= MIN_PASS_LENGTH_PHONE_ECUADOR) {
+                if (filteredText.length <= ValidationRules.MIN_PASS_LENGTH_PHONE_ECUADOR) {
                     textFieldValue = newValue.copy(text = filteredText)
                     onNewValue(filteredText)
                 }
@@ -359,7 +358,7 @@ fun PhoneFieldCursor(
             )
         )
         Text(
-            text = "${textFieldValue.text.length}/$MIN_PASS_LENGTH_PHONE_ECUADOR",
+            text = "${textFieldValue.text.length}/${ValidationRules.MIN_PASS_LENGTH_PHONE_ECUADOR}",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp, end = 8.dp),

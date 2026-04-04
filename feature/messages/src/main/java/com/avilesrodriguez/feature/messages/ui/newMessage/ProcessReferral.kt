@@ -35,10 +35,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.avilesrodriguez.domain.model.message.Message
+import com.avilesrodriguez.domain.model.validationRules.ValidationRules
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.attachment.AttachmentPreviews
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_SUBJECT
 
 @Composable
 fun ProcessReferral(
@@ -88,7 +87,7 @@ fun ProcessReferral(
                 )
             )
             Text(
-                text = "${newMessageState.subject.length}/$MAX_LENGTH_SUBJECT",
+                text = "${newMessageState.subject.length}/${ValidationRules.MAX_LENGTH_SUBJECT}",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.End,
@@ -118,7 +117,7 @@ fun ProcessReferral(
                 )
             )
             Text(
-                text = "${newMessageState.content.length}/$MAX_LENGTH_CONTENT",
+                text = "${newMessageState.content.length}/${ValidationRules.MAX_LENGTH_CONTENT}",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.End,

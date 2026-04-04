@@ -27,13 +27,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import androidx.core.net.toUri
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
+import com.avilesrodriguez.domain.model.validationRules.ValidationRules
 import com.avilesrodriguez.domain.usecases.user.GetUserFlow
 import com.avilesrodriguez.domain.usecases.transactions.RejectReferralTransaction
 import com.avilesrodriguez.domain.usecases.transactions.SendPayTransaction
 import com.avilesrodriguez.presentation.banksPays.BanksEcuador
 import com.avilesrodriguez.presentation.banksPays.getById
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_CONTENT
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_SUBJECT
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
 
@@ -105,12 +104,12 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun onSubjectChange(newSubject: String){
-        val filteredSubject = newSubject.take(MAX_LENGTH_SUBJECT)
+        val filteredSubject = newSubject.take(ValidationRules.MAX_LENGTH_SUBJECT)
         _newMessageState.value = _newMessageState.value.copy(subject = filteredSubject)
     }
 
     fun onContentChange(newContent: String){
-        val filteredContent = newContent.take(MAX_LENGTH_CONTENT)
+        val filteredContent = newContent.take(ValidationRules.MAX_LENGTH_CONTENT)
         _newMessageState.value = _newMessageState.value.copy(content = filteredContent)
     }
 

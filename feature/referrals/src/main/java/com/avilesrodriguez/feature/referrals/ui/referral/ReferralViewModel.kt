@@ -9,6 +9,7 @@ import com.avilesrodriguez.domain.model.message.Message
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
+import com.avilesrodriguez.domain.model.validationRules.ValidationRules
 import com.avilesrodriguez.domain.usecases.account.CurrentUserId
 import com.avilesrodriguez.domain.usecases.message.GetMessagesByReferral
 import com.avilesrodriguez.domain.usecases.referral.GetReferralByIdFlow
@@ -18,8 +19,6 @@ import com.avilesrodriguez.domain.usecases.message.SaveMessage
 import com.avilesrodriguez.domain.usecases.referral.SaveRatingWithTransaction
 import com.avilesrodriguez.domain.usecases.referral.UpdateReferralFields
 import com.avilesrodriguez.presentation.R
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
-import com.avilesrodriguez.presentation.ext.MIN_PASS_LENGTH_PHONE_ECUADOR
 import com.avilesrodriguez.presentation.ext.isValidEmail
 import com.avilesrodriguez.presentation.ext.isValidNumber
 import com.avilesrodriguez.presentation.navigation.NavRoutes
@@ -174,7 +173,7 @@ class ReferralViewModel @Inject constructor(
 
         val filteredName = newName
             .filter { it.isLetter() || it.isDigit() || it.isWhitespace() || allowedSymbols.contains(it) }
-            .take(MAX_LENGTH_NAME)
+            .take(ValidationRules.MAX_LENGTH_NAME)
 
         _referralState.value = _referralState.value?.copy(name = filteredName)
     }
@@ -216,7 +215,7 @@ class ReferralViewModel @Inject constructor(
     }
 
     fun updateNumberPhone(newNumberPhone: String){
-        val filtered = newNumberPhone.filter { it.isDigit() }.take(MIN_PASS_LENGTH_PHONE_ECUADOR)
+        val filtered = newNumberPhone.filter { it.isDigit() }.take(ValidationRules.MIN_PASS_LENGTH_PHONE_ECUADOR)
         _referralState.value = _referralState.value?.copy(numberPhone = filtered)
     }
 

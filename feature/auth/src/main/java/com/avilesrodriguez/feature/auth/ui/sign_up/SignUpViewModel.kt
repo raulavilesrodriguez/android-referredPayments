@@ -3,13 +3,13 @@ package com.avilesrodriguez.feature.auth.ui.sign_up
 import android.util.Log
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
+import com.avilesrodriguez.domain.model.validationRules.ValidationRules
 import com.avilesrodriguez.domain.usecases.account.CurrentUserId
 import com.avilesrodriguez.domain.usecases.user.IsAuthorizedProvider
 import com.avilesrodriguez.domain.usecases.user.SaveUser
 import com.avilesrodriguez.domain.usecases.authPreferences.SetNotFirstTime
 import com.avilesrodriguez.domain.usecases.account.SignUp
 import com.avilesrodriguez.presentation.R
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
 import com.avilesrodriguez.presentation.ext.isValidEmail
 import com.avilesrodriguez.presentation.ext.isValidPassword
 import com.avilesrodriguez.presentation.ext.passwordMatches
@@ -46,7 +46,7 @@ class SignUpViewModel @Inject constructor(
 
         val filteredName = name
             .filter { it.isLetter() || it.isDigit() || it.isWhitespace() || allowedSymbols.contains(it) }
-            .take(MAX_LENGTH_NAME)
+            .take(ValidationRules.MAX_LENGTH_NAME)
         _uiState.value = _uiState.value.copy(name = filteredName)
     }
 

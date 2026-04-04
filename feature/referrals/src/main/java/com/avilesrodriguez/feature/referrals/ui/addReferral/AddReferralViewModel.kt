@@ -1,14 +1,13 @@
 package com.avilesrodriguez.feature.referrals.ui.addReferral
 
 import android.util.Log
+import com.avilesrodriguez.domain.model.validationRules.ValidationRules
 import com.avilesrodriguez.domain.usecases.account.CurrentUserId
 import com.avilesrodriguez.domain.usecases.referral.SaveReferral
 import com.avilesrodriguez.domain.usecases.user.UpdateProviderProcessingReferralsCount
 import com.avilesrodriguez.feature.referrals.ui.model.AddReferralUiState
 import com.avilesrodriguez.feature.referrals.ui.model.toReferral
 import com.avilesrodriguez.presentation.R
-import com.avilesrodriguez.presentation.ext.MAX_LENGTH_NAME
-import com.avilesrodriguez.presentation.ext.MIN_PASS_LENGTH_PHONE_ECUADOR
 import com.avilesrodriguez.presentation.ext.isValidEmail
 import com.avilesrodriguez.presentation.ext.isValidNumber
 import com.avilesrodriguez.presentation.navigation.NavRoutes
@@ -49,7 +48,7 @@ class AddReferralViewModel @Inject constructor(
 
         val filteredName = newName
             .filter { it.isLetter() || it.isDigit() || it.isWhitespace() || allowedSymbols.contains(it) }
-            .take(MAX_LENGTH_NAME)
+            .take(ValidationRules.MAX_LENGTH_NAME)
 
         _addReferralState.value = _addReferralState.value.copy(name = filteredName)
         val currentState = _addReferralState.value
@@ -63,7 +62,7 @@ class AddReferralViewModel @Inject constructor(
     }
 
     fun onNumberPhoneChange(newNumberPhone: String){
-        val filtered = newNumberPhone.filter { it.isDigit() }.take(MIN_PASS_LENGTH_PHONE_ECUADOR)
+        val filtered = newNumberPhone.filter { it.isDigit() }.take(ValidationRules.MIN_PASS_LENGTH_PHONE_ECUADOR)
         _addReferralState.value = _addReferralState.value.copy(numberPhone = filtered)
         val currentState = _addReferralState.value
         _addReferralState.value = _addReferralState.value.copy(isEntryValid = validateInput(currentState))
