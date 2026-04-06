@@ -1,4 +1,4 @@
-package com.avilesrodriguez.feature.products.ui.model
+package com.example.feature.home.ui.products.model
 
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.industries.IndustriesType

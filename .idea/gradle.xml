@@ -19,7 +19,6 @@
             <option value="$PROJECT_DIR$/feature/home" />
             <option value="$PROJECT_DIR$/feature/messages" />
             <option value="$PROJECT_DIR$/feature/payments" />
-            <option value="$PROJECT_DIR$/feature/products" />
             <option value="$PROJECT_DIR$/feature/referrals" />
             <option value="$PROJECT_DIR$/feature/settings" />
           </set>

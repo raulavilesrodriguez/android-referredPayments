@@ -207,7 +207,6 @@
     <string name="percentage_rejected">Percentage rejected</string>
     <string name="percentage_paid">Percentage paid</string>
 
-
     <!-- Time -->
     <string name="yesterday">Yesterday</string>
 
@@ -254,6 +253,12 @@
     <string name="savings">Savings</string>
     <string name="checking">Checking</string>
     <string name="no_payments">There are no payments</string>
+
+    <!-- Products -->
+    <string name="add_new_product">Add New Product</string>
+    <string name="product_name">Product name</string>
+    <string name="product_description">Product description</string>
+    <string name="pay_by_referral">Pay by referral</string>
 
 
     <!-- Policies Screen -->

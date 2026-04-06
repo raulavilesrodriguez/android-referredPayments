@@ -1,20 +1,18 @@
-package com.avilesrodriguez.feature.products.ui.addProduct
+package com.example.feature.home.ui.products.addProduct
 
-import androidx.compose.ui.res.painterResource
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.validationRules.ProductRules
 import com.avilesrodriguez.domain.usecases.account.CurrentUserId
 import com.avilesrodriguez.domain.usecases.productProvider.SaveProductProvider
 import com.avilesrodriguez.domain.usecases.user.GetUser
-import com.avilesrodriguez.feature.products.ui.model.AddProduct
-import com.avilesrodriguez.feature.products.ui.model.toProductProvider
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
+import com.example.feature.home.ui.products.model.AddProduct
+import com.example.feature.home.ui.products.model.toProductProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
-import kotlin.text.forEach
 
 @HiltViewModel
 class AddProductViewModel @Inject constructor(
@@ -27,6 +25,9 @@ class AddProductViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _providerUser = MutableStateFlow<UserData?>(null)
+    val providerUser: StateFlow<UserData?> = _providerUser.asStateFlow()
+
     val currentUserId
         get() = currentUserIdUseCase()
 
@@ -38,6 +39,19 @@ class AddProductViewModel @Inject constructor(
 
     val payByReferral
         get() = _addProduct.value.payByReferral
+
+    fun loadInformation(providerId: String){
+        if(providerId.isBlank()) return
+        _isLoading.value = true
+        launchCatching {
+            try {
+                val user = getUser(providerId)
+                _providerUser.value = user
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 
     fun onNameChange(newName: String){
         // Solo deja pasar letras y espacios, eliminando lo demás al instante
@@ -91,16 +105,16 @@ class AddProductViewModel @Inject constructor(
         } ?: ""
     }
 
-    fun onSaveClick(providerId: String?, popUp: () -> Unit){
+    fun onSaveClick(popUp: () -> Unit){
         val normalizedAmount = normalizeAmount(payByReferral)
         if(nameProduct.isBlank() || description.isBlank() || normalizedAmount.isBlank()){
             return
         }
-        if(providerId == null) return
+
         _isLoading.value = true
         launchCatching {
-            val user = getUser(providerId)
-            val provider = user as? UserData.Provider ?: return@launchCatching
+            val user = _providerUser.value ?: return@launchCatching
+            val provider = user as UserData.Provider
             val currentState = _addProduct.value.copy(payByReferral = normalizedAmount)
             val product = currentState.toProductProvider(
                 providerId = currentUserId,

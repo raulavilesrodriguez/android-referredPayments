@@ -2,6 +2,7 @@ package com.avilesrodriguez.presentation.ext
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -40,6 +41,12 @@ fun Modifier.dropdownSelector(): Modifier {
 
 fun Modifier.fieldModifier(): Modifier {
     return this.fillMaxWidth().padding(20.dp, 4.dp)
+}
+
+fun Modifier.fieldModifierHeight(): Modifier {
+    return this.heightIn(min = 140.dp)
+        .fillMaxWidth()
+        .padding(horizontal = 0.dp, vertical = 4.dp)
 }
 
 fun Modifier.toolbarActions(): Modifier {

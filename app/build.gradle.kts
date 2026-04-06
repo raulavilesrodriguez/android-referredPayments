@@ -53,7 +53,6 @@ dependencies {
     implementation(project(":feature:payments"))
     implementation(project(":feature:home"))
     implementation(project(":feature:messages"))
-    implementation(project(":feature:products"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
