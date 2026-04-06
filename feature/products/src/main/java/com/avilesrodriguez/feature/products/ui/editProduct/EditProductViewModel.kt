@@ -1,29 +1,25 @@
-package com.avilesrodriguez.feature.products.ui.addProduct
+package com.avilesrodriguez.feature.products.ui.editProduct
 
-import androidx.compose.ui.res.painterResource
-import com.avilesrodriguez.domain.model.user.UserData
+import com.avilesrodriguez.domain.ext.normalizeName
+import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.validationRules.ProductRules
 import com.avilesrodriguez.domain.usecases.account.CurrentUserId
-import com.avilesrodriguez.domain.usecases.productProvider.SaveProductProvider
-import com.avilesrodriguez.domain.usecases.user.GetUser
-import com.avilesrodriguez.feature.products.ui.model.AddProduct
-import com.avilesrodriguez.feature.products.ui.model.toProductProvider
+import com.avilesrodriguez.domain.usecases.productProvider.GetProductProviderById
+import com.avilesrodriguez.domain.usecases.productProvider.UpdateProductProvider
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
-import kotlin.text.forEach
+import kotlin.text.isBlank
 
-@HiltViewModel
-class AddProductViewModel @Inject constructor(
+class EditProductViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
-    private val getUser: GetUser,
-    private val saveProductProvider: SaveProductProvider,
+    private val getProductProviderById: GetProductProviderById,
+    private val updateProductProvider: UpdateProductProvider
 ) : BaseViewModel() {
-    private val _addProduct = MutableStateFlow(AddProduct())
-    val addProduct: StateFlow<AddProduct> = _addProduct.asStateFlow()
+    private val _productState = MutableStateFlow<ProductProvider>(ProductProvider())
+    val productState: StateFlow<ProductProvider> = _productState.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
@@ -31,13 +27,26 @@ class AddProductViewModel @Inject constructor(
         get() = currentUserIdUseCase()
 
     val nameProduct
-        get() = _addProduct.value.name
+        get() = _productState.value.name
 
     val description
-        get() = _addProduct.value.description
+        get() = _productState.value.description
 
     val payByReferral
-        get() = _addProduct.value.payByReferral
+        get() = _productState.value.payByReferral
+
+    fun loadProductInformation(productId: String){
+        if(_productState.value.id == productId) return
+        _isLoading.value = true
+        launchCatching {
+            try {
+                val product = getProductProviderById(productId)
+                _productState.value = product?:ProductProvider()
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 
     fun onNameChange(newName: String){
         // Solo deja pasar letras y espacios, eliminando lo demás al instante
@@ -47,12 +56,13 @@ class AddProductViewModel @Inject constructor(
             .filter { it.isLetter() || it.isDigit() || it.isWhitespace() || allowedSymbols.contains(it) }
             .take(ProductRules.MAX_LENGTH_NAME)
 
-        _addProduct.value = _addProduct.value.copy(name = filteredName)
+        _productState.value = _productState.value.copy(name = filteredName)
+        _productState.value = _productState.value.copy(nameLowercase = filteredName.normalizeName())
     }
 
     fun updateDescription(newDescription: String){
         val filteredDescription = newDescription.take(ProductRules.MAX_LENGTH_PRODUCT_DESCRIPTION)
-        _addProduct.value = _addProduct.value.copy(description = filteredDescription)
+        _productState.value = _productState.value.copy(description = filteredDescription)
     }
 
     fun updatePayByReferral(amountUsd: String){
@@ -82,7 +92,7 @@ class AddProductViewModel @Inject constructor(
                 }
             }
         }
-        _addProduct.value = _addProduct.value.copy(payByReferral = filtered)
+        _productState.value = _productState.value.copy(payByReferral = filtered)
     }
 
     private fun normalizeAmount(value: String): String {
@@ -91,30 +101,25 @@ class AddProductViewModel @Inject constructor(
         } ?: ""
     }
 
-    fun onSaveClick(providerId: String?, popUp: () -> Unit){
+    fun onUpdateClick(providerId: String?, popUp: () -> Unit){
         val normalizedAmount = normalizeAmount(payByReferral)
+        if(providerId == null) return
         if(nameProduct.isBlank() || description.isBlank() || normalizedAmount.isBlank()){
             return
         }
-        if(providerId == null) return
         _isLoading.value = true
         launchCatching {
-            val user = getUser(providerId)
-            val provider = user as? UserData.Provider ?: return@launchCatching
-            val currentState = _addProduct.value.copy(payByReferral = normalizedAmount)
-            val product = currentState.toProductProvider(
-                providerId = currentUserId,
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis(),
-                providerName = provider.name?:"",
-                providerPhotoUrl = provider.photoUrl,
-                providerRating = provider.paymentRating,
-                industry = provider.industry
+            val currentProduct = _productState.value.copy(payByReferral = normalizedAmount)
+            val updates = mapOf(
+                "name" to currentProduct.name,
+                "nameLowercase" to currentProduct.nameLowercase,
+                "description" to currentProduct.description,
+                "payByReferral" to currentProduct.payByReferral,
+                "updatedAt" to System.currentTimeMillis()
             )
-            saveProductProvider(product)
-            _addProduct.value = AddProduct()
+            val productId = currentProduct.id
+            updateProductProvider(productId, updates)
             popUp()
-        }.invokeOnCompletion { _isLoading.value = false }
+        }
     }
-
 }

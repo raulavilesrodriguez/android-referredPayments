@@ -36,7 +36,7 @@ class ProductProviderDataSource @Inject constructor(
     suspend fun updateProductProvider(id: String, updates: Map<String, Any>) {
         if(id.isEmpty()) return
         val firestoreUpdates = updates.mapValues { entry ->
-            if ((entry.key == CREATED_AT_FIELD) && entry.value is Long) {
+            if ((entry.key == CREATED_AT_FIELD || entry.key == UPDATED_AT_FIELD) && entry.value is Long) {
                 Timestamp(Date(entry.value as Long))
             } else {
                 entry.value

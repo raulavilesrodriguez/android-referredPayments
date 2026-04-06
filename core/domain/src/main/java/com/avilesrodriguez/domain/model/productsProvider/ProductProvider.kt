@@ -8,14 +8,14 @@ data class ProductProvider(
     val providerId: String = "",
     val name: String = "",
     val nameLowercase: String = name.normalizeName(),
-    val description: String? = null,
-    val payByReferral: Double = 0.0,
+    val description: String = "",
+    val payByReferral: String = "0.0",
     val isActive: Boolean = true,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long? = null,
-    val industry: IndustriesType = IndustriesType.OTHER,
     // --- DATOS DENORMALIZADOS (Para la UI del Cliente) ---
     val providerName: String = "",
     val providerPhotoUrl: String = "",
-    val providerRating: Double = 0.0
+    val providerRating: Double = 0.0,
+    val industry: IndustriesType = IndustriesType.OTHER,
 )
