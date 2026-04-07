@@ -65,7 +65,7 @@ fun EditProductScreen(
         onNameChange = viewModel::onNameChange,
         onDescriptionChange = viewModel::updateDescription,
         onPayByReferralChange = viewModel::updatePayByReferral,
-        onSaveClick = { viewModel.onUpdateClick(productId, onBackClick) },
+        onSaveClick = { viewModel.onUpdateClick(onBackClick) },
         onBackClick = onBackClick,
         hideDelete = { showDialogDeleteProduct = true },
         showTopBar = showTopBar,

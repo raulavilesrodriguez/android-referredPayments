@@ -222,11 +222,20 @@ private fun NavGraphBuilder.editPhoneReferralNavigation(appState: AppState){
 private fun NavGraphBuilder.addNewReferral(appState: AppState){
     composable(
         route = NavRoutes.NEW_REFERRAL,
-        arguments = listOf(navArgument(NavRoutes.UserArgs.ID){type = NavType.StringType})
+        arguments = listOf(
+            navArgument(NavRoutes.UserArgs.ID){type = NavType.StringType},
+            navArgument(NavRoutes.ProductArgs.ID){
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
+            }
+        )
     ) { backStackEntry ->
-        val userId = backStackEntry.arguments?.getString(NavRoutes.UserArgs.ID)
+        val providerId = backStackEntry.arguments?.getString(NavRoutes.UserArgs.ID)
+        val productId = backStackEntry.arguments?.getString(NavRoutes.ProductArgs.ID)
         AddReferralScreen(
-            providerId = userId,
+            providerId = providerId,
+            productId = productId,
             openAndPopUp = {route, popUp -> appState.navigateAndPopUp(route, popUp)},
             onBackClick = { appState.popUp() }
         )

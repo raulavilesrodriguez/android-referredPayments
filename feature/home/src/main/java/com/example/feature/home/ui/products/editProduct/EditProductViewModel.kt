@@ -97,9 +97,8 @@ class EditProductViewModel @Inject constructor(
         } ?: ""
     }
 
-    fun onUpdateClick(providerId: String?, popUp: () -> Unit){
+    fun onUpdateClick(popUp: () -> Unit){
         val normalizedAmount = normalizeAmount(payByReferral)
-        if(providerId == null) return
         if(nameProduct.isBlank() || description.isBlank() || normalizedAmount.isBlank()){
             return
         }

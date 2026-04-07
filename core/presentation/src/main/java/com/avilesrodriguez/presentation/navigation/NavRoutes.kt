@@ -4,7 +4,6 @@ object NavRoutes {
     const val SPLASH = "splash"
     const val LOGIN = "login"
     const val SIGN_UP = "sign_up"
-    const val EDIT_USER = "edit_user"
     const val POLICIES = "policies"
     const val REFERRALS = "referrals"
     const val REFERRALS_ROUTE = "referrals?id={id}" //id del referral
@@ -13,11 +12,12 @@ object NavRoutes {
     }
     const val SETTINGS = "settings"
     const val HOME = "home"
-    const val PAYMENTS_MOVEMENT = "payments_movement"
-    const val NEW_REFERRAL = "new_referral/{id}"  //id del user provider
-    const val USER_DETAIL = "user_detail/{id}" //id del user client o provider
+    const val NEW_REFERRAL = "new_referral/{id}?product_id={product_id}"  //id del user provider
     object UserArgs {
         const val ID = "id"
+    }
+    object ProductArgs {
+        const val ID = "product_id"
     }
     const val REFERRAL_DETAIL = "referral_detail/{id}" //id del referral
     const val EDIT_NAME_REFERRAL = "edit_name_referral/{id}" //id del referral
@@ -27,17 +27,4 @@ object NavRoutes {
         const val ID = "id"
     }
     const val MESSAGES_SCREEN = "messages_screen/{id}" //id del referral
-    const val NEW_MESSAGE = "new_message/{id}" //id del referral
-    const val MESSAGE_SCREEN = "message_screen/{id}" //id del message
-    object MessageArgs {
-        const val ID = "id"
-    }
-    const val PAY_REFERRAL = "pay_referral/{id}" //id del referral
-
-    const val PAY_REFERRAL_ROUTE = "pay_referral?sharedUri={sharedUri}"
-    fun buildPayReferralRoute(uri: String): String {
-        // CODIFICAR la URI para que sea segura en la ruta
-        val encodedUri = java.net.URLEncoder.encode(uri, "UTF-8")
-        return "$PAY_REFERRAL?sharedUri=$encodedUri"
-    }
 }
