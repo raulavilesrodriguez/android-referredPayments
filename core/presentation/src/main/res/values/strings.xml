@@ -256,9 +256,12 @@
 
     <!-- Products -->
     <string name="add_new_product">Add New Product</string>
+    <string name="edit_product">Edit Product</string>
+    <string name="delete_product">Delete Product</string>
     <string name="product_name">Product name</string>
     <string name="product_description">Product description</string>
     <string name="pay_by_referral">Pay by referral</string>
+    <string name="warning_delete_product">Are yo sure yo want to delete this product?</string>
 
 
     <!-- Policies Screen -->

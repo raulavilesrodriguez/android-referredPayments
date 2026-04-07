@@ -3,7 +3,6 @@ package com.example.feature.home.ui.products.editProduct
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.validationRules.ProductRules
-import com.avilesrodriguez.domain.usecases.account.CurrentUserId
 import com.avilesrodriguez.domain.usecases.productProvider.DeactivateProductProvider
 import com.avilesrodriguez.domain.usecases.productProvider.GetProductProviderById
 import com.avilesrodriguez.domain.usecases.productProvider.UpdateProductProvider
@@ -14,18 +13,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 class EditProductViewModel @Inject constructor(
-    private val currentUserIdUseCase: CurrentUserId,
     private val getProductProviderById: GetProductProviderById,
     private val updateProductProvider: UpdateProductProvider,
     private val deactivateProductProvider: DeactivateProductProvider
 ) : BaseViewModel() {
-    private val _productState = MutableStateFlow<ProductProvider>(ProductProvider())
+    private val _productState = MutableStateFlow(ProductProvider())
     val productState: StateFlow<ProductProvider> = _productState.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-
-    val currentUserId
-        get() = currentUserIdUseCase()
 
     val nameProduct
         get() = _productState.value.name
@@ -124,11 +119,12 @@ class EditProductViewModel @Inject constructor(
         }.invokeOnCompletion { _isLoading.value = false }
     }
 
-    fun hideDelete(){
+    fun hideDelete(popUp: () -> Unit){
         _isLoading.value = true
         launchCatching {
             val productId = _productState.value.id
             deactivateProductProvider(productId)
+            popUp()
         }.invokeOnCompletion { _isLoading.value = false }
     }
 }

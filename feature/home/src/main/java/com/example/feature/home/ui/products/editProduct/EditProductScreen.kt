@@ -1,4 +1,4 @@
-package com.example.feature.home.ui.products.addProduct
+package com.example.feature.home.ui.products.editProduct
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,19 +14,25 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Paid
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.avilesrodriguez.domain.model.user.UserData
+import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.validationRules.ProductRules
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.BasicToolbar
@@ -35,44 +41,74 @@ import com.avilesrodriguez.presentation.composables.FormButtons
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.ext.fieldModifier
 import com.avilesrodriguez.presentation.ext.fieldModifierHeight
-import com.avilesrodriguez.presentation.fakeData.userProvider
 import com.avilesrodriguez.presentation.profile.Item
-import com.example.feature.home.ui.products.model.AddProduct
+import com.avilesrodriguez.presentation.profile.ItemEdit
+
 
 @Composable
-fun AddProductScreen(
+fun EditProductScreen(
+    productId: String?,
     onBackClick: () -> Unit,
     showTopBar: Boolean = true,
-    viewModel: AddProductViewModel = hiltViewModel()
+    viewModel: EditProductViewModel = hiltViewModel()
 ){
-    val addProduct by viewModel.addProduct.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val providerUser by viewModel.providerUser.collectAsState()
+    LaunchedEffect(productId){
+        viewModel.loadProductInformation(productId.orEmpty())
+    }
 
-    AddProductScreenContent(
+    val product by viewModel.productState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    var showDialogDeleteProduct by remember { mutableStateOf(false) }
+
+    EditProductScreenContent(
+        product = product,
         onNameChange = viewModel::onNameChange,
         onDescriptionChange = viewModel::updateDescription,
         onPayByReferralChange = viewModel::updatePayByReferral,
-        onSaveClick = { viewModel.onSaveClick( onBackClick) },
+        onSaveClick = { viewModel.onUpdateClick(productId, onBackClick) },
         onBackClick = onBackClick,
-        addProduct = addProduct,
-        isLoading = isLoading,
+        hideDelete = { showDialogDeleteProduct = true },
         showTopBar = showTopBar,
-        providerUser = providerUser as UserData.Provider?
+        isLoading = isLoading
     )
+
+    if(showDialogDeleteProduct){
+        AlertDialog(
+            onDismissRequest = { showDialogDeleteProduct = false },
+            title = { Text(text = stringResource(R.string.delete_product)) },
+            text = { Text(text = stringResource(R.string.warning_delete_product)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialogDeleteProduct = false
+                        viewModel.hideDelete(onBackClick)
+                    }
+                ) {
+                    Text(text = stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDialogDeleteProduct = false }
+                ){
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
 }
 
 @Composable
-private fun AddProductScreenContent(
+private fun EditProductScreenContent(
+    product: ProductProvider,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onPayByReferralChange: (String) -> Unit,
     onSaveClick: () -> Unit,
     onBackClick: () -> Unit,
-    addProduct: AddProduct,
-    isLoading: Boolean,
+    hideDelete: () -> Unit,
     showTopBar: Boolean,
-    providerUser: UserData.Provider?
+    isLoading: Boolean
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -81,40 +117,39 @@ private fun AddProductScreenContent(
             if(showTopBar){
                 ToolBarWithIcon(
                     iconBack = R.drawable.arrow_back,
-                    title = stringResource(R.string.add_new_product),
+                    title = stringResource(R.string.edit_product),
                     backClick = { onBackClick() }
                 )
             }else {
-                BasicToolbar(title = stringResource(R.string.add_new_product))
+                BasicToolbar(title = stringResource(R.string.edit_product))
             }
         },
-        content = { innerPadding ->
-            FormAddProduct(
+        content = {innerPadding ->
+            EditFormProduct(
+                product = product,
                 onNameChange = onNameChange,
                 onDescriptionChange = onDescriptionChange,
                 onPayByReferralChange = onPayByReferralChange,
                 onSaveClick = onSaveClick,
                 onBackClick = onBackClick,
-                addProduct = addProduct,
+                hideDelete = hideDelete,
                 isLoading = isLoading,
-                providerUser = providerUser,
                 modifier = Modifier.padding(innerPadding)
             )
         }
     )
 }
 
-
 @Composable
-private fun FormAddProduct(
+private fun EditFormProduct(
+    product: ProductProvider,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onPayByReferralChange: (String) -> Unit,
     onSaveClick: () -> Unit,
     onBackClick: () -> Unit,
-    addProduct: AddProduct,
+    hideDelete: () -> Unit,
     isLoading: Boolean,
-    providerUser: UserData.Provider?,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -126,15 +161,22 @@ private fun FormAddProduct(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
+        ItemEdit(
+            data = stringResource(R.string.delete_product),
+            onClick = hideDelete,
+            iconEdit = R.drawable.delete,
+            modifier = Modifier.fieldModifier()
+        )
+        Spacer(modifier = Modifier.padding(8.dp))
         Item(
             icon = R.drawable.industry,
             title = R.string.settings_industry,
-            data = providerUser?.industry?.name ?:"",
+            data = product.industry.name,
             modifier = Modifier.fieldModifier()
         )
         Spacer(modifier = Modifier.padding(8.dp))
         FieldForm(
-            value = addProduct.name,
+            value = product.name,
             onNewValue = onNameChange,
             namePlaceholder = stringResource(R.string.product_name),
             icon = Icons.Default.CardGiftcard,
@@ -142,15 +184,15 @@ private fun FormAddProduct(
             ruleField = ProductRules.MAX_LENGTH_NAME
         )
         FieldForm(
-            value = addProduct.payByReferral,
+            value = product.payByReferral,
             onNewValue = onPayByReferralChange,
             namePlaceholder = stringResource(R.string.pay_by_referral),
             icon = Icons.Default.Paid,
-            modifier = Modifier.fieldModifier()
+            modifier = Modifier.fieldModifier(),
         )
         Spacer(modifier = Modifier.padding(4.dp))
         FieldForm(
-            value = addProduct.description,
+            value = product.description,
             onNewValue = onDescriptionChange,
             namePlaceholder = stringResource(R.string.product_description),
             icon = Icons.Default.Description,
@@ -165,25 +207,25 @@ private fun FormAddProduct(
             onConfirm = onSaveClick,
             onCancel = onBackClick,
             isSaving = isLoading,
-            enabled = addProduct.name.isNotBlank() && addProduct.description.isNotBlank() && addProduct.payByReferral.isNotBlank()
+            enabled = product.name.isNotBlank() && product.description.isNotBlank() && product.payByReferral.isNotBlank()
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun AddProductScreenPreview(){
+fun EditProductScreenPreview(){
     MaterialTheme {
-        AddProductScreenContent(
+        EditProductScreenContent(
+            product = ProductProvider(),
             onNameChange = {},
             onDescriptionChange = {},
             onPayByReferralChange = {},
             onSaveClick = {},
             onBackClick = {},
-            addProduct = AddProduct(),
-            isLoading = false,
+            hideDelete = {},
             showTopBar = true,
-            providerUser = userProvider
+            isLoading = false
         )
     }
 }

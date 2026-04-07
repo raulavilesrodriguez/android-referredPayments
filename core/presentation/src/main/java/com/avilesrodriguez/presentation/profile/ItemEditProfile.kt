@@ -83,3 +83,69 @@ fun ItemEditProfile(
         }
     }
 }
+
+@Composable
+fun ItemEdit(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    title: String?=null,
+    data: String?=null,
+    @DrawableRes icon: Int?=null,
+    @DrawableRes iconEdit: Int? = null
+){
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClick() }
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Absolute.Left
+        ){
+            if(icon != null){
+                Icon(
+                    painter = painterResource(id = icon),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            Column(
+                modifier =  Modifier
+                    .padding(start = 4.dp)
+                    .fillMaxWidth(0.80f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
+            ) {
+                if(title != null){
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                if(data != null){
+                    Text(
+                        text = data,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            if(iconEdit != null){
+                Icon(
+                    painter = painterResource(id = iconEdit),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}

@@ -45,8 +45,6 @@ fun Modifier.fieldModifier(): Modifier {
 
 fun Modifier.fieldModifierHeight(): Modifier {
     return this.heightIn(min = 140.dp)
-        .fillMaxWidth()
-        .padding(horizontal = 0.dp, vertical = 4.dp)
 }
 
 fun Modifier.toolbarActions(): Modifier {

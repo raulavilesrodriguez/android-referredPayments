@@ -459,7 +459,9 @@ fun FieldForm(
                     modifier = Modifier.fillMaxWidth()
                 )},
             singleLine = true,
-            modifier = modifierHeight,
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(modifierHeight),
             leadingIcon = {
                 Icon(
                     imageVector = icon,

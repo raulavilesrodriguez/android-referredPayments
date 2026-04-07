@@ -3,6 +3,7 @@ package com.example.feature.home.ui.products.addProduct
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.validationRules.ProductRules
 import com.avilesrodriguez.domain.usecases.account.CurrentUserId
+import com.avilesrodriguez.domain.usecases.account.HasUser
 import com.avilesrodriguez.domain.usecases.productProvider.SaveProductProvider
 import com.avilesrodriguez.domain.usecases.user.GetUser
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class AddProductViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
     private val getUser: GetUser,
+    private val hasUser: HasUser,
     private val saveProductProvider: SaveProductProvider,
 ) : BaseViewModel() {
     private val _addProduct = MutableStateFlow(AddProduct())
@@ -40,15 +42,11 @@ class AddProductViewModel @Inject constructor(
     val payByReferral
         get() = _addProduct.value.payByReferral
 
-    fun loadInformation(providerId: String){
-        if(providerId.isBlank()) return
-        _isLoading.value = true
+    init {
         launchCatching {
-            try {
-                val user = getUser(providerId)
+            if(hasUser()){
+                val user = getUser(currentUserId)
                 _providerUser.value = user
-            } finally {
-                _isLoading.value = false
             }
         }
     }
