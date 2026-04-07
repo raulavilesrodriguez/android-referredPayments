@@ -15,11 +15,13 @@ data class AddReferralUiState(
 fun AddReferralUiState.toReferral(
     clientId: String,
     providerId: String,
+    productId: String,
     createdAt: Long
 ): Referral {
     return Referral(
         clientId = clientId,
         providerId = providerId,
+        productId = productId,
         name = name,
         nameLowercase = name.normalizeName(),
         email = email,

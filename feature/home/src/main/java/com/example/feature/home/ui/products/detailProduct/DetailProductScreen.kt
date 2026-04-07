@@ -1,4 +1,4 @@
-package com.example.feature.home.ui.details
+package com.example.feature.home.ui.products.detailProduct
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brightness2
 import androidx.compose.material.icons.filled.BrightnessHigh
 import androidx.compose.material.icons.filled.Business
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.PersonAdd
@@ -35,32 +35,71 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
+import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.StatItem
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.details.DetailMetricItem
+import com.avilesrodriguez.presentation.fakeData.productProvider
 import com.avilesrodriguez.presentation.fakeData.userProvider
+import com.avilesrodriguez.presentation.industries.icons
 import com.avilesrodriguez.presentation.industries.label
 import java.util.Locale
 
+
 @Composable
-fun DetailScreenProvider(
-    provider: UserData.Provider,
+fun DetailProductScreen(
+    productId: String?,
     onBackClick: () -> Unit,
-    onAddReferClick: (String) -> Unit,
-    isSaturated: Boolean,
+    openScreen: (String) -> Unit,
+    showTopBar: Boolean = true,
+    viewModel: DetailProductViewModel = hiltViewModel()
+){
+    LaunchedEffect(productId) {
+        viewModel.loadProductInformation(productId)
+    }
+
+    val canReferUserClient by viewModel.canReferUserClient.collectAsState()
+    val isProviderSaturated by viewModel.isProviderSaturated.collectAsState()
+    val product by viewModel.productState.collectAsState()
+    val providerUser by viewModel.providerUser.collectAsState()
+
+    DetailProductScreenContent(
+        onBackClick = onBackClick,
+        canReferUserClient = canReferUserClient,
+        isProviderSaturated = isProviderSaturated,
+        product = product,
+        providerUser = providerUser as UserData.Provider,
+        onAddReferClick = {viewModel.onAddReferClick(product.providerId, product.id, openScreen)},
+        showTopBar = showTopBar
+    )
+}
+
+@Composable
+private fun DetailProductScreenContent(
+    onBackClick: () -> Unit,
     canReferUserClient: Boolean,
+    isProviderSaturated: Boolean,
+    product: ProductProvider,
+    providerUser: UserData.Provider,
+    onAddReferClick: () -> Unit,
     showTopBar: Boolean = true
 ){
     Scaffold(
@@ -74,19 +113,22 @@ fun DetailScreenProvider(
                     title = stringResource(R.string.information_provider),
                     backClick = { onBackClick() }
                 )
+            } else {
+                BasicToolbar(stringResource(R.string.information_provider))
             }
         },
         bottomBar = {
             ButtonToRefer(
                 onReferClick = onAddReferClick,
-                provider = provider,
-                isSaturated = isSaturated,
+                isSaturated = isProviderSaturated,
                 canReferUserClient = canReferUserClient
-            )},
+            )
+        },
         content = { innerPadding ->
-            ProfileProvider(
-                provider = provider,
-                isSaturated = isSaturated,
+            ProfileProductProvider(
+                product = product,
+                provider = providerUser,
+                isSaturated = isProviderSaturated,
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -95,8 +137,7 @@ fun DetailScreenProvider(
 
 @Composable
 fun ButtonToRefer(
-    onReferClick: (String) -> Unit,
-    provider: UserData.Provider,
+    onReferClick: () -> Unit,
     isSaturated: Boolean,
     canReferUserClient: Boolean
 ){
@@ -107,7 +148,7 @@ fun ButtonToRefer(
         modifier = Modifier.fillMaxWidth()
     ) {
         Button(
-            onClick = { onReferClick(provider.uid) },
+            onClick = { onReferClick() },
             enabled = !isSaturated && canReferUserClient,
             modifier = Modifier
                 .fillMaxWidth()
@@ -127,7 +168,8 @@ fun ButtonToRefer(
 }
 
 @Composable
-private fun ProfileProvider(
+private fun ProfileProductProvider(
+    product: ProductProvider,
     provider: UserData.Provider,
     isSaturated: Boolean,
     modifier: Modifier = Modifier
@@ -140,8 +182,8 @@ private fun ProfileProvider(
     ){
         ElevatedCard(
             modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             shape = RoundedCornerShape(24.dp),
             elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
             colors = CardDefaults.elevatedCardColors(
@@ -154,16 +196,21 @@ private fun ProfileProvider(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Avatar(photoUri = provider.photoUrl, size = 90.dp)
-                Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = provider.name ?: stringResource(R.string.unnamed),
-                    style = MaterialTheme.typography.titleLarge,
+                    text = "$ ${product.payByReferral}",
+                    style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.ExtraBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+                Text(
+                    text = stringResource(R.string.pay_by_referral),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(16.dp))
                 Surface(
                     color = MaterialTheme.colorScheme.primaryContainer,
                     shape = RoundedCornerShape(8.dp),
@@ -178,6 +225,22 @@ private fun ProfileProvider(
                 }
             }
         }
+        Text(
+            text = stringResource(R.string.about_product),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+        )
+        InfoGeneralProduct(product = product)
+        Text(
+            text = stringResource(R.string.company_description),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+        )
+        InfoGeneralProvider(provider = provider)
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -221,25 +284,11 @@ private fun ProfileProvider(
                 }
             }
         }
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 16.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.company_description),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = provider.companyDescription ?: "",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
-            )
-        }
+        InfoCard(
+            icon = Icons.Default.Business,
+            title = stringResource(R.string.settings_industry),
+            value = stringResource(provider.industry.label())
+        )
         if (!provider.website.isNullOrBlank()) {
             InfoCard(
                 icon = Icons.Default.Language,
@@ -247,17 +296,6 @@ private fun ProfileProvider(
                 value = provider.website!!
             )
         }
-        /**
-        InfoCard(
-            icon = Icons.Default.Email,
-            title = stringResource(R.string.email),
-            value = provider.email
-        ) */
-        InfoCard(
-            icon = Icons.Default.Business,
-            title = stringResource(R.string.settings_industry),
-            value = stringResource(provider.industry.label())
-        )
         if(isSaturated){
             StatItem(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 16.dp),
@@ -270,6 +308,103 @@ private fun ProfileProvider(
         Spacer(modifier = Modifier.height(100.dp))
     }
 }
+
+@Composable
+private fun InfoGeneralProvider(
+    provider: UserData.Provider,
+){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Absolute.Left
+        ) {
+            Avatar(photoUri = provider.photoUrl, size = 42.dp, modifier = Modifier.padding(start = 4.dp))
+            Spacer(modifier = Modifier.width(24.dp))
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = provider.name ?: stringResource(R.string.unnamed),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = provider.companyDescription ?: "",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 5,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
+                )
+            }
+
+        }
+    }
+}
+
+@Composable
+private fun InfoGeneralProduct(product: ProductProvider){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Absolute.Left
+        ) {
+            Icon(
+                painter = painterResource(product.industry.icons()),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(42.dp).padding(start = 4.dp)
+            )
+            Spacer(modifier = Modifier.width(24.dp))
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = product.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = product.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 10,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun InfoCard(icon: ImageVector, title: String, value: String) {
@@ -295,14 +430,15 @@ private fun InfoCard(icon: ImageVector, title: String, value: String) {
 
 @Preview(showBackground = true)
 @Composable
-fun DetailScreenProviderPreview(){
+fun DetailProductScreenPreview() {
     MaterialTheme {
-        DetailScreenProvider(
-            provider = userProvider,
+        DetailProductScreenContent(
             onBackClick = {},
-            onAddReferClick = {},
-            isSaturated = true,
-            canReferUserClient = true
+            canReferUserClient = true,
+            isProviderSaturated = false,
+            product = productProvider,
+            providerUser = userProvider,
+            onAddReferClick = {}
         )
     }
 }

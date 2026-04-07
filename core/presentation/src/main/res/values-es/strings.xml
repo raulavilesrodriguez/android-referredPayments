@@ -128,6 +128,7 @@
     <string name="no_payments">No hay pagos</string>
     <string name="add_new_product">Añadir Nuevo Producto</string>
     <string name="pay_by_referral">Pago por referido</string>
+    <string name="pay_by_referral_value">Pago por referido %s</string>
     <string name="warning_delete_product">Estás seguro que quieres eliminar este producto?</string>
     <string name="policies">Políticas</string>
     <string name="policies_title">Política de uso y programa de referidos</string>
@@ -262,6 +263,8 @@
     <string name="reason_professional">Profesional</string>
     <string name="edit_product">Editar Producto</string>
     <string name="delete_product">Borrar Producto</string>
+    <string name="product_information">Información del Producto</string>
+    <string name="about_product">Acerca del Producto</string>
     <string name="product_name">Nombre del producto</string>
     <string name="product_description">Descripción del producto</string>
 </resources>

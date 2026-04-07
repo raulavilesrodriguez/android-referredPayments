@@ -2,6 +2,7 @@ package com.avilesrodriguez.presentation.fakeData
 
 import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.industries.IndustriesType
+import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
@@ -106,6 +107,21 @@ val userProvider = UserData.Provider(
     paymentRating = 4.5,
     totalPayouts = 50,
     website = "https://www.segurosatlantida.ec/personas"
+)
+
+val productProvider = ProductProvider(
+    id = "1p",
+    providerId = "2u",
+    name = "Seguro de Vida 1V",
+    description = "Seguro de vida con cobertura de $200 mil usd",
+    payByReferral = "25",
+    isActive = true,
+    createdAt = System.currentTimeMillis(),
+    updatedAt = System.currentTimeMillis(),
+    providerName = "Seguros Atlantida",
+    providerPhotoUrl = "https://i.pravatar.cc/150?u=40",
+    providerRating = 4.7,
+    industry = IndustriesType.INSURANCE
 )
 
 val usersProviders = listOf(

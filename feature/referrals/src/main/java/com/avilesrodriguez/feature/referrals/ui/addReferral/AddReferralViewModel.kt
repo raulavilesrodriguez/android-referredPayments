@@ -68,8 +68,8 @@ class AddReferralViewModel @Inject constructor(
         _addReferralState.value = _addReferralState.value.copy(isEntryValid = validateInput(currentState))
     }
 
-    fun onSaveClick(providerId: String?, openAndPopUp: (String, String) -> Unit){
-        if(providerId == null) return
+    fun onSaveClick(providerId: String?, productId: String?, openAndPopUp: (String, String) -> Unit){
+        if(providerId == null || productId == null) return
         if(!phoneNumber.isValidNumber()){
             SnackbarManager.showMessage(R.string.invalid_phone_number)
             return
@@ -87,6 +87,7 @@ class AddReferralViewModel @Inject constructor(
             val referral = currentState.toReferral(
                 clientId = currentUserId,
                 providerId = providerId,
+                productId = productId,
                 createdAt = System.currentTimeMillis()
             )
             try {
