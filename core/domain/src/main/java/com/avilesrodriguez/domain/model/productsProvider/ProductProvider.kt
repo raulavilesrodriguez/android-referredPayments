@@ -17,5 +17,5 @@ data class ProductProvider(
     val providerName: String = "",
     val providerPhotoUrl: String = "",
     val providerRating: Double = 0.0,
-    val industry: IndustriesType = IndustriesType.OTHER,
+    val industry: IndustriesType = IndustriesType.OTHER
 )

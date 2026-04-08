@@ -17,11 +17,11 @@ data class ProductProviderFirestore(
     val isActive: Boolean? = null,
     val createdAt: Any? = null,
     val updatedAt: Any? = null,
-    val industry: String? = null,
     // --- DATOS DENORMALIZADOS (Para la UI del Cliente) ---
     val providerName: String? = null,
     val providerPhotoUrl: String? = null,
-    val providerRating: Double? = null
+    val providerRating: Double? = null,
+    val industry: String? = null
 )
 
 fun ProductProvider.toProductProviderFirestore(): ProductProviderFirestore {
@@ -35,10 +35,10 @@ fun ProductProvider.toProductProviderFirestore(): ProductProviderFirestore {
         isActive = isActive,
         createdAt = Timestamp(Date(createdAt)),
         updatedAt = updatedAt?.let { Timestamp(Date(it)) },
-        industry = industry.name,
         providerName = providerName,
         providerPhotoUrl = providerPhotoUrl,
-        providerRating = providerRating
+        providerRating = providerRating,
+        industry = industry.name
     )
 }
 
@@ -83,9 +83,9 @@ fun ProductProviderFirestore.toProductProviderDomain(): ProductProvider {
         isActive = isActive ?: true,
         createdAt = toLong(createdAt),
         updatedAt = toNullableLong(updatedAt),
-        industry = domainIndustriesType,
         providerName = providerName ?: "",
         providerPhotoUrl = providerPhotoUrl ?: "",
-        providerRating = providerRating ?: 0.0
+        providerRating = providerRating ?: 0.0,
+        industry = domainIndustriesType
     )
 }
