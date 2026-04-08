@@ -110,11 +110,11 @@ private fun DetailProductScreenContent(
             if (showTopBar) {
                 ToolBarWithIcon(
                     iconBack = R.drawable.arrow_back,
-                    title = stringResource(R.string.information_provider),
+                    title = stringResource(R.string.product_information),
                     backClick = { onBackClick() }
                 )
             } else {
-                BasicToolbar(stringResource(R.string.information_provider))
+                BasicToolbar(stringResource(R.string.product_information))
             }
         },
         bottomBar = {
