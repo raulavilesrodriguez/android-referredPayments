@@ -1,6 +1,5 @@
 package com.avilesrodriguez.feature.referrals.ui.addReferral
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -47,7 +46,7 @@ fun AddReferralScreen(
         onNameChange = viewModel::onNameChange,
         onEmailChange = viewModel::onEmailChange,
         onNumberPhoneChange = viewModel::onNumberPhoneChange,
-        onSaveClick = { viewModel.onSaveClick(providerId, openAndPopUp) },
+        onSaveClick = { viewModel.onSaveClick(providerId, productId, openAndPopUp) },
         onCancel = { onBackClick() }
     )
 }
