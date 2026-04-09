@@ -18,6 +18,7 @@ import com.avilesrodriguez.domain.usecases.referral.GetReferralsByProvider
 import com.avilesrodriguez.domain.usecases.user.GetUserFlow
 import com.avilesrodriguez.domain.usecases.account.HasUser
 import com.avilesrodriguez.domain.usecases.account.SignOut
+import com.avilesrodriguez.domain.usecases.productProvider.DeactivateProductProvider
 import com.avilesrodriguez.domain.usecases.productProvider.GetAllProducts
 import com.avilesrodriguez.domain.usecases.productProvider.GetProductsByProvider
 import com.avilesrodriguez.domain.usecases.productProvider.GetProductsByProviderRealTime
@@ -63,7 +64,8 @@ class HomeViewModel @Inject constructor(
     private val getProductsRealTime: GetProductsRealTime,
     private val getAllProducts: GetAllProducts,
     private val getProductsByProviderRealTime: GetProductsByProviderRealTime,
-    private val getProductsByProvider: GetProductsByProvider
+    private val getProductsByProvider: GetProductsByProvider,
+    private val deactivateProductProvider: DeactivateProductProvider
 ) : BaseViewModel() {
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
@@ -394,6 +396,16 @@ class HomeViewModel @Inject constructor(
 
     fun onSettings(openScreen: (String) -> Unit){
         openScreen(NavRoutes.SETTINGS)
+    }
+
+    fun hideDelete(productId:String){
+        _isLoading.value = true
+        _isPaginationActive.value = false
+        _selectedIndustry.value = null
+        _searchText.value = ""
+        launchCatching {
+            deactivateProductProvider(productId)
+        }.invokeOnCompletion { _isLoading.value = false }
     }
 
 }

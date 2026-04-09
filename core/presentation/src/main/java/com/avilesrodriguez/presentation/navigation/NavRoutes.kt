@@ -13,6 +13,7 @@ object NavRoutes {
     const val SETTINGS = "settings"
     const val HOME = "home"
     const val NEW_REFERRAL = "new_referral/{id}?product_id={product_id}"  //id del user provider
+    const val EDIT_PRODUCT = "edit_product/{product_id}" //id del product
     object UserArgs {
         const val ID = "id"
     }

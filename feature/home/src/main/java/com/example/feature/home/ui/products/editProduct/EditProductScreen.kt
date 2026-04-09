@@ -14,18 +14,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Paid
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -42,7 +36,6 @@ import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.ext.fieldModifier
 import com.avilesrodriguez.presentation.ext.fieldModifierHeight
 import com.avilesrodriguez.presentation.profile.Item
-import com.avilesrodriguez.presentation.profile.ItemEdit
 
 
 @Composable
@@ -58,7 +51,6 @@ fun EditProductScreen(
 
     val product by viewModel.productState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    var showDialogDeleteProduct by remember { mutableStateOf(false) }
 
     EditProductScreenContent(
         product = product,
@@ -67,35 +59,9 @@ fun EditProductScreen(
         onPayByReferralChange = viewModel::updatePayByReferral,
         onSaveClick = { viewModel.onUpdateClick(onBackClick) },
         onBackClick = onBackClick,
-        hideDelete = { showDialogDeleteProduct = true },
         showTopBar = showTopBar,
         isLoading = isLoading
     )
-
-    if(showDialogDeleteProduct){
-        AlertDialog(
-            onDismissRequest = { showDialogDeleteProduct = false },
-            title = { Text(text = stringResource(R.string.delete_product)) },
-            text = { Text(text = stringResource(R.string.warning_delete_product)) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDialogDeleteProduct = false
-                        viewModel.hideDelete(onBackClick)
-                    }
-                ) {
-                    Text(text = stringResource(R.string.delete))
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { showDialogDeleteProduct = false }
-                ){
-                    Text(text = stringResource(R.string.cancel))
-                }
-            }
-        )
-    }
 }
 
 @Composable
@@ -106,7 +72,6 @@ private fun EditProductScreenContent(
     onPayByReferralChange: (String) -> Unit,
     onSaveClick: () -> Unit,
     onBackClick: () -> Unit,
-    hideDelete: () -> Unit,
     showTopBar: Boolean,
     isLoading: Boolean
 ){
@@ -132,7 +97,6 @@ private fun EditProductScreenContent(
                 onPayByReferralChange = onPayByReferralChange,
                 onSaveClick = onSaveClick,
                 onBackClick = onBackClick,
-                hideDelete = hideDelete,
                 isLoading = isLoading,
                 modifier = Modifier.padding(innerPadding)
             )
@@ -148,7 +112,6 @@ private fun EditFormProduct(
     onPayByReferralChange: (String) -> Unit,
     onSaveClick: () -> Unit,
     onBackClick: () -> Unit,
-    hideDelete: () -> Unit,
     isLoading: Boolean,
     modifier: Modifier = Modifier
 ){
@@ -161,13 +124,6 @@ private fun EditFormProduct(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        ItemEdit(
-            data = stringResource(R.string.delete_product),
-            onClick = hideDelete,
-            iconEdit = R.drawable.delete,
-            modifier = Modifier.fieldModifier()
-        )
-        Spacer(modifier = Modifier.padding(8.dp))
         Item(
             icon = R.drawable.industry,
             title = R.string.settings_industry,
@@ -223,7 +179,6 @@ fun EditProductScreenPreview(){
             onPayByReferralChange = {},
             onSaveClick = {},
             onBackClick = {},
-            hideDelete = {},
             showTopBar = true,
             isLoading = false
         )

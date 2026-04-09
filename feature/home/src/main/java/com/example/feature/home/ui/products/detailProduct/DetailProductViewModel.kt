@@ -6,6 +6,7 @@ import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.account.CurrentUserId
 import com.avilesrodriguez.domain.usecases.account.HasUser
+import com.avilesrodriguez.domain.usecases.productProvider.DeactivateProductProvider
 import com.avilesrodriguez.domain.usecases.productProvider.GetProductProviderByIdFlow
 import com.avilesrodriguez.domain.usecases.user.GetUser
 import com.avilesrodriguez.domain.usecases.user.GetUserFlow
@@ -33,8 +34,8 @@ class DetailProductViewModel @Inject constructor(
     private val getUserFlow: GetUserFlow
 ) : BaseViewModel() {
     private val _productId = MutableStateFlow<String?>(null)
-    private val _clientUser = MutableStateFlow<UserData?>(null)
-    val clientUser: StateFlow<UserData?> = _clientUser.asStateFlow()
+    private val _currentUser = MutableStateFlow<UserData?>(null)
+    val currentUser: StateFlow<UserData?> = _currentUser.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -45,7 +46,7 @@ class DetailProductViewModel @Inject constructor(
         launchCatching {
             if(hasUser()){
                 val user = getUser(currentUserId)
-                _clientUser.value = user
+                _currentUser.value = user
             }
         }
     }
@@ -56,7 +57,7 @@ class DetailProductViewModel @Inject constructor(
         _productId.value = productId
     }
 
-    val canReferUserClient: StateFlow<Boolean> = _clientUser.map { user ->
+    val canReferUserClient: StateFlow<Boolean> = _currentUser.map { user ->
         user is UserData.Client
                 && user.isActive
                 && !user.identityCard.isNullOrBlank()
@@ -90,6 +91,12 @@ class DetailProductViewModel @Inject constructor(
     fun onAddReferClick(providerId: String, productId: String, openScreen: (String) -> Unit){
         val route = NavRoutes.NEW_REFERRAL
             .replace("{${NavRoutes.UserArgs.ID}}", providerId)
+            .replace("{${NavRoutes.ProductArgs.ID}}", productId)
+        openScreen(route)
+    }
+
+    fun onEditProductClick(productId: String, openScreen: (String) -> Unit){
+        val route = NavRoutes.EDIT_PRODUCT
             .replace("{${NavRoutes.ProductArgs.ID}}", productId)
         openScreen(route)
     }

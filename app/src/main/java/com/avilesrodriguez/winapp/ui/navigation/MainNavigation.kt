@@ -41,6 +41,7 @@ import com.avilesrodriguez.presentation.snackbar.SnackbarManager
 import com.avilesrodriguez.winapp.ui.theme.WinAppTheme
 import com.example.feature.home.ui.HomeScreen
 import com.example.feature.home.ui.PoliciesScreen
+import com.example.feature.home.ui.products.editProduct.EditProductScreen
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -83,6 +84,7 @@ fun MainNavigation(){
                     editPhoneReferralNavigation(appState)
                     addNewReferral(appState)
                     addMessages(appState)
+                    editProductNavigation(appState)
                 }
             }
         }
@@ -252,6 +254,19 @@ private fun NavGraphBuilder.addMessages(appState: AppState){
             referralId = referralId,
             onBackClick = { appState.popUp() },
             openScreen = { route -> appState.navigate(route) }
+        )
+    }
+}
+
+private fun NavGraphBuilder.editProductNavigation(appState: AppState){
+    composable(
+        route = NavRoutes.EDIT_PRODUCT,
+        arguments = listOf(navArgument(NavRoutes.ProductArgs.ID){type = NavType.StringType})
+    ){ backStackEntry ->
+        val productId = backStackEntry.arguments?.getString(NavRoutes.ProductArgs.ID)
+        EditProductScreen(
+            productId = productId,
+            onBackClick = { appState.popUp() }
         )
     }
 }

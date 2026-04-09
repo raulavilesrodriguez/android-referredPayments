@@ -3,7 +3,6 @@ package com.example.feature.home.ui.products.editProduct
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.validationRules.ProductRules
-import com.avilesrodriguez.domain.usecases.productProvider.DeactivateProductProvider
 import com.avilesrodriguez.domain.usecases.productProvider.GetProductProviderById
 import com.avilesrodriguez.domain.usecases.productProvider.UpdateProductProvider
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
@@ -14,8 +13,7 @@ import javax.inject.Inject
 
 class EditProductViewModel @Inject constructor(
     private val getProductProviderById: GetProductProviderById,
-    private val updateProductProvider: UpdateProductProvider,
-    private val deactivateProductProvider: DeactivateProductProvider
+    private val updateProductProvider: UpdateProductProvider
 ) : BaseViewModel() {
     private val _productState = MutableStateFlow(ProductProvider())
     val productState: StateFlow<ProductProvider> = _productState.asStateFlow()
@@ -114,15 +112,6 @@ class EditProductViewModel @Inject constructor(
             )
             val productId = currentProduct.id
             updateProductProvider(productId, updates)
-            popUp()
-        }.invokeOnCompletion { _isLoading.value = false }
-    }
-
-    fun hideDelete(popUp: () -> Unit){
-        _isLoading.value = true
-        launchCatching {
-            val productId = _productState.value.id
-            deactivateProductProvider(productId)
             popUp()
         }.invokeOnCompletion { _isLoading.value = false }
     }

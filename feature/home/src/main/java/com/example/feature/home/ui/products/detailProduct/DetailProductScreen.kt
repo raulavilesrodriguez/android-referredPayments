@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,11 +34,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -69,6 +74,7 @@ fun DetailProductScreen(
     productId: String?,
     onBackClick: () -> Unit,
     openScreen: (String) -> Unit,
+    deleteProduct: () -> Unit,
     showTopBar: Boolean = true,
     viewModel: DetailProductViewModel = hiltViewModel()
 ){
@@ -80,6 +86,8 @@ fun DetailProductScreen(
     val isProviderSaturated by viewModel.isProviderSaturated.collectAsState()
     val product by viewModel.productState.collectAsState()
     val providerUser by viewModel.providerUser.collectAsState()
+    val currentUser by viewModel.currentUser.collectAsState()
+    var showDialogDeleteProduct by remember { mutableStateOf(false) }
 
     DetailProductScreenContent(
         onBackClick = onBackClick,
@@ -88,8 +96,36 @@ fun DetailProductScreen(
         product = product,
         providerUser = providerUser as UserData.Provider,
         onAddReferClick = {viewModel.onAddReferClick(product.providerId, product.id, openScreen)},
+        currentUser = currentUser,
+        onDeleteClick = {showDialogDeleteProduct = true},
+        onEditClick = {viewModel.onEditProductClick(product.id, openScreen)},
         showTopBar = showTopBar
     )
+
+    if(showDialogDeleteProduct){
+        AlertDialog(
+            onDismissRequest = { showDialogDeleteProduct = false },
+            title = { Text(text = stringResource(R.string.delete_product)) },
+            text = { Text(text = stringResource(R.string.warning_delete_product)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialogDeleteProduct = false
+                        deleteProduct()
+                    }
+                ) {
+                    Text(text = stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDialogDeleteProduct = false }
+                ){
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -100,6 +136,9 @@ private fun DetailProductScreenContent(
     product: ProductProvider,
     providerUser: UserData.Provider,
     onAddReferClick: () -> Unit,
+    currentUser: UserData?,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit,
     showTopBar: Boolean = true
 ){
     Scaffold(
@@ -118,11 +157,22 @@ private fun DetailProductScreenContent(
             }
         },
         bottomBar = {
-            ButtonToRefer(
-                onReferClick = onAddReferClick,
-                isSaturated = isProviderSaturated,
-                canReferUserClient = canReferUserClient
-            )
+            when (currentUser) {
+                is UserData.Client -> {
+                    ButtonToRefer(
+                        onReferClick = onAddReferClick,
+                        isSaturated = isProviderSaturated,
+                        canReferUserClient = canReferUserClient
+                    )
+                }
+                is UserData.Provider -> {
+                    ButtonsToDeleteAndEdit(
+                        onDeleteClick = onDeleteClick,
+                        onEditClick = onEditClick
+                    )
+                }
+                else -> {}
+            }
         },
         content = { innerPadding ->
             ProfileProductProvider(
@@ -163,6 +213,51 @@ fun ButtonToRefer(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
+        }
+    }
+}
+
+@Composable
+private fun ButtonsToDeleteAndEdit(
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit
+){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TextButton(
+            onClick = { onDeleteClick()}
+        ) {
+            Text(
+                text = stringResource(R.string.delete_product),
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Icon(
+                painter = painterResource(R.drawable.delete),
+                contentDescription = null,
+                modifier = Modifier.padding(start = 4.dp).size(24.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+        TextButton(
+            onClick = { onEditClick() }
+        ) {
+            Text(
+                text = stringResource(R.string.edit_product),
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Icon(
+                painter = painterResource(R.drawable.edit),
+                contentDescription = null,
+                modifier = Modifier.padding(start = 4.dp).size(24.dp),
+                tint = MaterialTheme.colorScheme.primary
+                )
         }
     }
 }
@@ -438,7 +533,11 @@ fun DetailProductScreenPreview() {
             isProviderSaturated = false,
             product = productProvider,
             providerUser = userProvider,
-            onAddReferClick = {}
+            currentUser = userProvider,
+            onAddReferClick = {},
+            onDeleteClick = {},
+            onEditClick = {},
+            showTopBar = true
         )
     }
 }

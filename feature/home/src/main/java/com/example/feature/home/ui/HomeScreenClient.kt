@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.avilesrodriguez.domain.model.industries.IndustriesType
+import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
@@ -79,6 +80,12 @@ fun HomeScreenClient(
     onPaymentView: () -> Unit,
     onGraphMetricsView: () -> Unit,
     canReferUserClient: Boolean,
+    onViewMoreProducts: () -> Unit,
+    loadMoreProducts: () -> Unit,
+    isPaginationActive: Boolean,
+    showButton: Boolean,
+    productsRealTime: List<ProductProvider>,
+    products: List<ProductProvider>
 ) {
     val client = user as? UserData.Client
 
@@ -361,7 +368,13 @@ fun HomeScreenClientPreview() {
             ),
             onPaymentView = {},
             onGraphMetricsView = {},
-            canReferUserClient = false
+            canReferUserClient = false,
+            onViewMoreProducts = {},
+            loadMoreProducts = {},
+            isPaginationActive = false,
+            showButton = true,
+            productsRealTime = emptyList(),
+            products = emptyList()
         )
     }
 }

@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.businessRules.BusinessRules
 import com.avilesrodriguez.domain.model.industries.IndustriesType
+import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
@@ -61,12 +62,14 @@ import com.example.feature.home.models.UserAndReferralMetrics
 import com.example.feature.home.ui.details.DetailScreenUser
 import com.example.feature.home.ui.graphicsMetrics.GraphMetrics
 import com.example.feature.home.ui.paymentsMovement.PaymentsMovement
+import com.example.feature.home.ui.products.detailProduct.DetailProductScreen
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 sealed class HomeDetailContent {
     data object Payments : HomeDetailContent()
     data object GraphMetrics : HomeDetailContent()
+    data class ProductDetail(val productId: String) : HomeDetailContent()
     data class UserDetail(val userId: String) : HomeDetailContent()
 
     // SAVER PARA QUE EL CONTENIDO SOBREVIVA A LA ROTACIÓN
@@ -76,6 +79,7 @@ sealed class HomeDetailContent {
                 when (content) {
                     is Payments -> "payments"
                     is GraphMetrics -> "graph_metrics"
+                    is ProductDetail -> "product_detail:${content.productId}"
                     is UserDetail -> "user_detail:${content.userId}"
                     null -> null
                 }
@@ -85,6 +89,7 @@ sealed class HomeDetailContent {
                 when {
                     str == "payments" -> Payments
                     str == "graph_metrics" -> GraphMetrics
+                    str.startsWith("product_detail:") -> ProductDetail(str.removePrefix("product_detail:"))
                     str.startsWith("user_detail:") -> UserDetail(str.removePrefix("user_detail:"))
                     else -> null
                 }
@@ -111,6 +116,10 @@ fun HomeScreen(
     val processingInfo by viewModel.processingCountReferralsProvider.collectAsState()
     val isSaturated = (processingInfo) >= BusinessRules.MAX_PROCESSING_REFERRALS
     val canReferUserClient by viewModel.canReferUserClient.collectAsState()
+    val isPaginationActive by viewModel.isPaginationActive.collectAsState()
+    val showButton by viewModel.showViewMoreButton.collectAsState()
+    val productsRealTime by viewModel.productsStateRealTime.collectAsState()
+    val products by viewModel.productsState.collectAsState()
 
     val options = ActionOptionsHome.getOptions()
     val industryOptions = IndustriesType.options(true)
@@ -256,7 +265,13 @@ fun HomeScreen(
                                         coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
                                     },
                                     isSaturated = isSaturated,
-                                    canReferUserClient = canReferUserClient
+                                    canReferUserClient = canReferUserClient,
+                                    onViewMoreProducts = viewModel::onViewMoreProducts,
+                                    loadMoreProducts = viewModel::loadMoreProducts,
+                                    isPaginationActive = isPaginationActive,
+                                    showButton = showButton,
+                                    productsRealTime = productsRealTime,
+                                    products = products
                                 )
                                 else -> {
                                     Box(Modifier.fillMaxSize())
@@ -279,6 +294,18 @@ fun HomeScreen(
                             is HomeDetailContent.GraphMetrics ->{
                                 GraphMetrics(
                                     popUp = { coroutineScope.launch { navigator.navigateBack() } },
+                                    showTopBar = !isShowingBothPanels
+                                )
+                            }
+                            is HomeDetailContent.ProductDetail -> {
+                                DetailProductScreen(
+                                    productId = content.productId,
+                                    onBackClick = { coroutineScope.launch { navigator.navigateBack() } },
+                                    openScreen = openScreen,
+                                    deleteProduct = {
+                                        detailContent = null
+                                        viewModel.hideDelete(content.productId)
+                                        coroutineScope.launch { navigator.navigateBack() } },
                                     showTopBar = !isShowingBothPanels
                                 )
                             }
@@ -316,7 +343,13 @@ fun HomeMainContent(
     onPaymentView: () -> Unit,
     onGraphMetricsView: () -> Unit,
     isSaturated: Boolean,
-    canReferUserClient: Boolean
+    canReferUserClient: Boolean,
+    onViewMoreProducts: () -> Unit,
+    loadMoreProducts: () -> Unit,
+    isPaginationActive: Boolean,
+    showButton: Boolean,
+    productsRealTime: List<ProductProvider>,
+    products: List<ProductProvider>
 ) {
     if (user != null) {
         when (user.type) {
@@ -333,7 +366,13 @@ fun HomeMainContent(
                 referralsMetrics = referralsMetrics,
                 onPaymentView = onPaymentView,
                 onGraphMetricsView = onGraphMetricsView,
-                canReferUserClient = canReferUserClient
+                canReferUserClient = canReferUserClient,
+                onViewMoreProducts = onViewMoreProducts,
+                loadMoreProducts = loadMoreProducts,
+                isPaginationActive = isPaginationActive,
+                showButton = showButton,
+                productsRealTime = productsRealTime,
+                products = products
             )
             UserType.PROVIDER -> HomeScreenProvider(
                 user = user,
@@ -346,7 +385,13 @@ fun HomeMainContent(
                 referralsConversion = referralsConversion,
                 onPaymentView = onPaymentView,
                 onGraphMetricsView = onGraphMetricsView,
-                isSaturated = isSaturated
+                isSaturated = isSaturated,
+                onViewMoreProducts = onViewMoreProducts,
+                loadMoreProducts = loadMoreProducts,
+                isPaginationActive = isPaginationActive,
+                showButton = showButton,
+                productsRealTime = productsRealTime,
+                products = products
             )
         }
     } else {
