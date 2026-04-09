@@ -3,6 +3,7 @@ package com.example.feature.home.ui
 import androidx.lifecycle.viewModelScope
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.industries.IndustriesType
+import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
@@ -16,9 +17,11 @@ import com.avilesrodriguez.domain.usecases.referral.GetReferralsByClientByProvid
 import com.avilesrodriguez.domain.usecases.referral.GetReferralsByProvider
 import com.avilesrodriguez.domain.usecases.user.GetUserFlow
 import com.avilesrodriguez.domain.usecases.account.HasUser
-import com.avilesrodriguez.domain.usecases.user.SearchUsersClient
-import com.avilesrodriguez.domain.usecases.user.SearchUsersProvider
 import com.avilesrodriguez.domain.usecases.account.SignOut
+import com.avilesrodriguez.domain.usecases.productProvider.GetAllProducts
+import com.avilesrodriguez.domain.usecases.productProvider.GetProductsByProvider
+import com.avilesrodriguez.domain.usecases.productProvider.GetProductsByProviderRealTime
+import com.avilesrodriguez.domain.usecases.productProvider.GetProductsRealTime
 import com.avilesrodriguez.presentation.industries.getById
 import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
 import com.avilesrodriguez.presentation.navigation.NavRoutes
@@ -50,15 +53,17 @@ class HomeViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
     private val hasUser: HasUser,
     private val signOut: SignOut,
-    private val searchUsersProvider: SearchUsersProvider,
-    private val searchUsersClient: SearchUsersClient,
     private val getReferralsByProvider: GetReferralsByProvider,
     private val getReferralsByClientByProvider: GetReferralsByClientByProvider,
     private val getReferralsByClient: GetReferralsByClient,
     private val getUserFlow: GetUserFlow,
     private val clearLocalCache: ClearLocalCache,
     private val clearFCMToken: ClearFCMToken,
-    private val getAndStoreFCMToken: GetAndStoreFCMToken
+    private val getAndStoreFCMToken: GetAndStoreFCMToken,
+    private val getProductsRealTime: GetProductsRealTime,
+    private val getAllProducts: GetAllProducts,
+    private val getProductsByProviderRealTime: GetProductsByProviderRealTime,
+    private val getProductsByProvider: GetProductsByProvider
 ) : BaseViewModel() {
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
@@ -73,11 +78,49 @@ class HomeViewModel @Inject constructor(
 
     private val _selectedIndustry = MutableStateFlow<IndustriesType?>(null)
     val selectedIndustry: StateFlow<IndustriesType?> = _selectedIndustry.asStateFlow()
+
     private val _uiStateReferralsMetrics = MutableStateFlow(ReferralMetrics())
     val uiStateReferralsMetrics: StateFlow<ReferralMetrics> = _uiStateReferralsMetrics.asStateFlow()
+
     private val _usersAndMetrics = MutableStateFlow<List<UserAndReferralMetrics>>(emptyList())
     val usersAndMetrics: StateFlow<List<UserAndReferralMetrics>> = _usersAndMetrics.asStateFlow()
     private val _referralsProvider = MutableStateFlow<List<Referral>>(emptyList())
+    private val _allProductsRealTime = MutableStateFlow<List<ProductProvider>>(emptyList())
+    private val _isPaginationActive = MutableStateFlow(false)
+    val isPaginationActive: StateFlow<Boolean> = _isPaginationActive.asStateFlow()
+
+    val productsStateRealTime: StateFlow<List<ProductProvider>> = combine(
+        _allProductsRealTime,
+        _searchText,
+        _selectedIndustry
+    ) { products, query, industry ->
+        val queryNormalized = query.normalizeName()
+        if (queryNormalized.isEmpty() && industry == null) {
+            products
+        } else {
+            products.filter { product ->
+                product.nameLowercase.contains(queryNormalized) && (industry == null || product.industry == industry)
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val showViewMoreButton: StateFlow<Boolean> = combine(
+        _allProductsRealTime,
+        _isPaginationActive
+    ) { products, active ->
+        products.size >= pageSize && !active
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    private val _productsState = MutableStateFlow<List<ProductProvider>>(emptyList())
+    val productsState: StateFlow<List<ProductProvider>> = _productsState.asStateFlow()
+    private var lastProductViewModel: ProductProvider? = null
+    private var allProductsLoaded = false
+    private val pageSize: Long = 3L
+    private val pageSizeLoadMore: Long = 3L
+    private var referralsJob: Job? = null
+    private var userMetricsJob: Job? = null
+    private var paginationJob: Job? = null
+    private var realTimeJob: Job? = null
     val processingCountReferralsProvider: StateFlow<Int> = _referralsProvider.map {referrals ->
         val activeStatuses = listOf(ReferralStatus.PROCESSING, ReferralStatus.PENDING)
         referrals.count { it.status in activeStatuses }
@@ -103,44 +146,43 @@ class HomeViewModel @Inject constructor(
                 && !user.bankName.isNullOrBlank()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-
-    private var searchJob: Job? = null
-    private var referralsJob: Job? = null
-    private var userMetricsJob: Job? = null
-
     val currentUserId
         get() = currentUserIdUseCase()
 
-    init{
+    init {
         launchCatching {
-            if(hasUser()){
+            if (hasUser()) {
                 launch {
                     getUserFlow(currentUserId).collect {
                         _userDataStore.value = it
                     }
                 }
-                val user = _userDataStore.filterNotNull().first()
-                launchCatching(snackbar = false) {
-                    getAndStoreFCMToken(user.uid)
-                }
-                when(user){
-                    is UserData.Provider ->{
-                        loadReferralsByProvider()
-                        observeUsersMetrics()
-                    }
-                    is UserData.Client -> {
-                        loadReferralsByClient()
+                launch {
+                    _userDataStore.filterNotNull().first().let { user ->
+                        launchCatching(snackbar = false) {
+                            getAndStoreFCMToken(user.uid)
+                        }
+                        when (user) {
+                            is UserData.Provider -> {
+                                loadReferralsByProvider()
+                                observeUsersMetrics()
+                            }
+
+                            is UserData.Client -> {
+                                loadReferralsByClient()
+                            }
+                        }
+                        loadRealData()
                     }
                 }
             }
-            combine(_searchText, _selectedIndustry){ text, industry ->
+            combine(_searchText, _selectedIndustry) { text, industry ->
                 Pair(text, industry)
             }
                 .debounce(300)
                 .distinctUntilChanged()
                 .collect { (query, industry) ->
-                    searchJob?.cancel() // cancel previous search
-                    loadData(query.normalizeName(), industry)
+                    loadInitialProducts(industry = industry, namePrefix = query)
                 }
         }
     }
@@ -154,26 +196,114 @@ class HomeViewModel @Inject constructor(
         _selectedIndustry.value = filteredNameIndustry
     }
 
-    private fun loadData(query: String, industry: IndustriesType?){
+    private fun loadRealData() {
         _isLoading.value = true
-        searchJob = launchCatching {
+        realTimeJob?.cancel()
+        realTimeJob = launchCatching {
             val user = _userDataStore.value
+            when (user) {
+                is UserData.Client -> {
+                    getProductsRealTime(limit = pageSize)
+                        .collect { products ->
+                            _allProductsRealTime.value = products
+                            _isLoading.value = false
+                        }
+                }
+
+                is UserData.Provider -> {
+                    getProductsByProviderRealTime(providerId = currentUserId, limit = pageSize)
+                        .collect { products ->
+                            _allProductsRealTime.value = products
+                            _isLoading.value = false
+                        }
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+
+    fun onViewMoreProducts() {
+        _isPaginationActive.value = true
+    }
+
+    private fun loadInitialProducts(industry: IndustriesType?, namePrefix: String){
+        _isLoading.value = true
+        paginationJob?.cancel()
+        paginationJob = launchCatching {
+            val user = _userDataStore.value
+            try {
+                when(user){
+                    is UserData.Client ->{
+                        val (products, lastProduct) = getAllProducts(
+                            pageSize = pageSize,
+                            industry = industry?.name,
+                            namePrefix = namePrefix,
+                            lastProduct = null
+                        )
+                        _productsState.value = products
+                        lastProductViewModel = lastProduct
+                        allProductsLoaded = products.size < pageSize
+                    }
+                    is UserData.Provider -> {
+                        val (products, lastProduct) = getProductsByProvider(
+                            providerId = currentUserId,
+                            pageSize = pageSize,
+                            namePrefix = namePrefix,
+                            lastProduct = null
+                        )
+                        _productsState.value = products
+                        lastProductViewModel = lastProduct
+                        allProductsLoaded = products.size < pageSize
+                    }
+                    else -> return@launchCatching
+                }
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun loadMoreProducts(){
+        if(allProductsLoaded || paginationJob?.isActive == true || lastProductViewModel == null) return
+        _isLoading.value =true
+        paginationJob = launchCatching {
+            val user = _userDataStore.value
+            val industrySelected = _selectedIndustry.value
+            val namePrefix = _searchText.value
             when(user){
                 is UserData.Client -> {
-                    searchUsersProvider(query, industry?.name)
-                        .collect { users ->
-                            _users.value = users
-                            _isLoading.value = false
-                        }
+                    val (moreProducts, lastProduct) = getAllProducts(
+                        pageSize = pageSizeLoadMore,
+                        industry = industrySelected?.name,
+                        namePrefix = namePrefix,
+                        lastProduct = lastProductViewModel
+                    )
+                    if(moreProducts.isNotEmpty()){
+                        val currentProducts = _productsState.value.toMutableList()
+                        currentProducts.addAll(moreProducts)
+                        val currentProductsFiltered = currentProducts.distinctBy { it.id }
+                        _productsState.value = currentProductsFiltered
+                        lastProductViewModel = lastProduct
+                    }
                 }
                 is UserData.Provider -> {
-                    searchUsersClient(query, currentUserId)
-                        .collect { users ->
-                            _users.value = users
-                            _isLoading.value = false
-                        }
+                    val (moreProducts, lastProduct) = getProductsByProvider(
+                        providerId = currentUserId,
+                        pageSize = pageSize,
+                        namePrefix = namePrefix,
+                        lastProduct = lastProductViewModel
+                    )
+                    if(moreProducts.isNotEmpty()){
+                        val currentProducts = _productsState.value.toMutableList()
+                        currentProducts.addAll(moreProducts)
+                        val currentProductsFiltered = currentProducts.distinctBy { it.id }
+                        _productsState.value = currentProductsFiltered
+                        lastProductViewModel = lastProduct
+                    }
                 }
-                else -> {emptyList<UserData>()}
+                else -> return@launchCatching
             }
         }
     }
