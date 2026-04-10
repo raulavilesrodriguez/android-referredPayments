@@ -395,7 +395,8 @@ fun HomeMainContent(
                 showButton = showButton,
                 productsRealTime = productsRealTime,
                 products = products,
-                onProductClick = onProductClick
+                onProductClick = onProductClick,
+                onViewRealProducts = onViewRealProducts
             )
             UserType.PROVIDER -> HomeScreenProvider(
                 user = user,

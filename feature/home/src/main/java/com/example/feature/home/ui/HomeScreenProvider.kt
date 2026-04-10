@@ -1,5 +1,6 @@
 package com.example.feature.home.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -21,27 +22,25 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Alarm
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.BuildCircle
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Diamond
 import androidx.compose.material.icons.filled.DoubleArrow
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Start
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material.icons.outlined.Payment
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,9 +50,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -76,8 +77,6 @@ import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
-import com.avilesrodriguez.presentation.composables.BasicButton
-import com.avilesrodriguez.presentation.composables.RatingBar
 import com.avilesrodriguez.presentation.composables.SearchFieldBasic
 import com.avilesrodriguez.presentation.composables.StatItem
 import com.avilesrodriguez.presentation.details.DetailMetricItem
@@ -88,9 +87,10 @@ import com.avilesrodriguez.presentation.fakeData.productsRealTimeFake
 import com.avilesrodriguez.presentation.fakeData.userProvider
 import com.avilesrodriguez.presentation.profile.ItemEdit
 import com.avilesrodriguez.presentation.time.formatTimeBasic
+import com.avilesrodriguez.presentation.time.formatTimestamp
 import com.example.feature.home.models.UserAndReferralMetrics
 import kotlinx.coroutines.flow.distinctUntilChanged
-import java.util.Locale
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreenProvider(
@@ -136,6 +136,14 @@ fun HomeScreenProvider(
     }
 
     val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
+    // boton scroll to top
+    val showScrollToTopButton by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex > 2
+        }
+    }
 
     // Detectamos si el usuario tiene el dedo en la pantalla moviendo la lista
     val isDragged by listState.interactionSource.collectIsDraggedAsState()
@@ -153,12 +161,8 @@ fun HomeScreenProvider(
             }
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        item {
+    Box(modifier = Modifier.fillMaxSize()){
+        Column(modifier = Modifier.fillMaxSize()) {
             BalanceCardProvider(
                 paidReferrals = referralsMetrics.paidReferrals.toString(),
                 iconPaidReferrals = Icons.Default.People,
@@ -166,200 +170,239 @@ fun HomeScreenProvider(
                 iconMoneyPaid = Icons.Default.AccountBalanceWallet,
                 onPaymentView = onPaymentView
             )
-        }
-        item {
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .nestedScroll(noPagerScrollConnection)
-                    .clickable{onGraphMetricsView()},
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                state = listState
             ) {
-                item{
-                    StatItem(
-                        modifier = Modifier.padding(start=4.dp),
-                        title = stringResource(R.string.total_payout),
-                        value = "${provider.totalPayouts}",
-                        icon = Icons.Outlined.Payment,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
-                item{
-                    StatItem(
-                        modifier = Modifier,
-                        title = stringResource(R.string.payment_rating),
-                        value = "${provider.paymentRating}",
-                        icon = Icons.Default.Star,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
-                item{
-                    StatItem(
-                        modifier = Modifier,
-                        title = stringResource(R.string.referrals_conversion),
-                        value = referralsConversion,
-                        icon = Icons.Default.AutoAwesome,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
-                item{
-                    StatItem(
-                        modifier = Modifier,
-                        title = stringResource(R.string.total_referrals),
-                        value = "${referralsMetrics.totalReferrals}",
-                        icon = Icons.Default.People,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
-                item{
-                    StatItem(
-                        modifier = Modifier,
-                        title = stringResource(R.string.pending),
-                        value = "${referralsMetrics.pendingReferrals}",
-                        icon = Icons.Default.Alarm,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
                 item {
-                    StatItem(
-                        modifier = Modifier,
-                        title = stringResource(R.string.processing),
-                        value = "${referralsMetrics.processingReferrals}",
-                        icon = Icons.Default.BuildCircle,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
-                item {
-                    StatItem(
-                        modifier = Modifier,
-                        title = stringResource(R.string.rejected),
-                        value = "${referralsMetrics.rejectedReferrals}",
-                        icon = Icons.Default.Block,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
-            }
-        }
-        if(isSaturated){
-            item{
-                StatItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = stringResource(R.string.message_to_provider_saturated),
-                    value = stringResource(R.string.warning),
-                    icon = Icons.Default.WarningAmber,
-                    color = MaterialTheme.colorScheme.errorContainer
-                )
-            }
-        }
-        item{
-            ItemEdit(
-                onClick = onAddProductClick,
-                modifier = Modifier.fieldModifier(),
-                data = stringResource(R.string.add_new_product),
-                icon = R.drawable.sell_twotone,
-                iconEdit = R.drawable.add
-            )
-        }
-        item{
-            Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                Text(
-                    text = stringResource(R.string.search_products),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                SearchFieldBasic(
-                    value = searchText,
-                    onValueChange = updateSearchText,
-                    placeholder = R.string.search,
-                    trailingIcon = R.drawable.search
-                )
-            }
-        }
-        if(!isPaginationActive){
-            if(productsRealTime.isNotEmpty()){
-                items(productsRealTime){ product ->
-                    ProductRow(product = product, onProductClick = onProductClick)
-                }
-                if(showButton){
-                    item {
-                        TextButton(
-                            onClick = {onViewMoreProducts()}
-                        ) {
-                            Text(text = stringResource(R.string.view_more_products))
-                            Icon(imageVector = Icons.Default.DoubleArrow, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .nestedScroll(noPagerScrollConnection)
+                            .clickable{onGraphMetricsView()},
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        item{
+                            StatItem(
+                                modifier = Modifier.padding(start=4.dp),
+                                title = stringResource(R.string.total_payout),
+                                value = "${provider.totalPayouts}",
+                                icon = Icons.Outlined.Payment,
+                                color = MaterialTheme.colorScheme.surface
+                            )
+                        }
+                        item{
+                            StatItem(
+                                modifier = Modifier,
+                                title = stringResource(R.string.payment_rating),
+                                value = "${provider.paymentRating}",
+                                icon = Icons.Default.Star,
+                                color = MaterialTheme.colorScheme.surface
+                            )
+                        }
+                        item{
+                            StatItem(
+                                modifier = Modifier,
+                                title = stringResource(R.string.referrals_conversion),
+                                value = referralsConversion,
+                                icon = Icons.Default.AutoAwesome,
+                                color = MaterialTheme.colorScheme.surface
+                            )
+                        }
+                        item{
+                            StatItem(
+                                modifier = Modifier,
+                                title = stringResource(R.string.total_referrals),
+                                value = "${referralsMetrics.totalReferrals}",
+                                icon = Icons.Default.People,
+                                color = MaterialTheme.colorScheme.surface
+                            )
+                        }
+                        item{
+                            StatItem(
+                                modifier = Modifier,
+                                title = stringResource(R.string.pending),
+                                value = "${referralsMetrics.pendingReferrals}",
+                                icon = Icons.Default.Alarm,
+                                color = MaterialTheme.colorScheme.surface
+                            )
+                        }
+                        item {
+                            StatItem(
+                                modifier = Modifier,
+                                title = stringResource(R.string.processing),
+                                value = "${referralsMetrics.processingReferrals}",
+                                icon = Icons.Default.BuildCircle,
+                                color = MaterialTheme.colorScheme.surface
+                            )
+                        }
+                        item {
+                            StatItem(
+                                modifier = Modifier,
+                                title = stringResource(R.string.rejected),
+                                value = "${referralsMetrics.rejectedReferrals}",
+                                icon = Icons.Default.Block,
+                                color = MaterialTheme.colorScheme.surface
+                            )
                         }
                     }
                 }
-                item { Spacer(modifier = Modifier.height(16.dp)) }
-            } else if(!isLoading) {
+                if(isSaturated){
+                    item{
+                        StatItem(
+                            modifier = Modifier.fillMaxWidth(),
+                            title = stringResource(R.string.message_to_provider_saturated),
+                            value = stringResource(R.string.warning),
+                            icon = Icons.Default.WarningAmber,
+                            color = MaterialTheme.colorScheme.errorContainer
+                        )
+                    }
+                }
                 item{
-                    Box(
-                        modifier = Modifier.fillMaxWidth().height(200.dp),
-                        contentAlignment = Alignment.Center
+                    ItemEdit(
+                        onClick = onAddProductClick,
+                        modifier = Modifier.fieldModifier(),
+                        data = stringResource(R.string.add_new_product),
+                        icon = R.drawable.sell_twotone,
+                        iconEdit = R.drawable.add
+                    )
+                }
+                item{
+                    Column(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = stringResource(R.string.no_have_products),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            text = stringResource(R.string.search_products),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 8.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        SearchFieldBasic(
+                            value = searchText,
+                            onValueChange = updateSearchText,
+                            placeholder = R.string.search,
+                            trailingIcon = R.drawable.search
                         )
                     }
                 }
-            }
-            if(isLoading && products.isNotEmpty()){
-                item {
-                    Box(Modifier
-                        .fillMaxWidth()
-                        .height(200.dp), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
+                if(!isPaginationActive){
+                    if(productsRealTime.isNotEmpty()){
+                        items(
+                            productsRealTime,
+                            key = { product -> product.id }
+                        ){ product ->
+                            ProductRow(product = product, onProductClick = onProductClick, isRealProduct = true)
+                        }
+                        if(showButton){
+                            item {
+                                TextButton(
+                                    onClick = {onViewMoreProducts()}
+                                ) {
+                                    Text(text = stringResource(R.string.view_more_products))
+                                    Icon(imageVector = Icons.Default.DoubleArrow, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                }
+                            }
+                        }
+                        item { Spacer(modifier = Modifier.height(16.dp)) }
+                    } else if(!isLoading) {
+                        item{
+                            Box(
+                                modifier = Modifier.fillMaxWidth().height(200.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.no_have_products),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                    if(isLoading && productsRealTime.isNotEmpty()){
+                        item {
+                            Box(Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                        )
+                                .height(200.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                        .wrapContentWidth(Alignment.CenterHorizontally)
+                                )
+                            }
+                        }
                     }
-                }
-            }
-        }else{
-            if (products.isNotEmpty()) {
-                item {
-                    TextButton(
-                        onClick = {onViewRealProducts()}
-                    ) {
-                        Text(text = stringResource(R.string.view_recent_products))
-                        Icon(imageVector = Icons.Default.DoubleArrow, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                }else{
+                    if (products.isNotEmpty()) {
+                        item {
+                            TextButton(
+                                onClick = {onViewRealProducts()}
+                            ) {
+                                Text(text = stringResource(R.string.view_recent_products))
+                                Icon(imageVector = Icons.Default.DoubleArrow, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                        items(
+                            products,
+                            key = { product -> product.id }
+                        ){ product ->
+                            ProductRow(product = product, onProductClick = onProductClick, isRealProduct = false)
+                        }
+                        item { Spacer(modifier = Modifier.height(16.dp)) }
+                    } else if(!isLoading){
+                        item{
+                            Box(
+                                modifier = Modifier.fillMaxWidth().height(200.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.no_have_products),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                     }
-                }
-                items(products){ product ->
-                    ProductRow(product = product, onProductClick = onProductClick)
-                }
-                item { Spacer(modifier = Modifier.height(16.dp)) }
-            } else if(!isLoading){
-                item{
-                    Box(
-                        modifier = Modifier.fillMaxWidth().height(200.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.no_have_products),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-            if(isLoading && products.isNotEmpty()){
-                item {
-                    Box(Modifier
-                        .fillMaxWidth()
-                        .height(200.dp), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
+                    if(isLoading && products.isNotEmpty()){
+                        item {
+                            Box(Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                        )
+                                .height(200.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                        .wrapContentWidth(Alignment.CenterHorizontally)
+                                )
+                            }
+                        }
                     }
                 }
+            }
+        }
+        AnimatedVisibility(
+            visible = showScrollToTopButton,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            FloatingActionButton(
+                onClick = {
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(0)
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = "Go Up",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     }
@@ -466,9 +509,9 @@ private fun BalanceCardProvider(
 }
 
 @Composable
-private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Unit){
-    val createdAt = formatTimeBasic(product.createdAt)
-    val updatedAt = formatTimeBasic(product.updatedAt)
+private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Unit, isRealProduct: Boolean){
+    val createdAt = formatTimestamp(product.createdAt)
+    val updatedAt = formatTimestamp(product.updatedAt)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -484,14 +527,43 @@ private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Uni
             horizontalArrangement = Arrangement.Absolute.Left
         ) {
             Avatar(photoUri = product.providerPhotoUrl, size = 42.dp)
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(4.dp))
             Column(
-                modifier = Modifier.padding(4.dp),
+                modifier = Modifier.weight(1f).padding(4.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = product.name.truncate(35),
+                    text = product.name.truncate(30),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = product.providerName.truncate(30),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+            Column(
+                modifier = Modifier.padding(4.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = "$${product.payByReferral.truncate(4)}",
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Text(
+                    text = stringResource(R.string.pay_by_referral),
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
@@ -499,15 +571,7 @@ private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Uni
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = stringResource(R.string.pay_by_referral_value, "$${product.payByReferral.truncate(7)}"),
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = stringResource(R.string.created, createdAt),
+                    text = if(isRealProduct) updatedAt else createdAt,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.labelMedium,
@@ -633,8 +697,8 @@ fun HomeScreenProviderPreview(){
             isSaturated = true,
             onViewMoreProducts = {},
             loadMoreProducts = {},
-            isPaginationActive = false,
-            showButton = true,
+            isPaginationActive = true,
+            showButton = false,
             productsRealTime = productsRealTimeFake,
             products = productsFake,
             onAddProductClick = {},

@@ -7,14 +7,14 @@ val productsRealTimeFake = listOf(
     ProductProvider(
         id = "1",
         providerId = "1",
-        name = "Producto 1",
+        name = "Inversiones en bolsa de valores con seguimiento del SP500 ",
         nameLowercase = "producto 1",
         description = "Descripción del producto 1",
-        payByReferral = "10.0",
+        payByReferral = "1000000000000000000000.0",
         isActive = true,
         createdAt = System.currentTimeMillis(),
         updatedAt = System.currentTimeMillis(),
-        providerName = "Proveedor 1",
+        providerName = "Byron Raul Aviles Rodriguez",
         providerPhotoUrl = "https://i.pravatar.cc/150?u=1",
         providerRating = 4.5,
         industry = IndustriesType.INSURANCE
@@ -34,35 +34,20 @@ val productsRealTimeFake = listOf(
         providerRating = 4.5,
         industry = IndustriesType.INSURANCE
     ),
-    ProductProvider(
-        id = "3",
-        providerId = "1",
-        name = "Producto 3",
-        nameLowercase = "producto 3",
-        description = "Descripción del producto 3",
-        payByReferral = "35.0",
-        isActive = true,
-        createdAt = System.currentTimeMillis(),
-        updatedAt = System.currentTimeMillis(),
-        providerName = "Proveedor 1",
-        providerPhotoUrl = "https://i.pravatar.cc/150?u=1",
-        providerRating = 4.5,
-        industry = IndustriesType.INSURANCE
-    ),
 )
 
 val productsFake = listOf(
     ProductProvider(
         id = "1",
         providerId = "1",
-        name = "Producto 1",
+        name = "Inversiones en bolsa de valores con seguimiento del SP500 ",
         nameLowercase = "producto 1",
         description = "Descripción del producto 1",
-        payByReferral = "10.0",
+        payByReferral = "1000000000000000000000.0",
         isActive = true,
         createdAt = System.currentTimeMillis(),
         updatedAt = System.currentTimeMillis(),
-        providerName = "Proveedor 1",
+        providerName = "Byron Raul Aviles Rodriguez",
         providerPhotoUrl = "https://i.pravatar.cc/150?u=1",
         providerRating = 4.5,
         industry = IndustriesType.INSURANCE
