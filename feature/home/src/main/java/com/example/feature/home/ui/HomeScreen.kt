@@ -58,8 +58,6 @@ import com.avilesrodriguez.presentation.industries.options
 import com.avilesrodriguez.presentation.navigation.ActionOptionsHome
 import com.avilesrodriguez.presentation.navigation.generateTabs
 import com.avilesrodriguez.presentation.permissions.NotificationPermissionHandler
-import com.example.feature.home.models.UserAndReferralMetrics
-import com.example.feature.home.ui.details.DetailScreenUser
 import com.example.feature.home.ui.graphicsMetrics.GraphMetrics
 import com.example.feature.home.ui.paymentsMovement.PaymentsMovement
 import com.example.feature.home.ui.products.addProduct.AddProductScreen
@@ -72,7 +70,6 @@ sealed class HomeDetailContent {
     data object GraphMetrics : HomeDetailContent()
     data object AddProduct: HomeDetailContent()
     data class ProductDetail(val productId: String) : HomeDetailContent()
-    data class UserDetail(val userId: String) : HomeDetailContent()
 
     // SAVER PARA QUE EL CONTENIDO SOBREVIVA A LA ROTACIÓN
     companion object {
@@ -83,7 +80,6 @@ sealed class HomeDetailContent {
                     is GraphMetrics -> "graph_metrics"
                     is AddProduct -> "add_product"
                     is ProductDetail -> "product_detail:${content.productId}"
-                    is UserDetail -> "user_detail:${content.userId}"
                     null -> null
                 }
             },
@@ -94,7 +90,6 @@ sealed class HomeDetailContent {
                     str == "graph_metrics" -> GraphMetrics
                     str == "add_product" -> AddProduct
                     str.startsWith("product_detail:") -> ProductDetail(str.removePrefix("product_detail:"))
-                    str.startsWith("user_detail:") -> UserDetail(str.removePrefix("user_detail:"))
                     else -> null
                 }
             }
@@ -110,12 +105,10 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ){
     val userData by viewModel.userDataStore.collectAsState()
-    val users by viewModel.users.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val selectedIndustry by viewModel.selectedIndustry.collectAsState()
     val referralsMetrics by viewModel.uiStateReferralsMetrics.collectAsState()
-    val usersAndMetrics by viewModel.usersAndMetrics.collectAsState()
     val referralsConversionViewModel by viewModel.referralsConversion.collectAsState()
     val processingInfo by viewModel.processingCountReferralsProvider.collectAsState()
     val isSaturated = (processingInfo) >= BusinessRules.MAX_PROCESSING_REFERRALS
@@ -246,19 +239,13 @@ fun HomeScreen(
                             when(selectedTabIndex){
                                 1 -> HomeMainContent(
                                     user = userData,
-                                    users = users,
                                     isLoading = isLoading,
                                     searchText = searchText,
                                     updateSearchText = viewModel::updateSearchText,
                                     selectedIndustry = selectedIndustry?.label(),
                                     onIndustryChange = viewModel::onIndustryChange,
                                     industryOptions = industryOptions,
-                                    onUserClick = { uId ->
-                                        detailContent = HomeDetailContent.UserDetail(uId)
-                                        coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
-                                    },
                                     referralsMetrics = referralsMetrics,
-                                    usersAndMetrics = usersAndMetrics,
                                     referralsConversion = referralsConversion,
                                     onPaymentView = {
                                         detailContent = HomeDetailContent.Payments
@@ -328,14 +315,6 @@ fun HomeScreen(
                                     showTopBar = !isShowingBothPanels
                                 )
                             }
-                            is HomeDetailContent.UserDetail -> {
-                                DetailScreenUser(
-                                    uId = content.userId,
-                                    popUp = { coroutineScope.launch { navigator.navigateBack() } },
-                                    openScreen = openScreen,
-                                    showTopBar = !isShowingBothPanels
-                                )
-                            }
                             null -> {}
                         }
                     }
@@ -348,16 +327,13 @@ fun HomeScreen(
 @Composable
 fun HomeMainContent(
     user: UserData?,
-    users: List<UserData>,
     isLoading: Boolean,
     searchText: String,
     updateSearchText: (String) -> Unit,
     selectedIndustry: Int?,
     onIndustryChange: (Int) -> Unit,
     industryOptions: List<Int>,
-    onUserClick: (String) -> Unit,
     referralsMetrics: ReferralMetrics,
-    usersAndMetrics: List<UserAndReferralMetrics>,
     referralsConversion: String,
     onPaymentView: () -> Unit,
     onGraphMetricsView: () -> Unit,
@@ -377,14 +353,12 @@ fun HomeMainContent(
         when (user.type) {
             UserType.CLIENT -> HomeScreenClient(
                 user = user,
-                users = users,
                 isLoading = isLoading,
                 searchText = searchText,
                 updateSearchText = updateSearchText,
                 selectedIndustry = selectedIndustry,
                 onIndustryChange = onIndustryChange,
                 industryOptions = industryOptions,
-                onUserClick = onUserClick,
                 referralsMetrics = referralsMetrics,
                 onPaymentView = onPaymentView,
                 onGraphMetricsView = onGraphMetricsView,
@@ -404,8 +378,6 @@ fun HomeMainContent(
                 searchText = searchText,
                 updateSearchText = updateSearchText,
                 referralsMetrics = referralsMetrics,
-                onUserClick = onUserClick,
-                usersAndMetrics = usersAndMetrics,
                 referralsConversion = referralsConversion,
                 onPaymentView = onPaymentView,
                 onGraphMetricsView = onGraphMetricsView,

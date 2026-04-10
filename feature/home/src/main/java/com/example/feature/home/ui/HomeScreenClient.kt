@@ -16,11 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -75,11 +73,9 @@ import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.fakeData.productsFake
 import com.avilesrodriguez.presentation.fakeData.productsRealTimeFake
 import com.avilesrodriguez.presentation.fakeData.userClient
-import com.avilesrodriguez.presentation.fakeData.usersProviders
 import com.avilesrodriguez.presentation.industries.icons
 import com.avilesrodriguez.presentation.industries.label
 import com.avilesrodriguez.presentation.industries.options
-import com.avilesrodriguez.presentation.time.formatTimeBasic
 import com.avilesrodriguez.presentation.time.formatTimestamp
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -88,14 +84,12 @@ import java.util.Locale
 @Composable
 fun HomeScreenClient(
     user: UserData,
-    users: List<UserData>,
     isLoading: Boolean,
     searchText: String,
     updateSearchText: (String) -> Unit,
     selectedIndustry: Int?,
     onIndustryChange: (Int) -> Unit,
     industryOptions: List<Int>,
-    onUserClick: (String) -> Unit,
     referralsMetrics: ReferralMetrics,
     onPaymentView: () -> Unit,
     onGraphMetricsView: () -> Unit,
@@ -161,15 +155,15 @@ fun HomeScreenClient(
                 balance = client?.moneyEarned.toString(),
                 onPaymentView = onPaymentView
             )
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(1),
+            LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp),
+                state = listState
             ) {
                 //Statics
-                item(span = { GridItemSpan(maxLineSpan) }) {
+                item {
                     LazyRow(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -215,7 +209,7 @@ fun HomeScreenClient(
                         }
                     }
                 }
-                item(span = { GridItemSpan(maxLineSpan)}){
+                item{
                     Column(
                         modifier = Modifier.padding(vertical = 8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -267,7 +261,7 @@ fun HomeScreenClient(
                             ProductRow(product = product, onProductClick = onProductClick, isRealProduct = true)
                         }
                         if(showButton){
-                            item(span = { GridItemSpan(maxLineSpan) }){
+                            item{
                                 TextButton(
                                     onClick = {onViewMoreProducts()}
                                 ) {
@@ -277,7 +271,7 @@ fun HomeScreenClient(
                             }
                         }
                     } else if(!isLoading){
-                        item(span = { GridItemSpan(maxLineSpan) }){
+                        item{
                             Box(
                                 modifier = Modifier.fillMaxWidth().height(200.dp),
                                 contentAlignment = Alignment.Center
@@ -305,7 +299,7 @@ fun HomeScreenClient(
                     }
                 }else{
                     if(products.isNotEmpty()){
-                        item(span = { GridItemSpan(maxLineSpan) }){
+                        item{
                             TextButton(
                                 onClick = {onViewRealProducts()}
                             ) {
@@ -320,7 +314,7 @@ fun HomeScreenClient(
                             ProductRow(product = it, onProductClick = onProductClick, isRealProduct = false)
                         }
                     } else if(!isLoading){
-                        item(span = { GridItemSpan(maxLineSpan) }){
+                        item{
                             Box(
                                 modifier = Modifier.fillMaxWidth().height(200.dp),
                                 contentAlignment = Alignment.Center
@@ -333,7 +327,7 @@ fun HomeScreenClient(
                         }
                     }
                     if(isLoading && products.isEmpty()){
-                        item(span = { GridItemSpan(maxLineSpan)}){
+                        item{
                             Box(Modifier
                                 .fillMaxWidth()
                                 .height(200.dp), contentAlignment = Alignment.Center) {
@@ -582,14 +576,12 @@ fun HomeScreenClientPreview() {
     ) {
         HomeScreenClient(
             user = userClient,
-            users = usersProviders,
             isLoading = false,
             searchText = "",
             updateSearchText = {},
             selectedIndustry = null,
             onIndustryChange = {},
             industryOptions = IndustriesType.options(true),
-            onUserClick = {},
             referralsMetrics = ReferralMetrics(
                 totalReferrals = 20,
                 pendingReferrals = 5,

@@ -4,6 +4,7 @@ import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.referral.Referral
+import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType

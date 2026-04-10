@@ -70,11 +70,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.avilesrodriguez.domain.model.banks.AccountType
 import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
-import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
 import com.avilesrodriguez.presentation.composables.SearchFieldBasic
@@ -86,7 +84,6 @@ import com.avilesrodriguez.presentation.fakeData.productsFake
 import com.avilesrodriguez.presentation.fakeData.productsRealTimeFake
 import com.avilesrodriguez.presentation.fakeData.userProvider
 import com.avilesrodriguez.presentation.profile.ItemEdit
-import com.avilesrodriguez.presentation.time.formatTimeBasic
 import com.avilesrodriguez.presentation.time.formatTimestamp
 import com.example.feature.home.models.UserAndReferralMetrics
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -99,8 +96,6 @@ fun HomeScreenProvider(
     searchText: String,
     updateSearchText: (String) -> Unit,
     referralsMetrics: ReferralMetrics,
-    onUserClick: (String) -> Unit,
-    usersAndMetrics: List<UserAndReferralMetrics>,
     referralsConversion: String,
     onPaymentView: () -> Unit,
     onGraphMetricsView: () -> Unit,
@@ -689,8 +684,6 @@ fun HomeScreenProviderPreview(){
                 rejectedReferrals = 2,
                 paidReferrals = 10
             ),
-            onUserClick = {},
-            usersAndMetrics = generateFakeUserAndReferralMetrics(),
             referralsConversion = "10.00",
             onPaymentView = {},
             onGraphMetricsView = {},
@@ -708,7 +701,8 @@ fun HomeScreenProviderPreview(){
     }
 }
 
-private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> = listOf(
+/**
+fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> = listOf(
     UserAndReferralMetrics(
         user = UserData.Client(
             uid = "1",
@@ -801,4 +795,4 @@ private fun generateFakeUserAndReferralMetrics(): List<UserAndReferralMetrics> =
             paidReferrals = 1
         )
     ),
-)
+) */
