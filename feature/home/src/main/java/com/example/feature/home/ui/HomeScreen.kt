@@ -62,6 +62,7 @@ import com.example.feature.home.models.UserAndReferralMetrics
 import com.example.feature.home.ui.details.DetailScreenUser
 import com.example.feature.home.ui.graphicsMetrics.GraphMetrics
 import com.example.feature.home.ui.paymentsMovement.PaymentsMovement
+import com.example.feature.home.ui.products.addProduct.AddProductScreen
 import com.example.feature.home.ui.products.detailProduct.DetailProductScreen
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -69,6 +70,7 @@ import java.util.Locale
 sealed class HomeDetailContent {
     data object Payments : HomeDetailContent()
     data object GraphMetrics : HomeDetailContent()
+    data object AddProduct: HomeDetailContent()
     data class ProductDetail(val productId: String) : HomeDetailContent()
     data class UserDetail(val userId: String) : HomeDetailContent()
 
@@ -79,6 +81,7 @@ sealed class HomeDetailContent {
                 when (content) {
                     is Payments -> "payments"
                     is GraphMetrics -> "graph_metrics"
+                    is AddProduct -> "add_product"
                     is ProductDetail -> "product_detail:${content.productId}"
                     is UserDetail -> "user_detail:${content.userId}"
                     null -> null
@@ -89,6 +92,7 @@ sealed class HomeDetailContent {
                 when {
                     str == "payments" -> Payments
                     str == "graph_metrics" -> GraphMetrics
+                    str == "add_product" -> AddProduct
                     str.startsWith("product_detail:") -> ProductDetail(str.removePrefix("product_detail:"))
                     str.startsWith("user_detail:") -> UserDetail(str.removePrefix("user_detail:"))
                     else -> null
@@ -271,7 +275,16 @@ fun HomeScreen(
                                     isPaginationActive = isPaginationActive,
                                     showButton = showButton,
                                     productsRealTime = productsRealTime,
-                                    products = products
+                                    products = products,
+                                    onAddProductClick = {
+                                        detailContent = HomeDetailContent.AddProduct
+                                        coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
+                                    },
+                                    onProductClick = {productId ->
+                                        detailContent = HomeDetailContent.ProductDetail(productId)
+                                        coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
+                                    },
+                                    onViewRealProducts = viewModel::onViewRealProducts
                                 )
                                 else -> {
                                     Box(Modifier.fillMaxSize())
@@ -294,6 +307,12 @@ fun HomeScreen(
                             is HomeDetailContent.GraphMetrics ->{
                                 GraphMetrics(
                                     popUp = { coroutineScope.launch { navigator.navigateBack() } },
+                                    showTopBar = !isShowingBothPanels
+                                )
+                            }
+                            is HomeDetailContent.AddProduct -> {
+                                AddProductScreen(
+                                    onBackClick = { coroutineScope.launch { navigator.navigateBack() } },
                                     showTopBar = !isShowingBothPanels
                                 )
                             }
@@ -349,7 +368,10 @@ fun HomeMainContent(
     isPaginationActive: Boolean,
     showButton: Boolean,
     productsRealTime: List<ProductProvider>,
-    products: List<ProductProvider>
+    products: List<ProductProvider>,
+    onAddProductClick: () -> Unit,
+    onProductClick: (String) -> Unit,
+    onViewRealProducts: () -> Unit
 ) {
     if (user != null) {
         when (user.type) {
@@ -372,7 +394,8 @@ fun HomeMainContent(
                 isPaginationActive = isPaginationActive,
                 showButton = showButton,
                 productsRealTime = productsRealTime,
-                products = products
+                products = products,
+                onProductClick = onProductClick
             )
             UserType.PROVIDER -> HomeScreenProvider(
                 user = user,
@@ -391,7 +414,10 @@ fun HomeMainContent(
                 isPaginationActive = isPaginationActive,
                 showButton = showButton,
                 productsRealTime = productsRealTime,
-                products = products
+                products = products,
+                onAddProductClick = onAddProductClick,
+                onProductClick = onProductClick,
+                onViewRealProducts = onViewRealProducts
             )
         }
     } else {

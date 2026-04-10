@@ -1,6 +1,7 @@
 package com.example.feature.home.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,23 +14,30 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.BuildCircle
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Diamond
+import androidx.compose.material.icons.filled.DoubleArrow
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Start
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material.icons.outlined.Payment
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,12 +47,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -64,11 +75,22 @@ import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.presentation.R
+import com.avilesrodriguez.presentation.avatar.Avatar
+import com.avilesrodriguez.presentation.composables.BasicButton
+import com.avilesrodriguez.presentation.composables.RatingBar
 import com.avilesrodriguez.presentation.composables.SearchFieldBasic
 import com.avilesrodriguez.presentation.composables.StatItem
 import com.avilesrodriguez.presentation.details.DetailMetricItem
+import com.avilesrodriguez.presentation.ext.fieldModifier
+import com.avilesrodriguez.presentation.ext.truncate
+import com.avilesrodriguez.presentation.fakeData.productsFake
+import com.avilesrodriguez.presentation.fakeData.productsRealTimeFake
 import com.avilesrodriguez.presentation.fakeData.userProvider
+import com.avilesrodriguez.presentation.profile.ItemEdit
+import com.avilesrodriguez.presentation.time.formatTimeBasic
 import com.example.feature.home.models.UserAndReferralMetrics
+import kotlinx.coroutines.flow.distinctUntilChanged
+import java.util.Locale
 
 @Composable
 fun HomeScreenProvider(
@@ -88,7 +110,10 @@ fun HomeScreenProvider(
     isPaginationActive: Boolean,
     showButton: Boolean,
     productsRealTime: List<ProductProvider>,
-    products: List<ProductProvider>
+    products: List<ProductProvider>,
+    onAddProductClick: () -> Unit,
+    onProductClick: (String) -> Unit,
+    onViewRealProducts: () -> Unit
 ){
     val provider = user as UserData.Provider
 
@@ -108,6 +133,24 @@ fun HomeScreenProvider(
                 }
             }
         }
+    }
+
+    val listState = rememberLazyListState()
+
+    // Detectamos si el usuario tiene el dedo en la pantalla moviendo la lista
+    val isDragged by listState.interactionSource.collectIsDraggedAsState()
+
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            val atBottom = !listState.canScrollForward  //ya no hay más contenido abajo → estoy en el final
+            isDragged && atBottom
+        }
+            .distinctUntilChanged()
+            .collect { shouldLoad ->
+                if(shouldLoad && !isLoading && products.isNotEmpty()){
+                    loadMoreProducts()
+                }
+            }
     }
 
     LazyColumn(
@@ -210,9 +253,18 @@ fun HomeScreenProvider(
             }
         }
         item{
+            ItemEdit(
+                onClick = onAddProductClick,
+                modifier = Modifier.fieldModifier(),
+                data = stringResource(R.string.add_new_product),
+                icon = R.drawable.sell_twotone,
+                iconEdit = R.drawable.add
+            )
+        }
+        item{
             Column(modifier = Modifier.padding(vertical = 8.dp)) {
                 Text(
-                    text = stringResource(R.string.search_referrers),
+                    text = stringResource(R.string.search_products),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -225,19 +277,90 @@ fun HomeScreenProvider(
                 )
             }
         }
-        if (isLoading) {
-            item {
-                Box(Modifier
-                    .fillMaxWidth()
-                    .height(200.dp), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+        if(!isPaginationActive){
+            if(productsRealTime.isNotEmpty()){
+                items(productsRealTime){ product ->
+                    ProductRow(product = product, onProductClick = onProductClick)
+                }
+                if(showButton){
+                    item {
+                        TextButton(
+                            onClick = {onViewMoreProducts()}
+                        ) {
+                            Text(text = stringResource(R.string.view_more_products))
+                            Icon(imageVector = Icons.Default.DoubleArrow, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        }
+                    }
+                }
+                item { Spacer(modifier = Modifier.height(16.dp)) }
+            } else if(!isLoading) {
+                item{
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_have_products),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
-        } else {
-            items(usersAndMetrics){ client ->
-                ClientRow(clientMetrics = client, onClientClick = onUserClick)
+            if(isLoading && products.isNotEmpty()){
+                item {
+                    Box(Modifier
+                        .fillMaxWidth()
+                        .height(200.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                        )
+                    }
+                }
             }
-            item { Spacer(modifier = Modifier.height(16.dp)) }
+        }else{
+            if (products.isNotEmpty()) {
+                item {
+                    TextButton(
+                        onClick = {onViewRealProducts()}
+                    ) {
+                        Text(text = stringResource(R.string.view_recent_products))
+                        Icon(imageVector = Icons.Default.DoubleArrow, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    }
+                }
+                items(products){ product ->
+                    ProductRow(product = product, onProductClick = onProductClick)
+                }
+                item { Spacer(modifier = Modifier.height(16.dp)) }
+            } else if(!isLoading){
+                item{
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_have_products),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+            if(isLoading && products.isNotEmpty()){
+                item {
+                    Box(Modifier
+                        .fillMaxWidth()
+                        .height(200.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -343,7 +466,60 @@ private fun BalanceCardProvider(
 }
 
 @Composable
-fun ClientRow(clientMetrics: UserAndReferralMetrics, onClientClick: (String) -> Unit){
+private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Unit){
+    val createdAt = formatTimeBasic(product.createdAt)
+    val updatedAt = formatTimeBasic(product.updatedAt)
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable{onProductClick(product.id)},
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Absolute.Left
+        ) {
+            Avatar(photoUri = product.providerPhotoUrl, size = 42.dp)
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(
+                modifier = Modifier.padding(4.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = product.name.truncate(35),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = stringResource(R.string.pay_by_referral_value, "$${product.payByReferral.truncate(7)}"),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = stringResource(R.string.created, createdAt),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ClientRow(clientMetrics: UserAndReferralMetrics, onClientClick: (String) -> Unit){
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -457,10 +633,13 @@ fun HomeScreenProviderPreview(){
             isSaturated = true,
             onViewMoreProducts = {},
             loadMoreProducts = {},
-            isPaginationActive = true,
+            isPaginationActive = false,
             showButton = true,
-            productsRealTime = listOf(),
-            products = listOf()
+            productsRealTime = productsRealTimeFake,
+            products = productsFake,
+            onAddProductClick = {},
+            onProductClick = {},
+            onViewRealProducts = {}
         )
     }
 }

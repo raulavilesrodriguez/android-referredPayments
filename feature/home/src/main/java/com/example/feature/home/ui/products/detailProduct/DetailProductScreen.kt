@@ -416,11 +416,11 @@ private fun InfoGeneralProvider(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth().padding(start = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Absolute.Left
         ) {
-            Avatar(photoUri = provider.photoUrl, size = 42.dp, modifier = Modifier.padding(start = 4.dp))
+            Avatar(photoUri = provider.photoUrl, size = 42.dp)
             Spacer(modifier = Modifier.width(24.dp))
             Column(
                 modifier = Modifier
@@ -461,7 +461,7 @@ private fun InfoGeneralProduct(product: ProductProvider){
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth().padding(start = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Absolute.Left
         ) {

@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Paid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -53,7 +52,7 @@ fun AddProductScreen(
         onNameChange = viewModel::onNameChange,
         onDescriptionChange = viewModel::updateDescription,
         onPayByReferralChange = viewModel::updatePayByReferral,
-        onSaveClick = { viewModel.onSaveClick( onBackClick) },
+        onSaveClick = { viewModel.onSaveClick(onBackClick) },
         onBackClick = onBackClick,
         addProduct = addProduct,
         isLoading = isLoading,

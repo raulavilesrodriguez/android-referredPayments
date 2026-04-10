@@ -105,19 +105,19 @@ class HomeViewModel @Inject constructor(
             }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    val showViewMoreButton: StateFlow<Boolean> = combine(
-        _allProductsRealTime,
-        _isPaginationActive
-    ) { products, active ->
-        products.size >= pageSize && !active
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
-
     private val _productsState = MutableStateFlow<List<ProductProvider>>(emptyList())
     val productsState: StateFlow<List<ProductProvider>> = _productsState.asStateFlow()
+    val showViewMoreButton: StateFlow<Boolean> = combine(
+        _productsState,
+        productsStateRealTime,
+        _isPaginationActive
+    ) { products, filteredRealTime, active ->
+        filteredRealTime.size < products.size && !active
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     private var lastProductViewModel: ProductProvider? = null
     private var allProductsLoaded = false
-    private val pageSize: Long = 3L
+    private val pageSize: Long = 5L
+    private val pageSizeRealTime: Long = 3L
     private val pageSizeLoadMore: Long = 3L
     private var referralsJob: Job? = null
     private var userMetricsJob: Job? = null
@@ -205,7 +205,7 @@ class HomeViewModel @Inject constructor(
             val user = _userDataStore.value
             when (user) {
                 is UserData.Client -> {
-                    getProductsRealTime(limit = pageSize)
+                    getProductsRealTime(limit = pageSizeRealTime)
                         .collect { products ->
                             _allProductsRealTime.value = products
                             _isLoading.value = false
@@ -213,7 +213,7 @@ class HomeViewModel @Inject constructor(
                 }
 
                 is UserData.Provider -> {
-                    getProductsByProviderRealTime(providerId = currentUserId, limit = pageSize)
+                    getProductsByProviderRealTime(providerId = currentUserId, limit = pageSizeRealTime)
                         .collect { products ->
                             _allProductsRealTime.value = products
                             _isLoading.value = false
@@ -228,6 +228,10 @@ class HomeViewModel @Inject constructor(
 
     fun onViewMoreProducts() {
         _isPaginationActive.value = true
+    }
+    
+    fun onViewRealProducts(){
+        _isPaginationActive.value = false
     }
 
     private fun loadInitialProducts(industry: IndustriesType?, namePrefix: String){
@@ -267,45 +271,51 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreProducts(){
-        if(allProductsLoaded || paginationJob?.isActive == true || lastProductViewModel == null) return
-        _isLoading.value =true
+    fun loadMoreProducts() {
+        if (allProductsLoaded || paginationJob?.isActive == true || lastProductViewModel == null) return
+        _isLoading.value = true
         paginationJob = launchCatching {
             val user = _userDataStore.value
             val industrySelected = _selectedIndustry.value
             val namePrefix = _searchText.value
-            when(user){
-                is UserData.Client -> {
-                    val (moreProducts, lastProduct) = getAllProducts(
-                        pageSize = pageSizeLoadMore,
-                        industry = industrySelected?.name,
-                        namePrefix = namePrefix,
-                        lastProduct = lastProductViewModel
-                    )
-                    if(moreProducts.isNotEmpty()){
-                        val currentProducts = _productsState.value.toMutableList()
-                        currentProducts.addAll(moreProducts)
-                        val currentProductsFiltered = currentProducts.distinctBy { it.id }
-                        _productsState.value = currentProductsFiltered
-                        lastProductViewModel = lastProduct
+            try {
+                when (user) {
+                    is UserData.Client -> {
+                        val (moreProducts, lastProduct) = getAllProducts(
+                            pageSize = pageSizeLoadMore,
+                            industry = industrySelected?.name,
+                            namePrefix = namePrefix,
+                            lastProduct = lastProductViewModel
+                        )
+                        allProductsLoaded = moreProducts.size < pageSizeLoadMore
+                        if (moreProducts.isNotEmpty()) {
+                            val currentProducts = _productsState.value.toMutableList()
+                            currentProducts.addAll(moreProducts)
+                            _productsState.value = currentProducts.distinctBy { it.id }
+                            lastProductViewModel = lastProduct
+                        }
                     }
-                }
-                is UserData.Provider -> {
-                    val (moreProducts, lastProduct) = getProductsByProvider(
-                        providerId = currentUserId,
-                        pageSize = pageSize,
-                        namePrefix = namePrefix,
-                        lastProduct = lastProductViewModel
-                    )
-                    if(moreProducts.isNotEmpty()){
-                        val currentProducts = _productsState.value.toMutableList()
-                        currentProducts.addAll(moreProducts)
-                        val currentProductsFiltered = currentProducts.distinctBy { it.id }
-                        _productsState.value = currentProductsFiltered
-                        lastProductViewModel = lastProduct
+
+                    is UserData.Provider -> {
+                        val (moreProducts, lastProduct) = getProductsByProvider(
+                            providerId = currentUserId,
+                            pageSize = pageSizeLoadMore,
+                            namePrefix = namePrefix,
+                            lastProduct = lastProductViewModel
+                        )
+                        allProductsLoaded = moreProducts.size < pageSizeLoadMore
+                        if (moreProducts.isNotEmpty()) {
+                            val currentProducts = _productsState.value.toMutableList()
+                            currentProducts.addAll(moreProducts)
+                            _productsState.value = currentProducts.distinctBy { it.id }
+                            lastProductViewModel = lastProduct
+                        }
                     }
+
+                    else -> return@launchCatching
                 }
-                else -> return@launchCatching
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -398,14 +408,15 @@ class HomeViewModel @Inject constructor(
         openScreen(NavRoutes.SETTINGS)
     }
 
-    fun hideDelete(productId:String){
+    fun hideDelete(productId: String) {
         _isLoading.value = true
         _isPaginationActive.value = false
         _selectedIndustry.value = null
         _searchText.value = ""
+        lastProductViewModel = null
+        allProductsLoaded = false
         launchCatching {
             deactivateProductProvider(productId)
         }.invokeOnCompletion { _isLoading.value = false }
     }
-
 }

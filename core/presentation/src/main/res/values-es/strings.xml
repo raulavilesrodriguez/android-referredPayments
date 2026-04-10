@@ -104,6 +104,7 @@
     <string name="referred_from">Referido desde: %s</string>
     <string name="referral">Referrido de</string>
     <string name="created">Creado: %s</string>
+    <string name="updated_value">Actualizado: %s</string>
     <string name="referred">Referrido: %s</string>
     <string name="phone_number_referred">Número Telefónico Referido</string>
     <string name="all_status">Todos</string>
@@ -126,10 +127,14 @@
     <string name="bank_austro">Banco del Austro</string>
     <string name="checking">Corriente</string>
     <string name="no_payments">No hay pagos</string>
+    <string name="product_value">Producto: %s</string>
     <string name="add_new_product">Añadir Nuevo Producto</string>
     <string name="pay_by_referral">Pago por referido</string>
     <string name="pay_by_referral_value">Pago por referido %s</string>
     <string name="warning_delete_product">Estás seguro que quieres eliminar este producto?</string>
+    <string name="view_more_products">Ver más productos</string>
+    <string name="view_recent_products">Ver productos recientes</string>
+    <string name="no_have_products">No tienes productos</string>
     <string name="policies">Políticas</string>
     <string name="policies_title">Política de uso y programa de referidos</string>
     <string name="policies_intro">Esta aplicación ofrece un programa de referidos basado exclusivamente en compras reales y verificables de productos o servicios proporcionados         por empresas registradas en la plataforma.</string>
@@ -265,6 +270,7 @@
     <string name="delete_product">Borrar Producto</string>
     <string name="product_information">Información del Producto</string>
     <string name="about_product">Acerca del Producto</string>
+    <string name="search_products">Buscar Productos</string>
     <string name="product_name">Nombre del producto</string>
     <string name="product_description">Descripción del producto</string>
 </resources>

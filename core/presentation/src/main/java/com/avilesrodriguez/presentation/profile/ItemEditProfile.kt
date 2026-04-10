@@ -100,7 +100,6 @@ fun ItemEdit(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onClick() }
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Absolute.Left
@@ -143,7 +142,8 @@ fun ItemEdit(
                 Icon(
                     painter = painterResource(id = iconEdit),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable { onClick() }
                 )
             }
         }

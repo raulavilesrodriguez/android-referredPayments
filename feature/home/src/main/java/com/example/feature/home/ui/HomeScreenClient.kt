@@ -85,7 +85,8 @@ fun HomeScreenClient(
     isPaginationActive: Boolean,
     showButton: Boolean,
     productsRealTime: List<ProductProvider>,
-    products: List<ProductProvider>
+    products: List<ProductProvider>,
+    onProductClick: (String) -> Unit
 ) {
     val client = user as? UserData.Client
 
@@ -374,7 +375,8 @@ fun HomeScreenClientPreview() {
             isPaginationActive = false,
             showButton = true,
             productsRealTime = emptyList(),
-            products = emptyList()
+            products = emptyList(),
+            onProductClick = {}
         )
     }
 }
