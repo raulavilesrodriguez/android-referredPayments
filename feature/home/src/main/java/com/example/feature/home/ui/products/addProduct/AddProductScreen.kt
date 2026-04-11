@@ -53,7 +53,7 @@ fun AddProductScreen(
         onDescriptionChange = viewModel::updateDescription,
         onPayByReferralChange = viewModel::updatePayByReferral,
         onSaveClick = { viewModel.onSaveClick(onBackClick) },
-        onBackClick = onBackClick,
+        onCancel = onBackClick,
         addProduct = addProduct,
         isLoading = isLoading,
         showTopBar = showTopBar,
@@ -67,7 +67,7 @@ private fun AddProductScreenContent(
     onDescriptionChange: (String) -> Unit,
     onPayByReferralChange: (String) -> Unit,
     onSaveClick: () -> Unit,
-    onBackClick: () -> Unit,
+    onCancel: () -> Unit,
     addProduct: AddProduct,
     isLoading: Boolean,
     showTopBar: Boolean,
@@ -81,7 +81,7 @@ private fun AddProductScreenContent(
                 ToolBarWithIcon(
                     iconBack = R.drawable.arrow_back,
                     title = stringResource(R.string.add_new_product),
-                    backClick = { onBackClick() }
+                    backClick = { onCancel() }
                 )
             }else {
                 BasicToolbar(title = stringResource(R.string.add_new_product))
@@ -93,7 +93,7 @@ private fun AddProductScreenContent(
                 onDescriptionChange = onDescriptionChange,
                 onPayByReferralChange = onPayByReferralChange,
                 onSaveClick = onSaveClick,
-                onBackClick = onBackClick,
+                onCancel = onCancel,
                 addProduct = addProduct,
                 isLoading = isLoading,
                 providerUser = providerUser,
@@ -110,7 +110,7 @@ private fun FormAddProduct(
     onDescriptionChange: (String) -> Unit,
     onPayByReferralChange: (String) -> Unit,
     onSaveClick: () -> Unit,
-    onBackClick: () -> Unit,
+    onCancel: () -> Unit,
     addProduct: AddProduct,
     isLoading: Boolean,
     providerUser: UserData.Provider?,
@@ -162,7 +162,7 @@ private fun FormAddProduct(
             confirmText = R.string.save,
             cancelText = R.string.cancel,
             onConfirm = onSaveClick,
-            onCancel = onBackClick,
+            onCancel = onCancel,
             isSaving = isLoading,
             enabled = addProduct.name.isNotBlank() && addProduct.description.isNotBlank() && addProduct.payByReferral.isNotBlank()
         )
@@ -178,7 +178,7 @@ fun AddProductScreenPreview(){
             onDescriptionChange = {},
             onPayByReferralChange = {},
             onSaveClick = {},
-            onBackClick = {},
+            onCancel = {},
             addProduct = AddProduct(),
             isLoading = false,
             showTopBar = true,

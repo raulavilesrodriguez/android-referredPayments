@@ -299,7 +299,13 @@ fun HomeScreen(
                             }
                             is HomeDetailContent.AddProduct -> {
                                 AddProductScreen(
-                                    onBackClick = { coroutineScope.launch { navigator.navigateBack() } },
+                                    onBackClick = {
+                                        if(isShowingBothPanels){
+                                            detailContent = HomeDetailContent.Payments
+                                            coroutineScope.launch { navigator.navigateBack() }
+                                        }else{
+                                            coroutineScope.launch { navigator.navigateBack() }
+                                        }},
                                     showTopBar = !isShowingBothPanels
                                 )
                             }
@@ -309,9 +315,14 @@ fun HomeScreen(
                                     onBackClick = { coroutineScope.launch { navigator.navigateBack() } },
                                     openScreen = openScreen,
                                     deleteProduct = {
-                                        detailContent = null
-                                        viewModel.hideDelete(content.productId)
-                                        coroutineScope.launch { navigator.navigateBack() } },
+                                        if(isShowingBothPanels){
+                                            detailContent = HomeDetailContent.Payments
+                                            viewModel.hideDelete(content.productId)
+                                            coroutineScope.launch { navigator.navigateBack() }
+                                        }else{
+                                            viewModel.hideDelete(content.productId)
+                                            coroutineScope.launch { navigator.navigateBack() }
+                                        }},
                                     showTopBar = !isShowingBothPanels
                                 )
                             }

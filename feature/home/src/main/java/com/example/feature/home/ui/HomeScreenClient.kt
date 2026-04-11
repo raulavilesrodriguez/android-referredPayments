@@ -382,6 +382,7 @@ private fun BalanceCard(balance: String, onPaymentView: () -> Unit) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(16.dp)
             .clickable { onPaymentView() },
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
@@ -457,13 +458,13 @@ private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Uni
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
                     text = product.providerName.truncate(30),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -486,7 +487,7 @@ private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Uni
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
                     text = stringResource(R.string.pay_by_referral),

@@ -262,7 +262,6 @@ fun SettingsScreen(
                                             detailContent = SettingsContent.EditSplash
                                             coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
                                         }else{
-                                            detailContent = null
                                             coroutineScope.launch { navigator.navigateBack() }
                                         }},
                                     showTopBar = !isShowingBothPanels

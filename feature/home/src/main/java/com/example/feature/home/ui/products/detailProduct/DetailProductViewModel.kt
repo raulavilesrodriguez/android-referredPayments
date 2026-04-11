@@ -6,7 +6,6 @@ import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.usecases.account.CurrentUserId
 import com.avilesrodriguez.domain.usecases.account.HasUser
-import com.avilesrodriguez.domain.usecases.productProvider.DeactivateProductProvider
 import com.avilesrodriguez.domain.usecases.productProvider.GetProductProviderByIdFlow
 import com.avilesrodriguez.domain.usecases.user.GetUser
 import com.avilesrodriguez.domain.usecases.user.GetUserFlow
