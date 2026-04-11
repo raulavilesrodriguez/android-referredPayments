@@ -17,7 +17,8 @@ fun AddProduct.toProductProvider(
     providerName: String = "",
     providerPhotoUrl: String = "",
     providerRating: Double = 0.0,
-    industry: IndustriesType = IndustriesType.OTHER
+    industry: IndustriesType = IndustriesType.OTHER,
+    isActive: Boolean = true
 ): ProductProvider {
     return ProductProvider(
         providerId = providerId,
@@ -30,6 +31,7 @@ fun AddProduct.toProductProvider(
         updatedAt = updatedAt,
         providerName = providerName,
         providerPhotoUrl = providerPhotoUrl,
-        providerRating = providerRating
+        providerRating = providerRating,
+        isActive = isActive
     )
 }

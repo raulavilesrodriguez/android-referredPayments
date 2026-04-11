@@ -94,7 +94,7 @@ fun ItemEdit(
     @DrawableRes iconEdit: Int? = null
 ){
     Card(
-        modifier = modifier,
+        modifier = modifier.clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
@@ -143,7 +143,7 @@ fun ItemEdit(
                     painter = painterResource(id = iconEdit),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable { onClick() }
+                    modifier = Modifier
                 )
             }
         }

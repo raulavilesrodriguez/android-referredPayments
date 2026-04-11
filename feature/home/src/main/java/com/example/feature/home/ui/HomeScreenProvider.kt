@@ -418,7 +418,10 @@ private fun BalanceCardProvider(
     val displayMoneyPaid = if (isVisible) "$$moneyPaid" else "$" + "*".repeat(moneyPaid.length)
 
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth().clickable { onPaymentView() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clickable { onPaymentView() },
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -510,19 +513,18 @@ private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Uni
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
             .clickable{onProductClick(product.id)},
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(start = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Absolute.Left
         ) {
-            Avatar(photoUri = product.providerPhotoUrl, size = 42.dp)
-            Spacer(modifier = Modifier.width(4.dp))
+            //Avatar(photoUri = product.providerPhotoUrl, size = 42.dp)
+            //Spacer(modifier = Modifier.width(4.dp))
             Column(
                 modifier = Modifier.weight(1f).padding(4.dp),
                 verticalArrangement = Arrangement.Center,
@@ -534,13 +536,13 @@ private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Uni
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
                     text = product.providerName.truncate(30),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
             }
@@ -555,7 +557,7 @@ private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Uni
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
                     text = stringResource(R.string.pay_by_referral),

@@ -5,6 +5,7 @@ import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.PropertyName
 import java.util.Date
 
 data class ProductProviderFirestore(
@@ -14,6 +15,7 @@ data class ProductProviderFirestore(
     val nameLowercase: String? = null,
     val description: String? = null,
     val payByReferral: Double? = null,
+    @get:PropertyName("isActive")
     val isActive: Boolean? = null,
     val createdAt: Any? = null,
     val updatedAt: Any? = null,

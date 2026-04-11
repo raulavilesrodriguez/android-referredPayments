@@ -91,6 +91,7 @@ class HomeViewModel @Inject constructor(
     private val _isPaginationActive = MutableStateFlow(false)
     val isPaginationActive: StateFlow<Boolean> = _isPaginationActive.asStateFlow()
 
+
     val productsStateRealTime: StateFlow<List<ProductProvider>> = combine(
         _allProductsRealTime,
         _searchText,
@@ -105,6 +106,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     private val _productsState = MutableStateFlow<List<ProductProvider>>(emptyList())
     val productsState: StateFlow<List<ProductProvider>> = _productsState.asStateFlow()
     val showViewMoreButton: StateFlow<Boolean> = combine(

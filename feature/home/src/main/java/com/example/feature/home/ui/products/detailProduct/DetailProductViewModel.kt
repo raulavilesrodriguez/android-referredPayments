@@ -12,6 +12,7 @@ import com.avilesrodriguez.domain.usecases.user.GetUser
 import com.avilesrodriguez.domain.usecases.user.GetUserFlow
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
+@HiltViewModel
 class DetailProductViewModel @Inject constructor(
     private val currentUserIdUseCase: CurrentUserId,
     private val getUser: GetUser,

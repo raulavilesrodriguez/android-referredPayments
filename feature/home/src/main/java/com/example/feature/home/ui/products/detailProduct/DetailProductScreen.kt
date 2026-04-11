@@ -1,6 +1,7 @@
 package com.example.feature.home.ui.products.detailProduct
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +30,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -89,18 +92,30 @@ fun DetailProductScreen(
     val currentUser by viewModel.currentUser.collectAsState()
     var showDialogDeleteProduct by remember { mutableStateOf(false) }
 
-    DetailProductScreenContent(
-        onBackClick = onBackClick,
-        canReferUserClient = canReferUserClient,
-        isProviderSaturated = isProviderSaturated,
-        product = product,
-        providerUser = providerUser as UserData.Provider,
-        onAddReferClick = {viewModel.onAddReferClick(product.providerId, product.id, openScreen)},
-        currentUser = currentUser,
-        onDeleteClick = {showDialogDeleteProduct = true},
-        onEditClick = {viewModel.onEditProductClick(product.id, openScreen)},
-        showTopBar = showTopBar
-    )
+    val provider = providerUser as? UserData.Provider
+    if (product.id.isEmpty() || provider == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+            )
+        }
+    } else {
+        DetailProductScreenContent(
+            onBackClick = onBackClick,
+            canReferUserClient = canReferUserClient,
+            isProviderSaturated = isProviderSaturated,
+            product = product,
+            providerUser = provider,
+            onAddReferClick = { viewModel.onAddReferClick(product.providerId, product.id, openScreen) },
+            currentUser = currentUser,
+            onDeleteClick = { showDialogDeleteProduct = true },
+            onEditClick = { viewModel.onEditProductClick(product.id, openScreen) },
+            showTopBar = showTopBar
+        )
+    }
 
     if(showDialogDeleteProduct){
         AlertDialog(

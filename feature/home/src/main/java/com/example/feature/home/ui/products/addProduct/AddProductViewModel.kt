@@ -121,7 +121,8 @@ class AddProductViewModel @Inject constructor(
                 providerName = provider.name?:"",
                 providerPhotoUrl = provider.photoUrl,
                 providerRating = provider.paymentRating,
-                industry = provider.industry
+                industry = provider.industry,
+                isActive = true
             )
             saveProductProvider(product)
             _addProduct.value = AddProduct()

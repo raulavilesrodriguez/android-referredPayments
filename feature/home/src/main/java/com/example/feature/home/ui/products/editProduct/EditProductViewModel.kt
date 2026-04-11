@@ -6,11 +6,13 @@ import com.avilesrodriguez.domain.model.validationRules.ProductRules
 import com.avilesrodriguez.domain.usecases.productProvider.GetProductProviderById
 import com.avilesrodriguez.domain.usecases.productProvider.UpdateProductProvider
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
+@HiltViewModel
 class EditProductViewModel @Inject constructor(
     private val getProductProviderById: GetProductProviderById,
     private val updateProductProvider: UpdateProductProvider
