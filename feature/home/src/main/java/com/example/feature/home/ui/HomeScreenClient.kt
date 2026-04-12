@@ -1,5 +1,6 @@
 package com.example.feature.home.ui
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -143,7 +144,8 @@ fun HomeScreenClient(
         }
             .distinctUntilChanged()
             .collect { shouldLoad ->
-                if(shouldLoad && !isLoading && products.isNotEmpty()){
+                if(shouldLoad){
+                    Log.d("HomeScreenClient", "Loading more products OJOO...")
                     loadMoreProducts()
                 }
             }
@@ -270,6 +272,7 @@ fun HomeScreenClient(
                                 }
                             }
                         }
+                        item { Spacer(modifier = Modifier.height(16.dp)) }
                     } else if(!isLoading){
                         item{
                             Box(
@@ -313,6 +316,7 @@ fun HomeScreenClient(
                         ){
                             ProductRow(product = it, onProductClick = onProductClick, isRealProduct = false)
                         }
+                        item { Spacer(modifier = Modifier.height(16.dp)) }
                     } else if(!isLoading){
                         item{
                             Box(
@@ -434,19 +438,18 @@ private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Uni
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
             .clickable{onProductClick(product.id)},
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(start = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Absolute.Left
         ) {
-            Avatar(photoUri = product.providerPhotoUrl, size = 42.dp)
-            Spacer(modifier = Modifier.width(4.dp))
+            //Avatar(photoUri = product.providerPhotoUrl, size = 42.dp)
+            //Spacer(modifier = Modifier.width(4.dp))
             Column(
                 modifier = Modifier.weight(1f).padding(4.dp),
                 verticalArrangement = Arrangement.Center,

@@ -150,7 +150,7 @@ fun HomeScreenProvider(
         }
             .distinctUntilChanged()
             .collect { shouldLoad ->
-                if(shouldLoad && !isLoading && products.isNotEmpty()){
+                if(shouldLoad){
                     loadMoreProducts()
                 }
             }

@@ -118,9 +118,9 @@ class HomeViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     private var lastProductViewModel: ProductProvider? = null
     private var allProductsLoaded = false
-    private val pageSize: Long = 5L
-    private val pageSizeRealTime: Long = 3L
-    private val pageSizeLoadMore: Long = 3L
+    private val pageSize: Long = 3L
+    private val pageSizeRealTime: Long = 2L
+    private val pageSizeLoadMore: Long = 1L
     private var referralsJob: Job? = null
     private var userMetricsJob: Job? = null
     private var paginationJob: Job? = null
@@ -230,6 +230,16 @@ class HomeViewModel @Inject constructor(
 
     fun onViewMoreProducts() {
         _isPaginationActive.value = true
+        launchCatching {
+            combine(_searchText, _selectedIndustry) { text, industry ->
+                Pair(text, industry)
+            }
+                .debounce(300)
+                .distinctUntilChanged()
+                .collect { (query, industry) ->
+                    loadInitialProducts(industry = industry, namePrefix = query)
+                }
+        }
     }
     
     fun onViewRealProducts(){

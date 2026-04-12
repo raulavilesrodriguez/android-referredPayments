@@ -256,7 +256,14 @@ fun SettingsScreen(
                             is SettingsContent.EditSplash -> EditSplash()
                             is SettingsContent.EditUser -> {
                                 EditScreen(
-                                    popUp = { coroutineScope.launch { navigator.navigateBack() } },
+                                    popUp = {
+                                        if(isShowingBothPanels){
+                                            detailContent = SettingsContent.EditSplash
+                                            coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
+                                        }else{
+                                            coroutineScope.launch { navigator.navigateBack() }
+                                        }
+                                            },
                                     cancel = {
                                         if(isShowingBothPanels){
                                             detailContent = SettingsContent.EditSplash
