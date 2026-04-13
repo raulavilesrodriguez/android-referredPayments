@@ -23,7 +23,8 @@ fun RatingBar(
     starSize: Dp = 14.dp,
     activeColor: Color = Color(0xFFFFC107),
     inactiveColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    onRatingChanged: (Double) -> Unit = {}
+    onRatingChanged: (Double) -> Unit = {},
+    isEditable: Boolean = true
 ) {
     Row {
         for (i in 1..maxRating) {
@@ -38,18 +39,28 @@ fun RatingBar(
                 rating >= i - 0.5 -> activeColor
                 else -> inactiveColor
             }
+            if(isEditable){
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = tint,
+                    modifier = Modifier
+                        .size(starSize)
+                        .clickable(
+                            role = Role.Button,
+                            onClick = { onRatingChanged(i.toDouble()) }
+                        )
+                )
+            }else{
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = tint,
+                    modifier = Modifier
+                        .size(starSize)
+                )
+            }
 
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = tint,
-                modifier = Modifier
-                    .size(starSize)
-                    .clickable(
-                        role = Role.Button,
-                        onClick = { onRatingChanged(i.toDouble()) }
-                    )
-            )
         }
     }
 }

@@ -56,7 +56,7 @@ class AddReferralViewModel @Inject constructor(
     }
 
     fun onEmailChange(newEmail: String){
-        _addReferralState.value = _addReferralState.value.copy(email = newEmail)
+        _addReferralState.value = _addReferralState.value.copy(email = newEmail.trim())
         val currentState = _addReferralState.value
         _addReferralState.value = _addReferralState.value.copy(isEntryValid = validateInput(currentState))
     }

@@ -471,7 +471,7 @@ private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Uni
                     color = MaterialTheme.colorScheme.secondary
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    RatingBar(rating = product.providerRating)
+                    RatingBar(rating = product.providerRating, isEditable = false)
                     Spacer(Modifier.width(4.dp))
                     Text(
                         text = String.format(Locale.US, "%.1f", product.providerRating),
@@ -560,7 +560,7 @@ private fun ProviderCard(provider: UserData.Provider, onUserClick: (String) -> U
                     fontWeight = FontWeight.Bold
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    RatingBar(rating = provider.paymentRating)
+                    RatingBar(rating = provider.paymentRating, isEditable = false)
                     Spacer(Modifier.width(4.dp))
                     Text(
                         text = String.format(Locale.US, "%.1f", provider.paymentRating),

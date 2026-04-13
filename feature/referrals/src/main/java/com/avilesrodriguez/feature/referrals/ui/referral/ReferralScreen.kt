@@ -348,7 +348,7 @@ fun ProfileReferral(
                                 RatingBar(
                                     rating = referral.rating,
                                     starSize = 32.dp,
-                                    onRatingChanged = { }
+                                    isEditable = false
                                 )
                                 Spacer(Modifier.width(4.dp))
                                 Text(
@@ -417,7 +417,7 @@ fun ProfileReferral(
                             RatingBar(
                                 rating = referral?.rating?:0.0,
                                 starSize = 32.dp,
-                                onRatingChanged = { }
+                                isEditable = false
                             )
                             Spacer(Modifier.width(4.dp))
                             Text(
