@@ -144,7 +144,8 @@ class ReferralViewModel @Inject constructor(
         launchCatching {
             _isLoading.value = true
             val updates = mapOf(
-                "status" to ReferralStatus.PROCESSING.name
+                "status" to ReferralStatus.PROCESSING.name,
+                "updatedAt" to System.currentTimeMillis()
             )
 
             updateReferralFields(referralId, updates)

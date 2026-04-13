@@ -88,7 +88,8 @@ class AddReferralViewModel @Inject constructor(
                 clientId = currentUserId,
                 providerId = providerId,
                 productId = productId,
-                createdAt = System.currentTimeMillis()
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
             )
             try {
                 val isSuccess = saveReferral(referral)

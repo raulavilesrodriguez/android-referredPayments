@@ -240,7 +240,7 @@ class NewMessageViewModel @Inject constructor(
                 val referralUpdates = mapOf(
                     "status" to ReferralStatus.PAID.name,
                     "amountPaid" to amountPaid,
-                    "paidAt" to System.currentTimeMillis()
+                    "updatedAt" to System.currentTimeMillis()
                 )
 
                 val confirmationMessage = Message(
@@ -299,7 +299,7 @@ class NewMessageViewModel @Inject constructor(
 
                 val updates = mapOf(
                     "status" to ReferralStatus.REJECTED.name,
-                    "paidAt" to System.currentTimeMillis()
+                    "updatedAt" to System.currentTimeMillis()
                 )
 
                 val message = _newMessageState.value.copy(

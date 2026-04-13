@@ -21,7 +21,7 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         status = ReferralStatus.PENDING,
         createdAt = System.currentTimeMillis(),
         amountPaid = 55.0,
-        paidAt = System.currentTimeMillis()
+        updatedAt = System.currentTimeMillis()
     ),
     Referral(
         id = "2",
@@ -34,7 +34,7 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         status = ReferralStatus.PAID,
         createdAt = System.currentTimeMillis(),
         amountPaid = 108.0,
-        paidAt = System.currentTimeMillis()
+        updatedAt = System.currentTimeMillis()
     ),
     Referral(
         id = "3",
@@ -47,7 +47,7 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         status = ReferralStatus.PROCESSING,
         createdAt = System.currentTimeMillis(),
         amountPaid = 36.5,
-        paidAt = System.currentTimeMillis()
+        updatedAt = System.currentTimeMillis()
     ),
     Referral(
         id = "4",
@@ -60,7 +60,7 @@ fun generateFakeReferrals(): List<Referral> = listOf(
         status = ReferralStatus.REJECTED,
         createdAt = System.currentTimeMillis(),
         amountPaid = 100.0,
-        paidAt = System.currentTimeMillis()
+        updatedAt = System.currentTimeMillis()
     )
 )
 
@@ -75,7 +75,7 @@ val referral = Referral(
     status = ReferralStatus.PROCESSING,
     createdAt = System.currentTimeMillis(),
     amountPaid = 100.0,
-    paidAt = System.currentTimeMillis()
+    updatedAt = System.currentTimeMillis()
 )
 
 val userClient = UserData.Client(

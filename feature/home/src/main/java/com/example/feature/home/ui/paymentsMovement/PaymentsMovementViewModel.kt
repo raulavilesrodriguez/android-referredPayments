@@ -120,7 +120,7 @@ class PaymentsMovementViewModel @Inject constructor(
                     otherPartyName = nameCache[otherId] ?: ""
                 )
             }
-            .sortedByDescending { it.referral.paidAt }
+            .sortedByDescending { it.referral.updatedAt }
     }
 
     private fun loadInitialReferralsByClient(pageSize: Long=20){
@@ -141,7 +141,7 @@ class PaymentsMovementViewModel @Inject constructor(
                 _referralsClient.value = result
                 lastReferralViewModel = lastReferral
                 allReferralsLoaded = result.size < pageSize
-                val newestTime = referrals.firstOrNull()?.paidAt ?: System.currentTimeMillis()
+                val newestTime = referrals.firstOrNull()?.updatedAt ?: System.currentTimeMillis()
                 val toDate = _dateTo.value
                 if(toDate == null) listenForNewReferralsByClient(currentUserId, newestTime)
             } finally {
@@ -216,7 +216,7 @@ class PaymentsMovementViewModel @Inject constructor(
                 _referralsProvider.value = result
                 lastReferralViewModel = lastReferral
                 allReferralsLoaded = result.size < pageSize
-                val newestTime = referrals.firstOrNull()?.paidAt ?: System.currentTimeMillis()
+                val newestTime = referrals.firstOrNull()?.updatedAt ?: System.currentTimeMillis()
                 val toDate = _dateTo.value
                 if(toDate == null) listenForNewReferralsByProvider(currentUserId, newestTime)
             } finally {

@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,13 +41,17 @@ fun AddReferralScreen(
     viewModel: AddReferralViewModel = hiltViewModel()
 ){
     val addReferralState by viewModel.addReferralState.collectAsState()
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     AddReferralScreenContent(
         onBackClick = onBackClick,
         addReferralState = addReferralState,
         onNameChange = viewModel::onNameChange,
         onEmailChange = viewModel::onEmailChange,
         onNumberPhoneChange = viewModel::onNumberPhoneChange,
-        onSaveClick = { viewModel.onSaveClick(providerId, productId, openAndPopUp) },
+        onSaveClick = {
+            viewModel.onSaveClick(providerId, productId, openAndPopUp)
+                      },
         onCancel = { onBackClick() }
     )
 }

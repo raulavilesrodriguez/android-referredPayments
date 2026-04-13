@@ -46,7 +46,7 @@ class ReferralDataSource @Inject constructor(
         if (referralId.isEmpty()) return
 
         val firestoreUpdates = updates.mapValues { entry ->
-            if ((entry.key == CREATED_AT_FIELD || entry.key == PAID_AT_FIELD) && entry.value is Long) {
+            if ((entry.key == CREATED_AT_FIELD || entry.key == UPDATE_AT_FIELD) && entry.value is Long) {
                 Timestamp(Date(entry.value as Long))
             } else {
                 entry.value
@@ -234,7 +234,7 @@ class ReferralDataSource @Inject constructor(
         status: String? = null,
         isPaymentsScreen: Boolean = false
     ) : Flow<List<Referral>>{
-        val dateField = if (isPaymentsScreen) PAID_AT_FIELD else CREATED_AT_FIELD
+        val dateField = if (isPaymentsScreen) UPDATE_AT_FIELD else CREATED_AT_FIELD
         val sinceTimestamp = Timestamp(Date(since))
         var query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(CLIENT_ID_FIELD, clientId)
@@ -255,7 +255,7 @@ class ReferralDataSource @Inject constructor(
         status: String? = null,
         isPaymentsScreen: Boolean = false
     ) : Flow<List<Referral>>{
-        val dateField = if (isPaymentsScreen) PAID_AT_FIELD else CREATED_AT_FIELD
+        val dateField = if (isPaymentsScreen) UPDATE_AT_FIELD else CREATED_AT_FIELD
         val sinceTimestamp = Timestamp(Date(since))
         var query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(PROVIDER_ID_FIELD, providerId)
@@ -280,7 +280,7 @@ class ReferralDataSource @Inject constructor(
         isPaymentsScreen: Boolean = false
     ) : Pair<List<Referral>, Referral?> {
 
-        val dateField = if (isPaymentsScreen) PAID_AT_FIELD else CREATED_AT_FIELD
+        val dateField = if (isPaymentsScreen) UPDATE_AT_FIELD else CREATED_AT_FIELD
 
         var query: Query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(CLIENT_ID_FIELD, clientId)
@@ -325,7 +325,7 @@ class ReferralDataSource @Inject constructor(
         isPaymentsScreen: Boolean = false
     ) : Pair<List<Referral>, Referral?>{
 
-        val dateField = if (isPaymentsScreen) PAID_AT_FIELD else CREATED_AT_FIELD
+        val dateField = if (isPaymentsScreen) UPDATE_AT_FIELD else CREATED_AT_FIELD
 
         var query: Query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(PROVIDER_ID_FIELD, providerId)
@@ -403,7 +403,7 @@ class ReferralDataSource @Inject constructor(
         private const val VOUCHER_URL_FIELD = "voucherUrl"
         private const val ORDER_BY_FIELD_LOWER = "nameLowercase"
         private const val CREATED_AT_FIELD = "createdAt"
-        private const val PAID_AT_FIELD = "paidAt"
+        private const val UPDATE_AT_FIELD = "updatedAt"
         private const val RATING_COUNT_FIELD_USER = "ratingCount"
         private const val PAYMENT_RATING_FIELD_USER = "paymentRating"
     }
