@@ -61,6 +61,7 @@ import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.avatar.Avatar
+import com.avilesrodriguez.presentation.avatar.DEFAULT_AVATAR_USER
 import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.StatItem
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
@@ -435,7 +436,8 @@ private fun InfoGeneralProvider(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Absolute.Left
         ) {
-            Avatar(photoUri = provider.photoUrl, size = 42.dp)
+            val photo = provider.photoUrl.ifEmpty { DEFAULT_AVATAR_USER }
+            Avatar(photoUri = photo, size = 42.dp)
             Spacer(modifier = Modifier.width(24.dp))
             Column(
                 modifier = Modifier

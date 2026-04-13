@@ -35,16 +35,21 @@ class ProductProviderDataSource @Inject constructor(
 
     suspend fun updateProductProvider(id: String, updates: Map<String, Any>) {
         if(id.isEmpty()) return
-        val firestoreUpdates = updates.mapValues { entry ->
-            if ((entry.key == CREATED_AT_FIELD || entry.key == UPDATED_AT_FIELD) && entry.value is Long) {
-                Timestamp(Date(entry.value as Long))
-            } else {
-                entry.value
+        val finalUpdates = updates.mapValues { (key, value) ->
+            when {
+                (key == CREATED_AT_FIELD || key == UPDATED_AT_FIELD) && value is Long -> {
+                    Timestamp(Date(value))
+                }
+                key == PAY_BY_REFERRAL_FIELD && value is String -> {
+                    value.toDoubleOrNull() ?: 0.0
+                }
+                else -> value
             }
         }
+
         firestore.collection(PRODUCTS_PROVIDER_COLLECTION)
             .document(id)
-            .update(firestoreUpdates)
+            .update(finalUpdates)
             .await()
     }
 
@@ -203,6 +208,7 @@ class ProductProviderDataSource @Inject constructor(
         private const val  NAME_LOWER_CASE_FIELD = "nameLowercase"
         private const val INDUSTRY_FIELD = "industry"
         private const val ID_FIELD = "id"
+        private const val PAY_BY_REFERRAL_FIELD = "payByReferral"
 
     }
 }

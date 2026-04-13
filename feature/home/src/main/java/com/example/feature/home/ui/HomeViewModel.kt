@@ -180,14 +180,35 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             }
-            combine(_searchText, _selectedIndustry) { text, industry ->
-                Pair(text, industry)
-            }
-                .debounce(300)
-                .distinctUntilChanged()
-                .collect { (query, industry) ->
-                    loadInitialProducts(industry = industry, namePrefix = query)
+            // launch para que work in parallel
+            launch {
+                combine(_allProductsRealTime, _isPaginationActive) { products, isPaginating ->
+                    Pair(products, isPaginating)
                 }
+                    .debounce(300)
+                    .distinctUntilChanged { old, new ->
+                        // Si el nuevo estado es "paginando", bloqueamos la emisión (true)
+                        if (new.second) return@distinctUntilChanged true
+                        old == new
+                    }
+                    .collect {
+                        loadInitialProducts(
+                            industry = _selectedIndustry.value,
+                            namePrefix = _searchText.value
+                        )
+                    }
+            }
+
+            launch {
+                combine(_searchText, _selectedIndustry) { text, industry ->
+                    Pair(text, industry)
+                }
+                    .debounce(300)
+                    .distinctUntilChanged()
+                    .collect { (query, industry) ->
+                        loadInitialProducts(industry = industry, namePrefix = query)
+                    }
+            }
         }
     }
 
@@ -195,7 +216,7 @@ class HomeViewModel @Inject constructor(
         _searchText.value = newText
     }
 
-    fun onIndustryChange(industry: Int){
+    fun onIndustryChange(industry: Int) {
         val filteredNameIndustry = IndustriesType.getById(industry)
         _selectedIndustry.value = filteredNameIndustry
     }
@@ -231,14 +252,9 @@ class HomeViewModel @Inject constructor(
     fun onViewMoreProducts() {
         _isPaginationActive.value = true
         launchCatching {
-            combine(_searchText, _selectedIndustry) { text, industry ->
-                Pair(text, industry)
-            }
-                .debounce(300)
-                .distinctUntilChanged()
-                .collect { (query, industry) ->
-                    loadInitialProducts(industry = industry, namePrefix = query)
-                }
+            val query = _searchText.value
+            val industry = _selectedIndustry.value
+            loadInitialProducts(industry = industry, namePrefix = query)
         }
     }
     

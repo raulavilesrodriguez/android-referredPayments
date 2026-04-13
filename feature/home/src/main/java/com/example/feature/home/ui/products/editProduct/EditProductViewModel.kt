@@ -109,7 +109,7 @@ class EditProductViewModel @Inject constructor(
                 "name" to currentProduct.name,
                 "nameLowercase" to currentProduct.nameLowercase,
                 "description" to currentProduct.description,
-                "payByReferral" to currentProduct.payByReferral,
+                "payByReferral" to currentProduct.payByReferral.toDouble(),
                 "updatedAt" to System.currentTimeMillis()
             )
             val productId = currentProduct.id
