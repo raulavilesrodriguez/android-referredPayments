@@ -158,13 +158,6 @@ fun HomeScreenProvider(
 
     Box(modifier = Modifier.fillMaxSize()){
         Column(modifier = Modifier.fillMaxSize()) {
-            BalanceCardProvider(
-                paidReferrals = referralsMetrics.paidReferrals.toString(),
-                iconPaidReferrals = Icons.Default.People,
-                moneyPaid = provider.moneyPaid.toString(),
-                iconMoneyPaid = Icons.Default.AccountBalanceWallet,
-                onPaymentView = onPaymentView
-            )
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
@@ -172,6 +165,15 @@ fun HomeScreenProvider(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 state = listState
             ) {
+                item {
+                    BalanceCardProvider(
+                        paidReferrals = referralsMetrics.paidReferrals.toString(),
+                        iconPaidReferrals = Icons.Default.People,
+                        moneyPaid = provider.moneyPaid.toString(),
+                        iconMoneyPaid = Icons.Default.AccountBalanceWallet,
+                        onPaymentView = onPaymentView
+                    )
+                }
                 item {
                     LazyRow(
                         modifier = Modifier

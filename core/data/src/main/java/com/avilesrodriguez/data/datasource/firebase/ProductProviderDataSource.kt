@@ -123,13 +123,17 @@ class ProductProviderDataSource @Inject constructor(
                 .whereGreaterThanOrEqualTo(NAME_LOWER_CASE_FIELD, normalizedPrefix)
                 .whereLessThanOrEqualTo(NAME_LOWER_CASE_FIELD, normalizedPrefix + "\uf8ff")
                 .orderBy(ID_FIELD)
+
+            if (lastProduct != null) {
+                query = query.startAfter(lastProduct.nameLowercase, lastProduct.id)
+            }
         } else {
             query = query.orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING).orderBy(ID_FIELD)
-        }
 
-        if (lastProduct != null) {
-            val lastTimestamp = Timestamp(Date(lastProduct.createdAt))
-            query = query.startAfter(lastTimestamp, lastProduct.id)
+            if (lastProduct != null) {
+                val lastTimestamp = Timestamp(Date(lastProduct.createdAt))
+                query = query.startAfter(lastTimestamp, lastProduct.id)
+            }
         }
 
         query = query.limit(pageSize)
@@ -160,13 +164,17 @@ class ProductProviderDataSource @Inject constructor(
                 .whereGreaterThanOrEqualTo(NAME_LOWER_CASE_FIELD, normalizedPrefix)
                 .whereLessThanOrEqualTo(NAME_LOWER_CASE_FIELD, normalizedPrefix + "\uf8ff")
                 .orderBy(ID_FIELD)
+
+            if (lastProduct != null) {
+                query = query.startAfter(lastProduct.nameLowercase, lastProduct.id)
+            }
         } else {
             query = query.orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING).orderBy(ID_FIELD)
-        }
 
-        if (lastProduct != null) {
-            val lastTimestamp = Timestamp(Date(lastProduct.createdAt))
-            query = query.startAfter(lastTimestamp, lastProduct.id)
+            if (lastProduct != null) {
+                val lastTimestamp = Timestamp(Date(lastProduct.createdAt))
+                query = query.startAfter(lastTimestamp, lastProduct.id)
+            }
         }
 
         query = query.limit(pageSize)

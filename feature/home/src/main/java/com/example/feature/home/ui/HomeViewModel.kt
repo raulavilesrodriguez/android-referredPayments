@@ -214,11 +214,15 @@ class HomeViewModel @Inject constructor(
 
     fun updateSearchText(newText: String) {
         _searchText.value = newText
+        lastProductViewModel = null
+        allProductsLoaded = false
     }
 
     fun onIndustryChange(industry: Int) {
         val filteredNameIndustry = IndustriesType.getById(industry)
         _selectedIndustry.value = filteredNameIndustry
+        lastProductViewModel = null
+        allProductsLoaded = false
     }
 
     private fun loadRealData() {
