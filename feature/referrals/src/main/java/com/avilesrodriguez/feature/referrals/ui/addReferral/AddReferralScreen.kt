@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +42,7 @@ fun AddReferralScreen(
     viewModel: AddReferralViewModel = hiltViewModel()
 ){
     val addReferralState by viewModel.addReferralState.collectAsState()
+    val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
     AddReferralScreenContent(
@@ -50,6 +52,8 @@ fun AddReferralScreen(
         onEmailChange = viewModel::onEmailChange,
         onNumberPhoneChange = viewModel::onNumberPhoneChange,
         onSaveClick = {
+            focusManager.clearFocus()
+            keyboardController?.hide()
             viewModel.onSaveClick(providerId, productId, openAndPopUp)
                       },
         onCancel = { onBackClick() }
