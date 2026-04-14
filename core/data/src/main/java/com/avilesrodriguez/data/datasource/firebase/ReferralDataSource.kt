@@ -4,6 +4,7 @@ import android.util.Log
 import com.avilesrodriguez.data.datasource.firebase.model.ReferralFirestore
 import com.avilesrodriguez.data.datasource.firebase.model.toReferralDomain
 import com.avilesrodriguez.data.datasource.firebase.model.toReferralFirestore
+import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -121,7 +122,7 @@ class ReferralDataSource @Inject constructor(
     fun searchReferralsByClient(namePrefix: String, currentUserId: String): Flow<List<Referral>> {
         val query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(CLIENT_ID_FIELD, currentUserId)
-            .orderBy(ORDER_BY_FIELD_LOWER, Query.Direction.ASCENDING)
+            .orderBy(NAME_LOWER_CASE_FIELD, Query.Direction.ASCENDING)
             .startAt(namePrefix)
             .endAt(namePrefix + "\uf8ff")
         return createReferralFlow(query)
@@ -130,7 +131,7 @@ class ReferralDataSource @Inject constructor(
     fun searchReferralsByProvider(namePrefix: String, currentUserId: String): Flow<List<Referral>> {
         val query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(PROVIDER_ID_FIELD, currentUserId)
-            .orderBy(ORDER_BY_FIELD_LOWER, Query.Direction.ASCENDING)
+            .orderBy(NAME_LOWER_CASE_FIELD, Query.Direction.ASCENDING)
             .startAt(namePrefix)
             .endAt(namePrefix + "\uf8ff")
         return createReferralFlow(query)
@@ -144,7 +145,7 @@ class ReferralDataSource @Inject constructor(
         val query = firestore.collection(REFERRALS_COLLECTION)
             .whereEqualTo(CLIENT_ID_FIELD, clientId)
             .whereEqualTo(PROVIDER_ID_FIELD, providerId)
-            .orderBy(ORDER_BY_FIELD_LOWER, Query.Direction.ASCENDING)
+            .orderBy(NAME_LOWER_CASE_FIELD, Query.Direction.ASCENDING)
             .startAt(namePrefix)
             .endAt(namePrefix + "\uf8ff")
         return createReferralFlow(query)
@@ -204,7 +205,7 @@ class ReferralDataSource @Inject constructor(
         }
 
         // Ordenamos por creación y limitamos a la cantidad actual de la página
-        query = query.orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING)
+        query = query.orderBy(UPDATE_AT_FIELD, Query.Direction.DESCENDING)
             .limit(limit)
 
         return createReferralFlow(query)
@@ -222,10 +223,55 @@ class ReferralDataSource @Inject constructor(
             query = query.whereEqualTo(STATUS_FIELD, status)
         }
 
-        query = query.orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING)
+        query = query.orderBy(UPDATE_AT_FIELD, Query.Direction.DESCENDING)
             .limit(limit)
 
         return createReferralFlow(query)
+    }
+
+    suspend fun getReferrals(
+        userId: String,
+        pageSize: Long,
+        namePrefix: String,
+        status: String? = null,
+        lastReferral: Referral? = null,
+        isClient: Boolean = false
+    ) : Pair<List<Referral>, Referral?>{
+        val typeUser = if (isClient) CLIENT_ID_FIELD else PROVIDER_ID_FIELD
+        var query = firestore.collection(REFERRALS_COLLECTION)
+            .whereEqualTo(typeUser, userId)
+
+        if (!status.isNullOrBlank()) {
+            query = query.whereEqualTo(STATUS_FIELD, status)
+        }
+
+        if(namePrefix.isNotEmpty()){
+            val normalizedPrefix = namePrefix.normalizeName()
+            query = query.orderBy(NAME_LOWER_CASE_FIELD)
+                .whereGreaterThanOrEqualTo(NAME_LOWER_CASE_FIELD, normalizedPrefix)
+                .whereLessThanOrEqualTo(NAME_LOWER_CASE_FIELD, normalizedPrefix + "\uf8ff")
+                .orderBy(ID_FIELD)
+
+            if(lastReferral != null){
+                query = query.startAfter(lastReferral.nameLowercase, lastReferral.id)
+            }
+        }else{
+            query = query.orderBy(CREATED_AT_FIELD, Query.Direction.DESCENDING).orderBy(ID_FIELD)
+
+            if(lastReferral != null){
+                val lastTimestamp = Timestamp(Date(lastReferral.createdAt))
+                query = query.startAfter(lastTimestamp, lastReferral.id)
+            }
+        }
+        query = query.limit(pageSize)
+        val snapshot = query.get().await()
+
+        val referrals = snapshot.documents.mapNotNull {
+            it.toObject(ReferralFirestore::class.java)?.toReferralDomain()
+        }
+
+        val last = referrals.lastOrNull()
+        return referrals to last
     }
 
     fun getReferralsByClientSince(
@@ -401,10 +447,11 @@ class ReferralDataSource @Inject constructor(
         private const val PROVIDER_ID_FIELD = "providerId"
         private const val STATUS_FIELD = "status"
         private const val VOUCHER_URL_FIELD = "voucherUrl"
-        private const val ORDER_BY_FIELD_LOWER = "nameLowercase"
+        private const val NAME_LOWER_CASE_FIELD = "nameLowercase"
         private const val CREATED_AT_FIELD = "createdAt"
         private const val UPDATE_AT_FIELD = "updatedAt"
         private const val RATING_COUNT_FIELD_USER = "ratingCount"
         private const val PAYMENT_RATING_FIELD_USER = "paymentRating"
+        private const val ID_FIELD = "id"
     }
 }
