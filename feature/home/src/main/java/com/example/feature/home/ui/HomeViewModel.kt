@@ -118,9 +118,9 @@ class HomeViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     private var lastProductViewModel: ProductProvider? = null
     private var allProductsLoaded = false
-    private val pageSize: Long = 3L
-    private val pageSizeRealTime: Long = 2L
-    private val pageSizeLoadMore: Long = 1L
+    private val pageSize: Long = 30L
+    private val pageSizeRealTime: Long = 15L
+    private val pageSizeLoadMore: Long = 20L
     private var referralsJob: Job? = null
     private var userMetricsJob: Job? = null
     private var paginationJob: Job? = null

@@ -68,9 +68,9 @@ class ReferralsViewModel @Inject constructor(
     val referralsState: StateFlow<List<Referral>> = _referralsState.asStateFlow()
     private var allReferralsLoaded = false
     private var lastReferralViewModel: Referral? = null
-    private val pageSize: Long = 3L
-    private val pageSizeRealTime: Long = 2L
-    private val pageSizeLoadMore: Long = 1L
+    private val pageSize: Long = 30L
+    private val pageSizeRealTime: Long = 15L
+    private val pageSizeLoadMore: Long = 20L
     private var realTimeJob: Job? = null
     private var paginationJob: Job? = null
 
