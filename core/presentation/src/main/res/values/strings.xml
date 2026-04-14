@@ -123,6 +123,9 @@
     <string name="no_have_referreds">You don\'t have referreds</string>
     <string name="referring_to">Referring to: %s</string>
     <string name="referred_from">Referred from: %s</string>
+    <string name="contact_number">Contact Number: %s</string>
+    <string name="view_more_referrals">View more referrals</string>
+    <string name="view_recent_referrals">View recent referrals</string>
     <string name="referring">Referring to</string>
     <string name="referral">Referred from</string>
     <string name="created">Created: %s</string>

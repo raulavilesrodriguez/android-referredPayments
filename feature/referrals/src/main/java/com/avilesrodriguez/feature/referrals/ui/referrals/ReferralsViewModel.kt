@@ -30,6 +30,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
@@ -90,6 +92,14 @@ class ReferralsViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val showViewMoreButton: StateFlow<Boolean> = combine(
+        _referralsState,
+        referralsStateRealTime,
+        _isPaginationActive
+    ){ referrals, filteredRealTime, active ->
+        filteredRealTime.size < referrals.size && !active
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     val currentUserId
         get() = currentUserIdUseCase()
 
@@ -100,6 +110,37 @@ class ReferralsViewModel @Inject constructor(
                 launch{
                     loadRealData()
                 }
+            }
+            launch {
+                combine(_allReferralsRealTime, _isPaginationActive){referrals, isPaginating ->
+                    Pair(referrals, isPaginating)
+                }
+                    .debounce(300)
+                    .distinctUntilChanged { old, new ->
+                        // Si el nuevo estado es "paginando", bloqueamos la emisión (true)
+                        if (new.second) return@distinctUntilChanged true
+                        old == new
+                    }
+                    .collect {
+                        loadInitialReferrals(
+                            referralStatus = _referralStatus.value,
+                            namePrefix = _searchText.value
+                        )
+                    }
+            }
+
+            launch {
+                combine(_searchText, _referralStatus){ text, status ->
+                    Pair(text, status)
+                }
+                    .debounce(300)
+                    .distinctUntilChanged()
+                    .collect { (query, status) ->
+                        loadInitialReferrals(
+                            referralStatus = status,
+                            namePrefix = query
+                        )
+                    }
             }
         }
     }
@@ -167,6 +208,19 @@ class ReferralsViewModel @Inject constructor(
                 else -> {}
             }
         }
+    }
+
+    fun onViewMoreReferrals(){
+        _isPaginationActive.value = true
+        launchCatching {
+            val query = _searchText.value
+            val status = _referralStatus.value
+            loadInitialReferrals(referralStatus = status, namePrefix = query)
+        }
+    }
+
+    fun onViewRealReferrals(){
+        _isPaginationActive.value = false
     }
 
     private fun loadInitialReferrals(referralStatus: ReferralStatus?, namePrefix: String){
@@ -259,36 +313,6 @@ class ReferralsViewModel @Inject constructor(
                 _isLoading.value = false
             }
 
-        }
-    }
-
-    private fun listenToReferralsByClient(status: String?, limit: Long) {
-        realTimeJob?.cancel()
-        _isLoading.value = true
-        realTimeJob = launchCatching {
-            getReferralsByClientRealTimePagination(currentUserId, limit, status)
-                .collect { referrals ->
-                    val enriched = transformToReferralsWithOtherName(referrals, false)
-                    _uiState.value = enriched
-
-                    // Si recibimos menos de lo que pedimos, es que ya no hay más en la DB
-                    allReferralsLoaded = referrals.size < limit
-                    _isLoading.value = false
-                }
-        }
-    }
-
-    private fun listenToReferralsByProvider(status: String?, limit: Long){
-        realTimeJob?.cancel()
-        _isLoading.value = true
-        realTimeJob = launchCatching {
-            getReferralsByProviderRealTimePagination(currentUserId, limit, status)
-                .collect { referrals ->
-                    val enriched = transformToReferralsWithOtherName(referrals, true)
-                    _uiState.value = enriched
-                    allReferralsLoaded = referrals.size < limit
-                    _isLoading.value = false
-                }
         }
     }
 

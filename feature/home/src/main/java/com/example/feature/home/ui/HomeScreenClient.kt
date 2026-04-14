@@ -1,6 +1,5 @@
 package com.example.feature.home.ui
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -145,7 +144,6 @@ fun HomeScreenClient(
             .distinctUntilChanged()
             .collect { shouldLoad ->
                 if(shouldLoad){
-                    Log.d("HomeScreenClient", "Loading more products OJOO...")
                     loadMoreProducts()
                 }
             }
@@ -330,7 +328,7 @@ fun HomeScreenClient(
                             }
                         }
                     }
-                    if(isLoading && products.isEmpty()){
+                    if(isLoading && products.isNotEmpty()){
                         item{
                             Box(Modifier
                                 .fillMaxWidth()

@@ -204,6 +204,9 @@
     <string name="pending">Pendiente</string>
     <string name="processing">Procesando</string>
     <string name="rejected">Rechazado</string>
+    <string name="contact_number">Número de Contacto: %s</string>
+    <string name="view_more_referrals">Ver más referidos</string>
+    <string name="view_recent_referrals">Ver referidos recientes</string>
     <string name="referring">Refiriendo a</string>
     <string name="error_webSite">Por favor, ingrese una válida URL de la página web</string>
     <string name="rating">Rating</string>

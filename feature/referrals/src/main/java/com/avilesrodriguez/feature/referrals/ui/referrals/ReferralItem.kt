@@ -1,6 +1,6 @@
 package com.avilesrodriguez.feature.referrals.ui.referrals
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +26,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
@@ -34,12 +33,85 @@ import com.avilesrodriguez.presentation.ext.toColor
 import com.avilesrodriguez.presentation.ext.toDisplayName
 import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.fakeData.referral
-import com.avilesrodriguez.presentation.fakeData.userClient
-import com.avilesrodriguez.presentation.fakeData.userProvider
 import com.avilesrodriguez.presentation.time.formatTimestamp
+
 
 @Composable
 fun ReferralItem(
+    referral: Referral,
+    onReferralClick: (String) -> Unit,
+    isRealTime: Boolean
+){
+    val createdAt = formatTimestamp(referral.createdAt)
+    val updatedAt = formatTimestamp(referral.updatedAt)
+    val dateToShow = if(isRealTime) stringResource(R.string.updated_value, updatedAt)
+    else stringResource(R.string.created, createdAt)
+
+    Card(
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .fillMaxWidth()
+            .clickable { onReferralClick(referral.id) }
+            .clip(RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ){
+            Column{
+                Text(
+                    text = referral.name.truncate(20),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = stringResource(R.string.contact_number, referral.numberPhone),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+                Text(
+                    text = dateToShow,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Column(
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.padding(start = 8.dp)
+            ) {
+                val status = referral.status.toDisplayName()
+                val colorBackground = referral.status.toColor()
+                Icon(
+                    imageVector = Icons.Default.Circle,
+                    contentDescription = null,
+                    tint = colorBackground,
+                    modifier = Modifier.size(32.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(status),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colorBackground
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ReferralFullItem(
     referral: Referral,
     otherPartyName: String,
     user: UserData?,
@@ -124,8 +196,8 @@ fun ReferralItemClientPreview(){
     MaterialTheme {
         ReferralItem(
             referral = referral,
-            otherPartyName = userClient.name?:"",
-            user = userProvider
+            onReferralClick = {},
+            isRealTime = false
         )
     }
 }
