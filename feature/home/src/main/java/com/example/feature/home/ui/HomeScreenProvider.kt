@@ -64,6 +64,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -142,6 +143,14 @@ fun HomeScreenProvider(
 
     // Detectamos si el usuario tiene el dedo en la pantalla moviendo la lista
     val isDragged by listState.interactionSource.collectIsDraggedAsState()
+
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(isDragged) {
+        if (isDragged) {
+            focusManager.clearFocus()
+        }
+    }
 
     LaunchedEffect(listState) {
         snapshotFlow {
