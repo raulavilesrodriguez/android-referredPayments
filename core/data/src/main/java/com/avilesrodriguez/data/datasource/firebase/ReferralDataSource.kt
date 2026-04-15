@@ -343,7 +343,7 @@ class ReferralDataSource @Inject constructor(
             query = query.whereLessThanOrEqualTo(dateField, toLocalEndOfDayTimestamp(it))
         }
 
-        query = query.orderBy(dateField, Query.Direction.DESCENDING)
+        query = query.orderBy(dateField, Query.Direction.DESCENDING).orderBy(ID_FIELD)
         query = query.limit(pageSize)
 
         if (lastReferral != null) {
@@ -387,7 +387,7 @@ class ReferralDataSource @Inject constructor(
             query = query.whereLessThanOrEqualTo(dateField, toLocalEndOfDayTimestamp(it))
         }
 
-        query = query.orderBy(dateField, Query.Direction.DESCENDING)
+        query = query.orderBy(dateField, Query.Direction.DESCENDING).orderBy(ID_FIELD)
         query = query.limit(pageSize)
 
         if (lastReferral != null) {
