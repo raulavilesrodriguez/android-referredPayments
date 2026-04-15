@@ -347,10 +347,9 @@ class ReferralDataSource @Inject constructor(
         query = query.limit(pageSize)
 
         if (lastReferral != null) {
-            val lastDoc = firestore.collection(REFERRALS_COLLECTION).document(lastReferral.id).get().await()
-            if (lastDoc.exists()) {
-                query = query.startAfter(lastDoc)
-            }
+            val lastDateValue = if(isPaymentsScreen) lastReferral.updatedAt else lastReferral.createdAt
+            val lastTimestamp = Timestamp(Date(lastDateValue))
+            query = query.startAfter(lastTimestamp, lastReferral.id)
         }
 
         val snapshot = query.get().await()
@@ -392,10 +391,9 @@ class ReferralDataSource @Inject constructor(
         query = query.limit(pageSize)
 
         if (lastReferral != null) {
-            val lastDoc = firestore.collection(REFERRALS_COLLECTION).document(lastReferral.id).get().await()
-            if (lastDoc.exists()) {
-                query = query.startAfter(lastDoc)
-            }
+            val lastDateValue = if(isPaymentsScreen) lastReferral.updatedAt else lastReferral.createdAt
+            val lastTimestamp = Timestamp(Date(lastDateValue))
+            query = query.startAfter(lastTimestamp, lastReferral.id)
         }
 
         val snapshot = query.get().await()

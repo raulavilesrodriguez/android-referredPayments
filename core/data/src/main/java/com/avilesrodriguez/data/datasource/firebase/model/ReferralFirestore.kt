@@ -36,7 +36,7 @@ fun Referral.toReferralFirestore(): ReferralFirestore {
         status = status.name, // "PENDING", "PAID", etc.
         createdAt = Timestamp(Date(createdAt)),
         amountPaid = amountPaid,
-        updatedAt = updatedAt?.let { Timestamp(Date(it)) },
+        updatedAt = Timestamp(Date(updatedAt)),
         rating = rating,
         feedbackReason = feedbackReason
     )
@@ -58,13 +58,6 @@ fun ReferralFirestore.toReferralDomain(): Referral{
         }
     }
 
-    fun toNullableLong(value: Any?): Long? {
-        return when (value) {
-            is Timestamp -> value.toDate().time
-            is Long -> value
-            else -> null
-        }
-    }
     return Referral(
         id = id ?: "",
         clientId = clientId ?: "",
@@ -77,7 +70,7 @@ fun ReferralFirestore.toReferralDomain(): Referral{
         status = referralStatusType,
         createdAt = toLong(createdAt),
         amountPaid = amountPaid ?: 0.0,
-        updatedAt = toNullableLong(updatedAt),
+        updatedAt = toLong(updatedAt),
         rating = rating,
         feedbackReason = feedbackReason
     )

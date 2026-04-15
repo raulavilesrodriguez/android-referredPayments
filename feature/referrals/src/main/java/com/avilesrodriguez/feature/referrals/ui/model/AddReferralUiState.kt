@@ -17,7 +17,7 @@ fun AddReferralUiState.toReferral(
     providerId: String,
     productId: String,
     createdAt: Long,
-    updatedAt: Long? = null
+    updatedAt: Long
 ): Referral {
     return Referral(
         clientId = clientId,

@@ -13,7 +13,7 @@ data class AddProduct(
 fun AddProduct.toProductProvider(
     providerId: String,
     createdAt: Long,
-    updatedAt: Long? = null,
+    updatedAt: Long,
     providerName: String = "",
     providerPhotoUrl: String = "",
     providerRating: Double = 0.0,

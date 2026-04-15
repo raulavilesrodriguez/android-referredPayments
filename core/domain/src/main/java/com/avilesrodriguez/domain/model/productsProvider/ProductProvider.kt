@@ -12,7 +12,7 @@ data class ProductProvider(
     val payByReferral: String = "0.0",
     val isActive: Boolean = true,
     val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long? = null,
+    val updatedAt: Long = System.currentTimeMillis(),
     // --- DATOS DENORMALIZADOS (Para la UI del Cliente) ---
     val providerName: String = "",
     val providerPhotoUrl: String = "",
