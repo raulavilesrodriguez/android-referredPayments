@@ -11,4 +11,6 @@ interface IMessageRepository {
     suspend fun markAsDeletedByReceiver(messageId: String)
     suspend fun deleteMessagePermanently(messageId: String)
     suspend fun getMessageById(messageId: String): Message?
+    fun getMessagesByReferralSince(referralId: String, since: Long): Flow<List<Message>>
+    suspend fun getMessagesByReferralPaged(referralId: String, currentUserId: String, pageSize: Long, lastMessage: Message?=null, subjectPrefix: String) : Pair<List<Message>, Message?>
 }

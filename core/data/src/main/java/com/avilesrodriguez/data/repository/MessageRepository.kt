@@ -36,4 +36,18 @@ class MessageRepository @Inject constructor(
     override suspend fun getMessageById(messageId: String): Message? {
         return data.getMessageById(messageId)
     }
+
+    override fun getMessagesByReferralSince(referralId: String, since: Long): Flow<List<Message>> {
+        return data.getMessagesByReferralSince(referralId, since)
+    }
+
+    override suspend fun getMessagesByReferralPaged(
+        referralId: String,
+        currentUserId: String,
+        pageSize: Long,
+        lastMessage: Message?,
+        subjectPrefix: String
+    ): Pair<List<Message>, Message?> {
+        return data.getMessagesByReferralPaged(referralId, currentUserId, pageSize, lastMessage, subjectPrefix)
+    }
 }

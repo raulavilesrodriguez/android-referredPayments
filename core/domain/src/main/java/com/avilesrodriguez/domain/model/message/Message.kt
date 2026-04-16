@@ -1,11 +1,14 @@
 package com.avilesrodriguez.domain.model.message
 
+import com.avilesrodriguez.domain.ext.normalizeName
+
 data class Message(
     val id: String = "",
     val referralId: String = "",
     val senderId: String = "",
     val receiverId: String = "",
     val subject: String = "",
+    val subjectLowercase: String = subject.normalizeName(),
     val content: String = "",
     val attachmentsUrl: List<String> = emptyList(),
     val createdAt: Long = System.currentTimeMillis(),
