@@ -160,10 +160,6 @@ fun HomeScreenClient(
 
     Box(modifier = Modifier.fillMaxSize()){
         Column(modifier = Modifier.fillMaxSize()) {
-            BalanceCard(
-                balance = client?.moneyEarned.toString(),
-                onPaymentView = onPaymentView
-            )
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
@@ -171,6 +167,12 @@ fun HomeScreenClient(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 state = listState
             ) {
+                item{
+                    BalanceCard(
+                        balance = client?.moneyEarned.toString(),
+                        onPaymentView = onPaymentView
+                    )
+                }
                 //Statics
                 item {
                     LazyRow(
