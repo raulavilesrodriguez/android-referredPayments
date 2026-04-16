@@ -1,5 +1,6 @@
 package com.avilesrodriguez.feature.messages.ui.messages
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -98,6 +99,8 @@ class MessagesViewModel @Inject constructor(
     }
 
     fun loadReferralInformation(referralId: String){
+        if (_referralState.value.id == referralId) return
+
         referralJob?.cancel()
         referralJob = launchCatching {
             val referral = getReferralById(referralId)
@@ -183,14 +186,16 @@ class MessagesViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreMessages(referralId: String) {
+    fun loadMoreMessages() {
         if (allMessagesLoaded || paginationJob?.isActive == true || lastMessageViewModel == null) return
+        val referral = _referralState.value
+        if(referral.id.isEmpty()) return
 
         _isLoading.value = true
         paginationJob = launchCatching {
             try {
                 val (moreMessages, lastMessage) = getMessagesByReferralPaged(
-                    referralId = referralId,
+                    referralId = referral.id,
                     currentUserId = currentUserId,
                     pageSize = pageSizeLoadMore,
                     lastMessage = lastMessageViewModel,
@@ -200,11 +205,11 @@ class MessagesViewModel @Inject constructor(
                 if (moreMessages.isNotEmpty()) {
                     val currentMessages = _uiState.value.toMutableList()
                     currentMessages.addAll(moreMessages)
-                    // Evitamos duplicados y mantenemos el orden
                     _uiState.value = currentMessages.distinctBy { it.id }.sortedByDescending { it.createdAt }
                     lastMessageViewModel = lastMessage
                 }
-                allMessagesLoaded = moreMessages.size < pageSize
+                lastMessageViewModel = lastMessage
+                allMessagesLoaded = moreMessages.size < pageSizeLoadMore
             } finally {
                 _isLoading.value = false
             }

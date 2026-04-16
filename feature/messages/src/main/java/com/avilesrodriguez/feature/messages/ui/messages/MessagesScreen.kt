@@ -1,7 +1,13 @@
 package com.avilesrodriguez.feature.messages.ui.messages
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,13 +16,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -30,8 +40,10 @@ import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -86,7 +98,7 @@ fun MessagesScreen(
     openScreen: (String) -> Unit,
     viewModel: MessagesViewModel = hiltViewModel()
 ){
-    LaunchedEffect(Unit) {
+    LaunchedEffect(referralId) {
         viewModel.loadReferralInformation(referralId.orEmpty())
     }
     val uiState by viewModel.uiState.collectAsState()
@@ -172,7 +184,8 @@ fun MessagesScreen(
                         providerThatReceived = providerThatReceived,
                         referral = referralState,
                         onNewMessageClick = { detailContent = MessagesContent.NewMessage(referralState.id)
-                            coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) } }
+                            coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) } },
+                        loadMoreMessages = viewModel::loadMoreMessages
                     )
                 }
             },
@@ -220,8 +233,19 @@ private fun MessagesScreenContent(
     clientWhoReferred: UserData?,
     providerThatReceived: UserData?,
     referral: Referral,
-    onNewMessageClick: () -> Unit
+    onNewMessageClick: () -> Unit,
+    loadMoreMessages: () -> Unit
 ){
+
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    // boton scroll to top
+    val showScrollToTopButton by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex > 2
+        }
+    }
+
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -233,15 +257,42 @@ private fun MessagesScreenContent(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.primary,
-                onClick = onNewMessageClick
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
+                AnimatedVisibility(
+                    visible = showScrollToTopButton,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    SmallFloatingActionButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                listState.animateScrollToItem(0)
+                            }
+                        },
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowUp,
+                            contentDescription = "Go Up",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
+
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    onClick = onNewMessageClick
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
         },
         content = { innerPadding ->
@@ -254,6 +305,8 @@ private fun MessagesScreenContent(
                 clientWhoReferred = clientWhoReferred,
                 providerThatReceived = providerThatReceived,
                 isLoading = isLoading,
+                loadMoreMessages = loadMoreMessages,
+                listState = listState,
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -270,39 +323,22 @@ private fun InBox(
     clientWhoReferred: UserData?,
     providerThatReceived: UserData?,
     isLoading: Boolean,
+    loadMoreMessages: () -> Unit,
+    listState: LazyListState,
     modifier: Modifier = Modifier
 ){
     Column(modifier = modifier.fillMaxSize()){
-        SearchFieldBasic(
-            value = searchText,
+        MessagesList(
+            searchText = searchText,
             onValueChange = onValueChange,
-            placeholder = R.string.search_in_mail,
-            trailingIcon = R.drawable.search,
-            modifier = Modifier
-                .padding(16.dp)
+            onMessageClick = onMessageClick,
+            messages = messages,
+            currentUserId = user?.uid?:"",
+            clientWhoReferred = clientWhoReferred,
+            providerThatReceived = providerThatReceived,
+            loadMoreMessages = loadMoreMessages,
+            isLoading = isLoading,
+            listState = listState
         )
-        Box(modifier = Modifier.weight(1f).fillMaxWidth()){
-            if(!isLoading){
-                if(messages.isNotEmpty()){
-                    MessagesList(
-                        onMessageClick = onMessageClick,
-                        messages = messages,
-                        currentUserId = user?.uid?:"",
-                        clientWhoReferred = clientWhoReferred,
-                        providerThatReceived = providerThatReceived)
-                } else {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text= stringResource(R.string.no_have_emails))
-                    }
-                }
-            } else {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(8.dp)
-                    )
-                }
-            }
-        }
     }
 }
