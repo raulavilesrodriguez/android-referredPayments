@@ -4,6 +4,7 @@ import {
 } from "firebase-functions/v2/firestore";
 import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
+import {onRequest} from "firebase-functions/v2/https";
 
 // Inicializa el SDK de administrador si no se ha hecho
 if (admin.apps.length === 0) {
@@ -145,5 +146,110 @@ export const onProviderProfileUpdated = onDocumentUpdated(
     }
 
     logger.log(`Actualización finalizada. Total productos: ${totalUpdated}`);
+  }
+);
+
+/**
+ * Webhook para recibir notificaciones de pagos desde PayPhone.
+ */
+export const payphoneWebhook = onRequest(
+  {secrets: ["PAYPHONE_WEBHOOK_SECRET"]},
+  async (req, res) => {
+    // Seguridad validar Token secreto en la URL (?secret=)
+    const WEBHOOK_SECRET = process.env.PAYPHONE_WEBHOOK_SECRET;
+    if (req.query.secret !== WEBHOOK_SECRET) {
+      logger.warn("Intento de acceso no autorizado al Webhook.");
+      res.status(403).json({"Response": false, "ErrorCode": "222"});
+      return;
+    }
+
+    // Validar que sea un POST
+    if (req.method !== "POST") {
+      res.status(405).json({
+        "Response": false,
+        "ErrorCode": "222",
+      });
+      return;
+    }
+
+    const data = req.body;
+
+    // Validar si los datos necesarios vienen en el body
+    if (!data || !data.TransactionId || !data.ClientTransactionId) {
+      res.status(400).json({
+        "Response": false,
+        "ErrorCode": "444", // Error en variables requeridas
+      });
+      return;
+    }
+
+    // Solo procesamos si el estado es aprobado
+    if (data.TransactionStatus === "Approved" && data.StatusCode === 3) {
+      const uid = data.ClientTransactionId;
+      const transactionId = data.TransactionId;
+      const amount = data.Amount;
+      const authorizationCode = data.AuthorizationCode;
+
+      try {
+        const db = admin.firestore();
+
+        // Verificar si la transacción ya fue procesada anteriormente
+        const paymentDoc = await db.collection("payments")
+          .doc(transactionId.toString()).get();
+
+        if (paymentDoc.exists) {
+          res.status(200).json({
+            "Response": false,
+            "ErrorCode": "333",
+          });
+          return;
+        }
+
+        // Actualizar el usuario en Firestore
+        await db.runTransaction(async (t) => {
+          const userRef = db.collection("users").doc(uid);
+          const userDoc = await t.get(userRef);
+          if (!userDoc.exists) throw new Error("User not found");
+
+          const userData = userDoc.data();
+          const currentLimit = userData?.referralLimit || 100;
+
+          t.update(userRef, {referralLimit: currentLimit + 100});
+
+          // Guardar registro del pago
+          const paymentId = transactionId.toString();
+          const paymentRef = db.collection("payments").doc(paymentId);
+          t.set(paymentRef, {
+            id: paymentId,
+            uid: uid,
+            amount: amount / 100,
+            authorizationCode: authorizationCode,
+            date: admin.firestore.FieldValue.serverTimestamp(),
+            status: "SUCCESS",
+          });
+        });
+
+        logger.log(`Pago aprobado y procesado para el usuario: ${uid}`);
+
+        // RESPUESTA EXITOSA
+        res.status(200).json({
+          "Response": true,
+          "ErrorCode": "000",
+        });
+      } catch (error) {
+        logger.error("Error procesando notificación de PayPhone:", error);
+        res.status(500).json({
+          "Response": false,
+          "ErrorCode": "222", // Error genérico en el servidor
+        });
+      }
+    } else {
+      // Si la transacción no es aprobada (ej. Canceled), respondemos éxito
+      // para que PayPhone no reintente, pero no actualizamos nada.
+      res.status(200).json({
+        "Response": true,
+        "ErrorCode": "000",
+      });
+    }
   }
 );
