@@ -1,5 +1,6 @@
 package com.example.feature.home.ui
 
+import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -64,6 +66,7 @@ import com.example.feature.home.ui.products.addProduct.AddProductScreen
 import com.example.feature.home.ui.products.detailProduct.DetailProductScreen
 import kotlinx.coroutines.launch
 import java.util.Locale
+import androidx.core.net.toUri
 
 sealed class HomeDetailContent {
     data object Payments : HomeDetailContent()
@@ -117,6 +120,17 @@ fun HomeScreen(
     val showButton by viewModel.showViewMoreButton.collectAsState()
     val productsRealTime by viewModel.productsStateRealTime.collectAsState()
     val products by viewModel.productsState.collectAsState()
+    val paymentResponse by viewModel.paymentResponse.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(paymentResponse) {
+        paymentResponse?.let { response ->
+            val intent = Intent(Intent.ACTION_VIEW, response.url.toUri())
+            context.startActivity(intent)
+            // para que no se abra si la pantalla se recompone
+            viewModel.onPaymentLinkOpened()
+        }
+    }
 
     val options = ActionOptionsHome.getOptions()
     val industryOptions = IndustriesType.options(true)

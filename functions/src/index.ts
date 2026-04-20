@@ -165,10 +165,7 @@ export const payphoneWebhook = onRequest(
 
     // Validar que sea un POST
     if (req.method !== "POST") {
-      res.status(405).json({
-        "Response": false,
-        "ErrorCode": "222",
-      });
+      res.status(405).json({"Response": false, "ErrorCode": "222"});
       return;
     }
 
@@ -176,16 +173,13 @@ export const payphoneWebhook = onRequest(
 
     // Validar si los datos necesarios vienen en el body
     if (!data || !data.TransactionId || !data.ClientTransactionId) {
-      res.status(400).json({
-        "Response": false,
-        "ErrorCode": "444", // Error en variables requeridas
-      });
+      res.status(400).json({"Response": false, "ErrorCode": "444"});
       return;
     }
 
     // Solo procesamos si el estado es aprobado
     if (data.TransactionStatus === "Approved" && data.StatusCode === 3) {
-      const uid = data.ClientTransactionId;
+      const shortId = data.ClientTransactionId; // ID corto de 15 chars
       const transactionId = data.TransactionId;
       const amount = data.Amount;
       const authorizationCode = data.AuthorizationCode;
@@ -193,65 +187,150 @@ export const payphoneWebhook = onRequest(
       try {
         const db = admin.firestore();
 
-        // Verificar si la transacción ya fue procesada anteriormente
+        // 1. Verificar si el ID corto existe en los intentos de pago
+        const attemptDoc = await db.collection("payment_attempts")
+          .doc(shortId).get();
+
+        if (!attemptDoc.exists) {
+          logger.error(`Intento de pago no encontrado para el ID: ${shortId}`);
+          res.status(404).json({"Response": false, "ErrorCode": "444"});
+          return;
+        }
+
+        const realUid = attemptDoc.data()?.uid; // El UID de 28 caracteres
+
+        // 2. Verificar si la transacción ya fue procesada anteriormente
         const paymentDoc = await db.collection("payments")
           .doc(transactionId.toString()).get();
 
         if (paymentDoc.exists) {
-          res.status(200).json({
-            "Response": false,
-            "ErrorCode": "333",
-          });
+          res.status(200).json({"Response": false, "ErrorCode": "333"});
           return;
         }
 
-        // Actualizar el usuario en Firestore
+        // 3. Actualizar el usuario real de 28 caracteres
         await db.runTransaction(async (t) => {
-          const userRef = db.collection("users").doc(uid);
+          const userRef = db.collection("users").doc(realUid);
           const userDoc = await t.get(userRef);
-          if (!userDoc.exists) throw new Error("User not found");
+
+          if (!userDoc.exists) throw new Error("User real not found");
 
           const userData = userDoc.data();
           const currentLimit = userData?.referralLimit || 100;
 
+          // Aumentar el límite
           t.update(userRef, {referralLimit: currentLimit + 100});
 
-          // Guardar registro del pago
+          // Guardar registro del pago vinculado al UID real
           const paymentId = transactionId.toString();
           const paymentRef = db.collection("payments").doc(paymentId);
           t.set(paymentRef, {
             id: paymentId,
-            uid: uid,
+            shortId: shortId,
+            uid: realUid,
             amount: amount / 100,
             authorizationCode: authorizationCode,
             date: admin.firestore.FieldValue.serverTimestamp(),
             status: "SUCCESS",
           });
+
+          // Opcional: Marcar el intento como procesado
+          t.update(attemptDoc.ref, {status: "PROCESSED"});
         });
 
-        logger.log(`Pago aprobado y procesado para el usuario: ${uid}`);
+        logger.log(`Pago aprobado y procesado para el usuario: ${realUid}`);
 
-        // RESPUESTA EXITOSA
-        res.status(200).json({
-          "Response": true,
-          "ErrorCode": "000",
-        });
+        res.status(200).json({"Response": true, "ErrorCode": "000"});
       } catch (error) {
         logger.error("Error procesando notificación de PayPhone:", error);
-        res.status(500).json({
-          "Response": false,
-          "ErrorCode": "222", // Error genérico en el servidor
-        });
+        res.status(500).json({"Response": false, "ErrorCode": "222"});
       }
     } else {
-      // Si la transacción no es aprobada (ej. Canceled), respondemos éxito
-      // para que PayPhone no reintente, pero no actualizamos nada.
-      res.status(200).json({
-        "Response": true,
-        "ErrorCode": "000",
-      });
+      res.status(200).json({"Response": true, "ErrorCode": "000"});
     }
   }
 );
 
+/**
+ * Genera un link de pago dinámico vinculado a un usuario de 28 caracteres.
+ */
+export const createPaymentLink = onRequest(
+  {secrets: ["PAYPHONE_TOKEN", "PAYPHONE_STORE_ID"]},
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).send("Method Not Allowed");
+      return;
+    }
 
+    const {uid, amount} = req.body; // uid de 28 caracteres
+
+    if (!uid || !amount) {
+      res.status(400).send("Faltan parámetros: uid y amount son obligatorios");
+      return;
+    }
+
+    try {
+      const db = admin.firestore();
+
+      // Creamos un ID aleatorio de 15 caracteres para PayPhone
+      const shortId = Math.random().toString(36).substring(2, 12)
+        .toUpperCase() + Date.now().toString().slice(-5);
+
+      // Guardamos la relación entre el ID corto y el UID real de 28 chars
+      await db.collection("payment_attempts").doc(shortId).set({
+        shortId: shortId,
+        uid: uid,
+        amount: amount,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        status: "PENDING",
+      });
+
+      // Usamos el fetch nativo de Node.js (disponible en Node 18+)
+      // El monto debe estar en centavos para los cálculos internos
+      const totalAmountInCents = Math.round(amount * 100);
+      const amountWithTax = Math.round(totalAmountInCents / 1.15);
+      const tax = totalAmountInCents - amountWithTax;
+
+      const response = await fetch(
+        "https://pay.payphonetodoesposible.com/api/Links",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${process.env.PAYPHONE_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: totalAmountInCents,
+            amountWithTax: amountWithTax,
+            amountWithoutTax: 0,
+            tax: tax,
+            currency: "USD",
+            clientTransactionId: shortId, // Aquí enviamos el ID de 15 chars
+            storeId: process.env.PAYPHONE_STORE_ID,
+            reference: `Pago servicio WinApp: ${uid.substring(0, 5)}`,
+            oneTime: true,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        logger.error("Error en PayPhone API:", errorData);
+        res.status(response.status).send(errorData);
+        return;
+      }
+
+      const link = await response.text();
+      // Limpiamos la URL (PayPhone a veces devuelve el string con comillas)
+      const cleanLink = link.trim().replace(/^"|"$/g, "");
+
+      res.status(200).json({
+        url: cleanLink,
+        shortId: shortId, // Lo devolvemos por si la app lo necesita
+      });
+    } catch (error) {
+      logger.error("Error al crear el link de pago:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  }
+);

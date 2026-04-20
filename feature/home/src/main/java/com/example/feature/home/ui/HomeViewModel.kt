@@ -3,6 +3,7 @@ package com.example.feature.home.ui
 import androidx.lifecycle.viewModelScope
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.industries.IndustriesType
+import com.avilesrodriguez.domain.model.payments.PaymentResponse
 import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralMetrics
@@ -18,6 +19,7 @@ import com.avilesrodriguez.domain.usecases.referral.GetReferralsByProvider
 import com.avilesrodriguez.domain.usecases.user.GetUserFlow
 import com.avilesrodriguez.domain.usecases.account.HasUser
 import com.avilesrodriguez.domain.usecases.account.SignOut
+import com.avilesrodriguez.domain.usecases.payments.CreatePaymentLinkUseCase
 import com.avilesrodriguez.domain.usecases.productProvider.DeactivateProductProvider
 import com.avilesrodriguez.domain.usecases.productProvider.GetAllProducts
 import com.avilesrodriguez.domain.usecases.productProvider.GetProductsByProvider
@@ -65,10 +67,14 @@ class HomeViewModel @Inject constructor(
     private val getAllProducts: GetAllProducts,
     private val getProductsByProviderRealTime: GetProductsByProviderRealTime,
     private val getProductsByProvider: GetProductsByProvider,
-    private val deactivateProductProvider: DeactivateProductProvider
+    private val deactivateProductProvider: DeactivateProductProvider,
+    private val createPaymentLinkUseCase: CreatePaymentLinkUseCase
 ) : BaseViewModel() {
     private val _userDataStore = MutableStateFlow<UserData?>(null)
     val userDataStore: StateFlow<UserData?> = _userDataStore
+
+    private val _paymentResponse = MutableStateFlow<PaymentResponse?>(null)
+    val paymentResponse: StateFlow<PaymentResponse?> = _paymentResponse
 
     private val _users = MutableStateFlow<List<UserData>>(emptyList())
     val users: StateFlow<List<UserData>> = _users.asStateFlow()
@@ -450,5 +456,19 @@ class HomeViewModel @Inject constructor(
         launchCatching {
             deactivateProductProvider(productId)
         }.invokeOnCompletion { _isLoading.value = false }
+    }
+
+    fun onPayProviderClick(){
+        launchCatching {
+            createPaymentLinkUseCase(currentUserId, 1.0).onSuccess { response ->
+                _paymentResponse.value = response
+            }.onFailure {
+                _paymentResponse.value = null
+            }
+        }
+    }
+
+    fun onPaymentLinkOpened(){
+        _paymentResponse.value = null
     }
 }
