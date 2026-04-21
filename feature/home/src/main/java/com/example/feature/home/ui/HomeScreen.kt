@@ -285,7 +285,8 @@ fun HomeScreen(
                                         detailContent = HomeDetailContent.ProductDetail(productId)
                                         coroutineScope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }
                                     },
-                                    onViewRealProducts = viewModel::onViewRealProducts
+                                    onViewRealProducts = viewModel::onViewRealProducts,
+                                    onPayClickByProvider = {viewModel.onPayClickByProvider()}
                                 )
                                 else -> {
                                     Box(Modifier.fillMaxSize())
@@ -372,7 +373,8 @@ fun HomeMainContent(
     products: List<ProductProvider>,
     onAddProductClick: () -> Unit,
     onProductClick: (String) -> Unit,
-    onViewRealProducts: () -> Unit
+    onViewRealProducts: () -> Unit,
+    onPayClickByProvider: () -> Unit
 ) {
     if (user != null) {
         when (user.type) {
@@ -415,7 +417,8 @@ fun HomeMainContent(
                 products = products,
                 onAddProductClick = onAddProductClick,
                 onProductClick = onProductClick,
-                onViewRealProducts = onViewRealProducts
+                onViewRealProducts = onViewRealProducts,
+                onPayClickByProvider = onPayClickByProvider
             )
         }
     } else {

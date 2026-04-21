@@ -1,5 +1,6 @@
 package com.example.feature.home.ui
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.industries.IndustriesType
@@ -458,9 +459,10 @@ class HomeViewModel @Inject constructor(
         }.invokeOnCompletion { _isLoading.value = false }
     }
 
-    fun onPayProviderClick(){
+    fun onPayClickByProvider(){
         launchCatching {
             createPaymentLinkUseCase(currentUserId, 1.0).onSuccess { response ->
+                Log.d("HOMEVIEWMODEL", "link de pago: ${response.url}")
                 _paymentResponse.value = response
             }.onFailure {
                 _paymentResponse.value = null

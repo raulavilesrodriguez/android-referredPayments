@@ -78,9 +78,21 @@ object PaymentModule {
 
     @Provides
     @Singleton
-    fun providePayPhoneApi(): PayPhoneApi {
+    fun provideOkHttpClient(): okhttp3.OkHttpClient {
+        val logging = okhttp3.logging.HttpLoggingInterceptor()
+        logging.setLevel(okhttp3.logging.HttpLoggingInterceptor.Level.BODY)
+        return okhttp3.OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun providePayPhoneApi(client: okhttp3.OkHttpClient): PayPhoneApi {
         return Retrofit.Builder()
-            .baseUrl("https://us-central1-winapp-dcad8.cloudfunctions.net/")
+            // Usamos la URL directa del servicio que te dio Firebase
+            .baseUrl("https://createpaymentlink-wylj67jajq-uc.a.run.app/")
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(PayPhoneApi::class.java)

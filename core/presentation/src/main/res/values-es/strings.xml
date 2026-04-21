@@ -135,6 +135,7 @@
     <string name="view_more_products">Ver más productos</string>
     <string name="view_recent_products">Ver productos recientes</string>
     <string name="no_have_products">No tienes productos</string>
+    <string name="comment_process_pay">Has superado el límite de referidos. Para seguir usando la aplicación, realiza un pago de $300 por 100 referidos más.</string>
     <string name="policies">Políticas</string>
     <string name="policies_title">Política de uso y programa de referidos</string>
     <string name="policies_intro">Esta aplicación ofrece un programa de referidos basado exclusivamente en compras reales y verificables de productos o servicios proporcionados         por empresas registradas en la plataforma.</string>

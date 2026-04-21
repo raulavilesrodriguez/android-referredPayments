@@ -275,6 +275,9 @@
     <string name="view_recent_products">View recent products</string>
     <string name="no_have_products">You don\'t have products</string>
 
+    <!-- Process Pay -->
+    <string name="comment_process_pay">You have exceeded the referral limit. To continue using the app, please proceed to payment of $300 for 100 more referrals.</string>
+
 
     <!-- Policies Screen -->
     <string name="policies">Policies</string>

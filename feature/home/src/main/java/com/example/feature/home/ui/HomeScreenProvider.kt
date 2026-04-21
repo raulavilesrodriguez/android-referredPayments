@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material.icons.outlined.Payment
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -60,6 +61,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -68,6 +70,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -109,7 +112,8 @@ fun HomeScreenProvider(
     products: List<ProductProvider>,
     onAddProductClick: () -> Unit,
     onProductClick: (String) -> Unit,
-    onViewRealProducts: () -> Unit
+    onViewRealProducts: () -> Unit,
+    onPayClickByProvider: () -> Unit
 ){
     val provider = user as UserData.Provider
 
@@ -257,15 +261,21 @@ fun HomeScreenProvider(
                         }
                     }
                 }
-                if(isSaturated){
+                if(isSaturated && provider.totalPayouts < provider.referralLimit){
                     item{
                         StatItem(
                             modifier = Modifier.fillMaxWidth(),
                             title = stringResource(R.string.message_to_provider_saturated),
                             value = stringResource(R.string.warning),
                             icon = Icons.Default.WarningAmber,
-                            color = MaterialTheme.colorScheme.errorContainer
+                            color = MaterialTheme.colorScheme.surfaceContainerLow,
+                            tintIcon = Color(0xFFF8DE22)
                         )
+                    }
+                }
+                if(provider.totalPayouts> provider.referralLimit){
+                    item {
+                        ButtonToPay(onPayClickByProvider)
                     }
                 }
                 item{
@@ -518,6 +528,50 @@ private fun BalanceCardProvider(
 }
 
 @Composable
+private fun ButtonToPay(onPayClickByProvider: () -> Unit){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(imageVector = Icons.Default.WarningAmber, contentDescription = null, tint = Color(0xFFF8DE22))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.comment_process_pay),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Justify,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .weight(1f)
+                )
+            }
+            Button(
+                onClick = onPayClickByProvider,
+                modifier = Modifier.padding(4.dp)
+            ){
+                Text(
+                    text = stringResource(R.string.pay),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun ProductRow(product: ProductProvider, onProductClick: (String) -> Unit, isRealProduct: Boolean){
     val createdAt = formatTimestamp(product.createdAt)
     val updatedAt = formatTimestamp(product.updatedAt)
@@ -709,7 +763,8 @@ fun HomeScreenProviderPreview(){
             products = productsFake,
             onAddProductClick = {},
             onProductClick = {},
-            onViewRealProducts = {}
+            onViewRealProducts = {},
+            onPayClickByProvider = {}
         )
     }
 }

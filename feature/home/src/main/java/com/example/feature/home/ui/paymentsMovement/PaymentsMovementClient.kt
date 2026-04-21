@@ -219,7 +219,7 @@ private fun ReferralPaidItem(
     referral: ReferralWithNames,
     client: UserData.Client,
 ){
-    val paidAt = formatTimeBasic(referral.referral.updatedAt ?: 0L)
+    val paidAt = formatTimeBasic(referral.referral.updatedAt)
     var expanded by remember { mutableStateOf(false) }
 
     Card(

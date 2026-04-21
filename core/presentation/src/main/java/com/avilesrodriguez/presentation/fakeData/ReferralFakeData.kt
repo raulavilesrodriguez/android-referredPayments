@@ -106,8 +106,9 @@ val userProvider = UserData.Provider(
     industry = IndustriesType.INSURANCE,
     companyDescription = "Seguros Atlantida, a insurance company",
     paymentRating = 4.5,
-    totalPayouts = 50,
-    website = "https://www.segurosatlantida.ec/personas"
+    totalPayouts = 101,
+    website = "https://www.segurosatlantida.ec/personas",
+    referralLimit = 100
 )
 
 val productProvider = ProductProvider(

@@ -5,6 +5,7 @@ import {
 import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
 import {onRequest} from "firebase-functions/v2/https";
+import axios from "axios";
 
 // Inicializa el SDK de administrador si no se ha hecho
 if (admin.apps.length === 0) {
@@ -255,82 +256,86 @@ export const payphoneWebhook = onRequest(
  * Genera un link de pago dinámico vinculado a un usuario de 28 caracteres.
  */
 export const createPaymentLink = onRequest(
-  {secrets: ["PAYPHONE_TOKEN", "PAYPHONE_STORE_ID"]},
+  {
+    secrets: ["PAYPHONE_TOKEN"],
+    region: "us-central1",
+    memory: "512MiB",
+  },
   async (req, res) => {
     if (req.method !== "POST") {
       res.status(405).send("Method Not Allowed");
       return;
     }
 
-    const {uid, amount} = req.body; // uid de 28 caracteres
-
-    if (!uid || !amount) {
-      res.status(400).send("Faltan parámetros: uid y amount son obligatorios");
-      return;
-    }
-
     try {
-      const db = admin.firestore();
-
-      // Creamos un ID aleatorio de 15 caracteres para PayPhone
-      const shortId = Math.random().toString(36).substring(2, 12)
-        .toUpperCase() + Date.now().toString().slice(-5);
-
-      // Guardamos la relación entre el ID corto y el UID real de 28 chars
-      await db.collection("payment_attempts").doc(shortId).set({
-        shortId: shortId,
-        uid: uid,
-        amount: amount,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        status: "PENDING",
-      });
-
-      // Usamos el fetch nativo de Node.js (disponible en Node 18+)
-      // El monto debe estar en centavos para los cálculos internos
-      const totalAmountInCents = Math.round(amount * 100);
-      const amountWithTax = Math.round(totalAmountInCents / 1.15);
-      const tax = totalAmountInCents - amountWithTax;
-
-      const response = await fetch(
-        "https://pay.payphonetodoesposible.com/api/Links",
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${process.env.PAYPHONE_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            amount: totalAmountInCents,
-            amountWithTax: amountWithTax,
-            amountWithoutTax: 0,
-            tax: tax,
-            currency: "USD",
-            clientTransactionId: shortId, // Aquí enviamos el ID de 15 chars
-            storeId: process.env.PAYPHONE_STORE_ID,
-            reference: `Pago servicio WinApp: ${uid.substring(0, 5)}`,
-            oneTime: true,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        logger.error("Error en PayPhone API:", errorData);
-        res.status(response.status).send(errorData);
+      const {uid} = req.body;
+      if (!uid) {
+        res.status(400).json({error: "Falta uid en el body"});
         return;
       }
 
-      const link = await response.text();
-      // Limpiamos la URL (PayPhone a veces devuelve el string con comillas)
-      const cleanLink = link.trim().replace(/^"|"$/g, "");
+      // 1. Obtener y verificar el token
+      const token = (process.env.PAYPHONE_TOKEN || "").trim();
+      const storeId = "dbbba11d-a472-466a-8831-bc01b4355e5b";
+
+      if (!token) {
+        throw new Error("Secret PAYPHONE_TOKEN no configurado");
+      }
+
+      // 2. Generar clientTransactionId ÚNICO (solo números)
+      const uniqueId = Date.now().toString().slice(-14);
+
+      // 3. Payload exacto que funcionó en Insomnia
+      const payload = {
+        amount: 115,
+        amountWithTax: 100,
+        amountWithoutTax: 0,
+        tax: 15,
+        service: 0,
+        tip: 0,
+        currency: "USD",
+        clientTransactionId: uniqueId,
+        storeId: storeId,
+        reference: "Pago WinApp",
+        oneTime: true,
+      };
+
+      logger.log(`Iniciando petición a PayPhone con Axios. ID: ${uniqueId}`);
+
+      // 4. Petición usando Axios
+      const response = await axios.post(
+        "https://pay.payphonetodoesposible.com/api/Links",
+        payload,
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // PayPhone devuelve el link (a veces como string plano con comillas)
+      const cleanLink = response.data.trim().replace(/^"|"$/g, "");
+
+      // 5. Guardar el intento para el webhook
+      await admin.firestore().collection("payment_attempts").doc(uniqueId).set({
+        uid: uid,
+        shortId: uniqueId,
+        amount: 1.15,
+        status: "PENDING",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
       res.status(200).json({
         url: cleanLink,
-        shortId: shortId, // Lo devolvemos por si la app lo necesita
+        shortId: uniqueId,
       });
-    } catch (error) {
-      logger.error("Error al crear el link de pago:", error);
-      res.status(500).send("Internal Server Error");
+    } catch (e: unknown) {
+      logger.error("Error en createPaymentLink (Axios):", e);
+      res.status(500).json({
+        error: "PayPhone API Error",
+        details: e,
+      });
     }
   }
 );

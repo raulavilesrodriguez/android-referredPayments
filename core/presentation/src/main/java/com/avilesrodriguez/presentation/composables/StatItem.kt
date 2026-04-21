@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun StatItem(modifier: Modifier, title: String, value: String, icon: ImageVector, color: Color) {
+fun StatItem(modifier: Modifier, title: String, value: String, icon: ImageVector, color: Color, tintIcon: Color = MaterialTheme.colorScheme.primary) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
@@ -33,7 +33,7 @@ fun StatItem(modifier: Modifier, title: String, value: String, icon: ImageVector
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.primary)
+            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(24.dp), tint = tintIcon)
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(text = value, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
