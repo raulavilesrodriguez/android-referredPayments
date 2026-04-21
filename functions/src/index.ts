@@ -154,16 +154,10 @@ export const onProviderProfileUpdated = onDocumentUpdated(
  * Webhook para recibir notificaciones de pagos desde PayPhone.
  */
 export const payphoneWebhook = onRequest(
-  {secrets: ["PAYPHONE_WEBHOOK_SECRET"]},
+  {
+    memory: "512MiB",
+  },
   async (req, res) => {
-    // Seguridad validar Token secreto en la URL (?secret=)
-    const WEBHOOK_SECRET = process.env.PAYPHONE_WEBHOOK_SECRET;
-    if (req.query.secret !== WEBHOOK_SECRET) {
-      logger.warn("Intento de acceso no autorizado al Webhook.");
-      res.status(403).json({"Response": false, "ErrorCode": "222"});
-      return;
-    }
-
     // Validar que sea un POST
     if (req.method !== "POST") {
       res.status(405).json({"Response": false, "ErrorCode": "222"});
