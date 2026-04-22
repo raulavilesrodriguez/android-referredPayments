@@ -89,6 +89,11 @@ class DetailProductViewModel @Inject constructor(
         (provider?.processingReferralsCount ?: 0) >= BusinessRules.MAX_PROCESSING_REFERRALS
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val providerNonPayment: StateFlow<Boolean> = providerUser.map { user ->
+        val provider = user as? UserData.Provider ?: return@map false
+        provider.totalPayouts >= provider.referralLimit
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     fun onAddReferClick(providerId: String, productId: String, openScreen: (String) -> Unit){
         val route = NavRoutes.NEW_REFERRAL
             .replace("{${NavRoutes.UserArgs.ID}}", providerId)

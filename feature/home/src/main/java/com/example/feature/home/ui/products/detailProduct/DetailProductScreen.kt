@@ -88,6 +88,7 @@ fun DetailProductScreen(
 
     val canReferUserClient by viewModel.canReferUserClient.collectAsState()
     val isProviderSaturated by viewModel.isProviderSaturated.collectAsState()
+    val providerNonPayment by viewModel.providerNonPayment.collectAsState()
     val product by viewModel.productState.collectAsState()
     val providerUser by viewModel.providerUser.collectAsState()
     val currentUser by viewModel.currentUser.collectAsState()
@@ -108,6 +109,7 @@ fun DetailProductScreen(
             onBackClick = onBackClick,
             canReferUserClient = canReferUserClient,
             isProviderSaturated = isProviderSaturated,
+            providerNonPayment = providerNonPayment,
             product = product,
             providerUser = provider,
             onAddReferClick = { viewModel.onAddReferClick(product.providerId, product.id, openScreen) },
@@ -149,6 +151,7 @@ private fun DetailProductScreenContent(
     onBackClick: () -> Unit,
     canReferUserClient: Boolean,
     isProviderSaturated: Boolean,
+    providerNonPayment: Boolean,
     product: ProductProvider,
     providerUser: UserData.Provider,
     onAddReferClick: () -> Unit,
@@ -178,7 +181,8 @@ private fun DetailProductScreenContent(
                     ButtonToRefer(
                         onReferClick = onAddReferClick,
                         isSaturated = isProviderSaturated,
-                        canReferUserClient = canReferUserClient
+                        canReferUserClient = canReferUserClient,
+                        providerNonPayment = providerNonPayment
                     )
                 }
                 is UserData.Provider -> {
@@ -195,6 +199,7 @@ private fun DetailProductScreenContent(
                 product = product,
                 provider = providerUser,
                 isSaturated = isProviderSaturated,
+                providerNonPayment = providerNonPayment,
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -205,7 +210,8 @@ private fun DetailProductScreenContent(
 fun ButtonToRefer(
     onReferClick: () -> Unit,
     isSaturated: Boolean,
-    canReferUserClient: Boolean
+    canReferUserClient: Boolean,
+    providerNonPayment: Boolean
 ){
     Surface(
         color = MaterialTheme.colorScheme.surface,
@@ -215,7 +221,7 @@ fun ButtonToRefer(
     ) {
         Button(
             onClick = { onReferClick() },
-            enabled = !isSaturated && canReferUserClient,
+            enabled = !isSaturated && canReferUserClient && !providerNonPayment,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 16.dp)
@@ -283,6 +289,7 @@ private fun ProfileProductProvider(
     product: ProductProvider,
     provider: UserData.Provider,
     isSaturated: Boolean,
+    providerNonPayment: Boolean,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -395,6 +402,24 @@ private fun ProfileProductProvider(
                 }
             }
         }
+        if(isSaturated && !providerNonPayment){
+            StatItem(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 16.dp),
+                title = stringResource(R.string.provider_saturated),
+                value = stringResource(R.string.warning),
+                icon = Icons.Default.WarningAmber,
+                color = MaterialTheme.colorScheme.errorContainer
+            )
+        }
+        if(providerNonPayment){
+            StatItem(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 16.dp),
+                title = stringResource(R.string.provider_non_payment),
+                value = stringResource(R.string.warning),
+                icon = Icons.Default.WarningAmber,
+                color = MaterialTheme.colorScheme.errorContainer
+            )
+        }
         InfoCard(
             icon = Icons.Default.Business,
             title = stringResource(R.string.settings_industry),
@@ -405,15 +430,6 @@ private fun ProfileProductProvider(
                 icon = Icons.Default.Language,
                 title = stringResource(R.string.website),
                 value = provider.website!!
-            )
-        }
-        if(isSaturated){
-            StatItem(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 16.dp),
-                title = stringResource(R.string.provider_saturated),
-                value = stringResource(R.string.warning),
-                icon = Icons.Default.WarningAmber,
-                color = MaterialTheme.colorScheme.errorContainer
             )
         }
         Spacer(modifier = Modifier.height(100.dp))
@@ -547,7 +563,8 @@ fun DetailProductScreenPreview() {
         DetailProductScreenContent(
             onBackClick = {},
             canReferUserClient = true,
-            isProviderSaturated = false,
+            isProviderSaturated = true,
+            providerNonPayment = true,
             product = productProvider,
             providerUser = userProvider,
             currentUser = userProvider,

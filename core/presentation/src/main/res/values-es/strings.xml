@@ -136,6 +136,9 @@
     <string name="view_recent_products">Ver productos recientes</string>
     <string name="no_have_products">No tienes productos</string>
     <string name="comment_process_pay">Has superado el límite de referidos. Para seguir usando la aplicación, realiza un pago de $300 por 100 referidos más.</string>
+    <string name="referral_limit">Límite de Referidos</string>
+    <string name="referral_limit_value">Límite de Referidos: %s</string>
+    <string name="provider_non_payment">Compañía temporalmente inhabilitada por falta de pago</string>
     <string name="policies">Políticas</string>
     <string name="policies_title">Política de uso y programa de referidos</string>
     <string name="policies_intro">Esta aplicación ofrece un programa de referidos basado exclusivamente en compras reales y verificables de productos o servicios proporcionados         por empresas registradas en la plataforma.</string>
@@ -181,9 +184,12 @@
     <string name="search_in_mail">Buscar en mensajes</string>
     <string name="emails_referral">Emails: %s</string>
     <string name="no_have_emails">No tienes mensajes</string>
+    <string name="accept">Aceptar</string>
     <string name="accept_and_view_contact">Aceptar y Ver Contacto</string>
     <string name="pending_acceptance_referred">Pendiente de la aceptación de tu referido por parte de la Compañía</string>
     <string name="content_referral_accepted">He aceptado tu referido. A partir de este momento iniciaré el proceso de contacto y venta. Te mantendré informado por este medio.</string>
+    <string name="content_referral_rejected">El referido ha sido revisado y no se continuará con su gestión en este momento. Gracias por compartirlo.</string>
+    <string name="content_referral_paid">El referido ha sido pagado exitosamente. Gracias por tu aporte.</string>
     <string name="view_process_details">Ver Proceso de Seguimiento</string>
     <string name="new_email">Nuevo Email</string>
     <string name="status_update">Actualización del Estado</string>
@@ -277,4 +283,6 @@
     <string name="search_products">Buscar Productos</string>
     <string name="product_name">Nombre del producto</string>
     <string name="product_description">Descripción del producto</string>
+    <string name="subject_referral_rejected">Referrido Rechazado</string>
+    <string name="subject_referral_paid">Referrido Pagado</string>
 </resources>

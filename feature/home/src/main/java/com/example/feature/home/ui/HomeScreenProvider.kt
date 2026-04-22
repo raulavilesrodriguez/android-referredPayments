@@ -196,6 +196,16 @@ fun HomeScreenProvider(
                             .clickable{onGraphMetricsView()},
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+                        val valueLimit = provider.referralLimit - provider.totalPayouts
+                        item{
+                            StatItem(
+                                modifier = Modifier.padding(start=4.dp),
+                                title = stringResource(R.string.referral_limit),
+                                value = if(valueLimit > 0) valueLimit.toString() else "0",
+                                icon = Icons.Default.Diamond,
+                                color = MaterialTheme.colorScheme.surface
+                            )
+                        }
                         item{
                             StatItem(
                                 modifier = Modifier.padding(start=4.dp),
@@ -261,6 +271,11 @@ fun HomeScreenProvider(
                         }
                     }
                 }
+                if(provider.totalPayouts>= provider.referralLimit){
+                    item {
+                        ButtonToPay(onPayClickByProvider)
+                    }
+                }
                 if(isSaturated && provider.totalPayouts < provider.referralLimit){
                     item{
                         StatItem(
@@ -271,11 +286,6 @@ fun HomeScreenProvider(
                             color = MaterialTheme.colorScheme.surfaceContainerLow,
                             tintIcon = Color(0xFFF8DE22)
                         )
-                    }
-                }
-                if(provider.totalPayouts> provider.referralLimit){
-                    item {
-                        ButtonToPay(onPayClickByProvider)
                     }
                 }
                 item{

@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.message.Message
+import com.avilesrodriguez.domain.model.message.MessageSystemKeys
 import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
@@ -154,12 +155,23 @@ class ReferralViewModel @Inject constructor(
                 referralId = referralId,
                 senderId = currentUserId,
                 receiverId = clientId,
-                subject = "$subject $nameReferral",
-                content = content,
+                subject = "${MessageSystemKeys.KEY_PREFIX}${MessageSystemKeys.REFERRAL_ACCEPTED_SUBJECT}|$nameReferral",
+                content = "${MessageSystemKeys.KEY_PREFIX}${MessageSystemKeys.REFERRAL_ACCEPTED_CONTENT}",
                 createdAt = System.currentTimeMillis()
             )
             saveMessage(systemMessage)
-            _isLoading.value = false
+        }.invokeOnCompletion { _isLoading.value = false }
+    }
+
+    fun onRejectReferral(){
+        val referralId = _referralState.value?.id?:return
+        launchCatching {
+            val updates = mapOf(
+                "status" to ReferralStatus.REJECTED.name,
+                "updatedAt" to System.currentTimeMillis()
+            )
+            updateReferralFields(referralId, updates)
+
         }
     }
 

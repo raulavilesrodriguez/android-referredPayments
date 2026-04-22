@@ -150,11 +150,16 @@
     <string name="search_in_mail">Search in mail</string>
     <string name="emails_referral">Emails: %s</string>
     <string name="no_have_emails">You don\'t have emails"</string>
+    <string name="accept">Accept</string>
     <string name="accept_and_view_contact">Accept and View Contact</string>
-    <string name="subject_referral_accepted">Referral Accepted: </string>
     <string name="pending_acceptance_referred">Pending acceptance of your referred by the Company</string>
+    <string name="subject_referral_accepted">Referral Accepted: </string>
     <string name="content_referral_accepted">I have accepted your referral. From this moment on,
         I will begin the contact and sales process. I will keep you informed through this channel.</string>
+    <string name="subject_referral_rejected">Referral Rejected</string>
+    <string name="content_referral_rejected">The referral has been reviewed and will not be pursued at this time. Thank you for your submission.</string>
+    <string name="subject_referral_paid">Referral Paid</string>
+    <string name="content_referral_paid">The referral has been successfully paid. Thank you for your contribution.</string>
     <string name="view_process_details">View Process Details</string>
     <string name="new_email">New Email</string>
     <string name="status_update">Status Update</string>
@@ -277,7 +282,9 @@
 
     <!-- Process Pay -->
     <string name="comment_process_pay">You have exceeded the referral limit. To continue using the app, please proceed to payment of $300 for 100 more referrals.</string>
-
+    <string name="referral_limit">Referral Limit</string>
+    <string name="referral_limit_value">Referral Limit: %s</string>
+    <string name="provider_non_payment">Company temporarily disabled due to non-payment</string>
 
     <!-- Policies Screen -->
     <string name="policies">Policies</string>

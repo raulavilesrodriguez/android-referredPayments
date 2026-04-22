@@ -60,6 +60,7 @@ import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.BasicButton
 import com.avilesrodriguez.presentation.composables.BasicToolbar
+import com.avilesrodriguez.presentation.composables.FormButtons
 import com.avilesrodriguez.presentation.composables.RatingBar
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
 import com.avilesrodriguez.presentation.ext.basicButton
@@ -111,6 +112,7 @@ fun ReferralScreen(
         onEmailClick = { viewModel.onEmailReferral(openScreen)},
         onPhoneClick = { viewModel.onPhoneReferral(openScreen)},
         onAcceptReferral = { viewModel.onAcceptReferral(subjectAccept, contentAccept, openScreen)},
+        onRejectReferral = { viewModel.onRejectReferral()},
         onProcessClick = { viewModel.onProcessReferral(openScreen)},
         unReadMessages = unReadMessages.toString(),
         showTopBar = showTopBar,
@@ -134,6 +136,7 @@ fun ReferralScreenContent(
     onEmailClick: () -> Unit,
     onPhoneClick: () -> Unit,
     onAcceptReferral: () -> Unit,
+    onRejectReferral: () -> Unit,
     onProcessClick: () -> Unit,
     unReadMessages: String,
     showTopBar: Boolean = true,
@@ -158,32 +161,26 @@ fun ReferralScreenContent(
             }
         },
         content = { paddingValues ->
-            if(!isLoading){
-                ProfileReferral(
-                    referral = referral,
-                    user = user,
-                    clientWhoReferred = clientWhoReferred,
-                    providerThatReceived = providerThatReceived,
-                    onNameClick = onNameClick,
-                    onEmailClick = onEmailClick,
-                    onPhoneClick = onPhoneClick,
-                    onAcceptReferral = onAcceptReferral,
-                    onProcessClick = onProcessClick,
-                    unReadMessages = unReadMessages,
-                    onRatingChanged = onRatingChanged,
-                    referralRating = referralRating,
-                    onFeedbackReasonChanged = onFeedbackReasonChanged,
-                    saveRatings = saveRatings,
-                    isLoadingRating = isLoadingRating,
-                    modifier = Modifier.padding(paddingValues)
-                )
-            } else{
-                Box(Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                }
-            }
+            ProfileReferral(
+                referral = referral,
+                user = user,
+                clientWhoReferred = clientWhoReferred,
+                providerThatReceived = providerThatReceived,
+                onNameClick = onNameClick,
+                onEmailClick = onEmailClick,
+                onPhoneClick = onPhoneClick,
+                onAcceptReferral = onAcceptReferral,
+                onRejectReferral = onRejectReferral,
+                onProcessClick = onProcessClick,
+                unReadMessages = unReadMessages,
+                onRatingChanged = onRatingChanged,
+                referralRating = referralRating,
+                onFeedbackReasonChanged = onFeedbackReasonChanged,
+                saveRatings = saveRatings,
+                isLoadingRating = isLoadingRating,
+                isLoading = isLoading,
+                modifier = Modifier.padding(paddingValues)
+            )
         }
     )
 }
@@ -198,6 +195,7 @@ fun ProfileReferral(
     onEmailClick: () -> Unit,
     onPhoneClick: () -> Unit,
     onAcceptReferral: () -> Unit,
+    onRejectReferral: () -> Unit,
     onProcessClick: () -> Unit,
     unReadMessages: String,
     onRatingChanged: (Double) -> Unit,
@@ -205,6 +203,7 @@ fun ProfileReferral(
     onFeedbackReasonChanged: (String) -> Unit,
     saveRatings: () -> Unit,
     isLoadingRating: Boolean,
+    isLoading: Boolean,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -369,10 +368,13 @@ fun ProfileReferral(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 if(isPending){
-                    BasicButton(
-                        text = R.string.accept_and_view_contact,
-                        modifier = Modifier.basicButton()
-                    ) { onAcceptReferral() }
+                    FormButtons(
+                        confirmText = R.string.accept,
+                        cancelText = R.string.reject,
+                        onConfirm = onAcceptReferral,
+                        onCancel = onRejectReferral,
+                        isSaving = isLoading
+                    )
                 } else {
                     InBox(onProcessClick = onProcessClick, unReadMessages = unReadMessages)
                 }
@@ -519,6 +521,7 @@ fun ProfileReferralPreview(){
             onEmailClick = {},
             onPhoneClick = {},
             onAcceptReferral = {},
+            onRejectReferral = {},
             onProcessClick = {},
             unReadMessages = "100",
             showTopBar = true,

@@ -3,6 +3,7 @@ package com.example.feature.home.ui
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.avilesrodriguez.domain.ext.normalizeName
+import com.avilesrodriguez.domain.model.businessRules.BusinessRules
 import com.avilesrodriguez.domain.model.industries.IndustriesType
 import com.avilesrodriguez.domain.model.payments.PaymentResponse
 import com.avilesrodriguez.domain.model.productsProvider.ProductProvider
@@ -461,7 +462,7 @@ class HomeViewModel @Inject constructor(
 
     fun onPayClickByProvider(){
         launchCatching {
-            createPaymentLinkUseCase(currentUserId, 1.0).onSuccess { response ->
+            createPaymentLinkUseCase(currentUserId, BusinessRules.PAYMENT_VALUE_PER_PROVIDER_TO_APP).onSuccess { response ->
                 Log.d("HOMEVIEWMODEL", "link de pago: ${response.url}")
                 _paymentResponse.value = response
             }.onFailure {

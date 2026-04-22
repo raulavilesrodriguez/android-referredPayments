@@ -24,19 +24,23 @@ class ReferralDataSource @Inject constructor(
 ) {
     suspend fun saveReferral(referral: Referral): Boolean {
         val referralFirestore = referral.toReferralFirestore()
-        val docRef = firestore.collection(REFERRALS_COLLECTION)
-            .document(referral.numberPhone)
+        val referralsCol = firestore.collection(REFERRALS_COLLECTION)
+        
         return try {
-            val transactionResult = firestore.runTransaction { transaction ->
-                val snapshot = transaction.get(docRef)
-                if (snapshot.exists()) {
-                    false
-                } else {
-                    transaction.set(docRef, referralFirestore.copy(id = docRef.id))
-                    true
-                }
-            }.await()
-            transactionResult == true
+            val activeReferral = referralsCol
+                .whereEqualTo(NUMBER_PHONE_FIELD, referral.numberPhone)
+                .whereIn(STATUS_FIELD, listOf("PENDING", "PROCESSING"))
+                .get()
+                .await()
+
+            if (!activeReferral.isEmpty) {
+                return false
+            }
+
+            // Si no hay procesos activos (o todos están REJECTED/PAID), creamos uno nuevo
+            val newDocRef = referralsCol.document() // ID aleatoria
+            newDocRef.set(referralFirestore.copy(id = newDocRef.id)).await()
+            true
         } catch (e: Exception){
             Log.e("ReferralDataSource", "Error saving referral", e)
             throw e
@@ -444,6 +448,7 @@ class ReferralDataSource @Inject constructor(
         private const val CLIENT_ID_FIELD = "clientId"
         private const val PROVIDER_ID_FIELD = "providerId"
         private const val STATUS_FIELD = "status"
+        private const val NUMBER_PHONE_FIELD = "numberPhone"
         private const val VOUCHER_URL_FIELD = "voucherUrl"
         private const val NAME_LOWER_CASE_FIELD = "nameLowercase"
         private const val CREATED_AT_FIELD = "createdAt"
