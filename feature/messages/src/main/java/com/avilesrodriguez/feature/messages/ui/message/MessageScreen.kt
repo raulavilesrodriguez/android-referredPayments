@@ -36,6 +36,7 @@ import com.avilesrodriguez.presentation.attachment.AttachmentDownload
 import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.ButtonWithIcon
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
+import com.avilesrodriguez.presentation.message.formatSystemMessage
 import com.avilesrodriguez.presentation.time.formatTimeBasic
 
 @Composable
@@ -172,10 +173,10 @@ private fun Email(
         InfoHeadEmail(title = stringResource(R.string.from), value = from, modifier = Modifier.padding(top=8.dp))
         InfoHeadEmail(title = stringResource(R.string.to), value = to)
         InfoHeadEmail(title = stringResource(R.string.date), value = formattedDate)
-        InfoHeadEmail(title = stringResource(R.string.subject), value = messageState.subject)
+        InfoHeadEmail(title = stringResource(R.string.subject), value = formatSystemMessage(messageState.subject))
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         Text(
-            text = messageState.content,
+            text = formatSystemMessage(messageState.content),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier

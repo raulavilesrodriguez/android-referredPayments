@@ -35,6 +35,7 @@ import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.fakeData.message1
 import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.fakeData.userProvider
+import com.avilesrodriguez.presentation.message.formatSystemMessage
 import com.avilesrodriguez.presentation.time.formatTimestamp
 
 @Composable
@@ -102,7 +103,7 @@ fun MessageItem(
                     )
                 }
                 Text(
-                    text = message.subject,
+                    text = formatSystemMessage(message.subject),
                     fontWeight = fontWeight,
                     style = MaterialTheme.typography.bodyMedium,
                     color = textColor,
@@ -110,7 +111,7 @@ fun MessageItem(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = message.content,
+                    text = formatSystemMessage(message.content),
                     fontWeight = if (isUnreadForMe) FontWeight.Medium else FontWeight.Normal,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

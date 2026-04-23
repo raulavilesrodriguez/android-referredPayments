@@ -76,6 +76,16 @@ class ReferralViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val countMessagesByReferral: StateFlow<Int> = _referralState
+        .filterNotNull()
+        .flatMapLatest { referral ->
+            getMessagesByReferral(referral.id).map { messages ->
+                messages.count()
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
     val currentUserId
         get() = currentUserIdUseCase()
 
@@ -139,7 +149,7 @@ class ReferralViewModel @Inject constructor(
         openScreen(route)
     }
 
-    fun onAcceptReferral(subject:String, content:String, openScreen: (String) -> Unit){
+    fun onAcceptReferral(){
         val referralId = _referralState.value?.id?:return
         val clientId = _referralState.value?.clientId?:return
         launchCatching {

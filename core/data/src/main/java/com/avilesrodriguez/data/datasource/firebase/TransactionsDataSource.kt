@@ -68,7 +68,7 @@ class TransactionsDataSource @Inject constructor(
 
     private fun sanitizeMap(map: Map<String, Any>): Map<String, Any> {
         return map.mapValues { entry ->
-            if ((entry.key == PAID_AT_FIELD || entry.key == CREATED_AT_FIELD) && entry.value is Long) {
+            if ((entry.key == UPDATE_AT || entry.key == CREATED_AT_FIELD) && entry.value is Long) {
                 Timestamp(Date(entry.value as Long))
             } else {
                 entry.value
@@ -84,7 +84,7 @@ class TransactionsDataSource @Inject constructor(
         private const val MONEY_PAID_PROVIDER_FIELD = "moneyPaid"
         private const val TOTAL_PAYOUTS_PROVIDER_FIELD = "totalPayouts"
         private const val PROCESSING_REFERRALS_COUNT = "processingReferralsCount"
-        private const val PAID_AT_FIELD = "paidAt"
+        private const val UPDATE_AT = "updatedAt"
         private const val CREATED_AT_FIELD = "createdAt"
     }
 }

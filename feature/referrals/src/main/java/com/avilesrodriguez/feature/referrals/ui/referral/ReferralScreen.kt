@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,9 +23,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Circle
-import androidx.compose.material.icons.filled.Diamond
-import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -40,7 +39,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -58,14 +56,11 @@ import com.avilesrodriguez.domain.model.referral.Referral
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
-import com.avilesrodriguez.presentation.composables.BasicButton
 import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.FormButtons
 import com.avilesrodriguez.presentation.composables.RatingBar
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
-import com.avilesrodriguez.presentation.ext.basicButton
 import com.avilesrodriguez.presentation.ext.toColor
-import com.avilesrodriguez.presentation.ext.toDisplayIcon
 import com.avilesrodriguez.presentation.ext.toDisplayName
 import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.fakeData.referral
@@ -96,10 +91,7 @@ fun ReferralScreen(
     val clientWhoReferred = viewModel.clientWhoReferred
     val providerThatReceived = viewModel.providerThatReceived
     val unReadMessages by viewModel.unReadMessages.collectAsState()
-
-    val subjectAccept = stringResource(R.string.subject_referral_accepted)
-    val contentAccept = stringResource(R.string.content_referral_accepted)
-
+    val countMessagesByReferral by viewModel.countMessagesByReferral.collectAsState()
 
     ReferralScreenContent(
         onBackClick = onBackClick,
@@ -111,7 +103,7 @@ fun ReferralScreen(
         onNameClick = { viewModel.onNameReferral(openScreen)},
         onEmailClick = { viewModel.onEmailReferral(openScreen)},
         onPhoneClick = { viewModel.onPhoneReferral(openScreen)},
-        onAcceptReferral = { viewModel.onAcceptReferral(subjectAccept, contentAccept, openScreen)},
+        onAcceptReferral = { viewModel.onAcceptReferral()},
         onRejectReferral = { viewModel.onRejectReferral()},
         onProcessClick = { viewModel.onProcessReferral(openScreen)},
         unReadMessages = unReadMessages.toString(),
@@ -120,7 +112,8 @@ fun ReferralScreen(
         referralRating = referralRating,
         onFeedbackReasonChanged = {viewModel.onFeedbackReasonChanged(it)},
         saveRatings = {viewModel.saveRatings()},
-        isLoadingRating = isLoadingRating
+        isLoadingRating = isLoadingRating,
+        countMessagesByReferral = countMessagesByReferral
     )
 }
 
@@ -145,6 +138,7 @@ fun ReferralScreenContent(
     onFeedbackReasonChanged: (String) -> Unit,
     saveRatings: () -> Unit,
     isLoadingRating: Boolean,
+    countMessagesByReferral: Int
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -179,6 +173,7 @@ fun ReferralScreenContent(
                 saveRatings = saveRatings,
                 isLoadingRating = isLoadingRating,
                 isLoading = isLoading,
+                countMessagesByReferral = countMessagesByReferral,
                 modifier = Modifier.padding(paddingValues)
             )
         }
@@ -204,6 +199,7 @@ fun ProfileReferral(
     saveRatings: () -> Unit,
     isLoadingRating: Boolean,
     isLoading: Boolean,
+    countMessagesByReferral: Int,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -216,6 +212,7 @@ fun ProfileReferral(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val isPending = referral?.status == ReferralStatus.PENDING
+        val isRejected = referral?.status == ReferralStatus.REJECTED
 
         when(user){
             is UserData.Client -> {
@@ -226,15 +223,37 @@ fun ProfileReferral(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 if(isPending){
-                    Text(
-                        text = stringResource(R.string.pending_acceptance_referred),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Card(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ){
+                        Text(
+                            text = stringResource(R.string.pending_acceptance_referred),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Justify,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
                 }
-                else{
+                else if(countMessagesByReferral == 0 && isRejected){
+                    Card(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ){
+                        Text(
+                            text = stringResource(R.string.content_referral_rejected),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Justify,
+                            modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                } else {
                     InBox(onProcessClick = onProcessClick, unReadMessages = unReadMessages)
                 }
                 if(referral != null) ReferralStatus(status = referral.status)
@@ -253,7 +272,7 @@ fun ProfileReferral(
                 )
                 val nameProvider = providerThatReceived?.name?.truncate(30)?:""
                 ItemProfile(R.drawable.step, title = R.string.referring, data = nameProvider)
-                if(referral?.status == ReferralStatus.PAID || referral?.status == ReferralStatus.REJECTED){
+                if(referral?.status == ReferralStatus.PAID || referral?.status == ReferralStatus.REJECTED && countMessagesByReferral > 0){
                     var showFeedbackOptions by rememberSaveable { mutableStateOf(false) }
                     var selectedReason by rememberSaveable { mutableStateOf<RatingReason?>(null) }
                     Column(
@@ -529,7 +548,8 @@ fun ProfileReferralPreview(){
             referralRating = 0.0,
             onFeedbackReasonChanged = {},
             saveRatings = {},
-            isLoadingRating = false
+            isLoadingRating = false,
+            countMessagesByReferral = 0
         )
     }
 }
