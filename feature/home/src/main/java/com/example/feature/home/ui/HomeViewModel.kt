@@ -133,6 +133,7 @@ class HomeViewModel @Inject constructor(
     private var userMetricsJob: Job? = null
     private var paginationJob: Job? = null
     private var realTimeJob: Job? = null
+    private var initJob: Job? = null
     val processingCountReferralsProvider: StateFlow<Int> = _referralsProvider.map {referrals ->
         val activeStatuses = listOf(ReferralStatus.PROCESSING, ReferralStatus.PENDING)
         referrals.count { it.status in activeStatuses }
@@ -162,7 +163,7 @@ class HomeViewModel @Inject constructor(
         get() = currentUserIdUseCase()
 
     init {
-        launchCatching {
+        initJob = launchCatching {
             if (hasUser()) {
                 launch {
                     getUserFlow(currentUserId).collect {
@@ -363,12 +364,20 @@ class HomeViewModel @Inject constructor(
     fun onActionClick(openScreen: (String) -> Unit, restartApp: (String) -> Unit, action: Int){
         when(ActionOptionsHome.getById(action)){
             ActionOptionsHome.POLICIES -> openScreen(NavRoutes.POLICIES)
-            ActionOptionsHome.SIGN_OUT -> launchCatching {
-                val userId = currentUserId
-                clearFCMToken(userId)
-                clearLocalCache()
-                signOut()
-                restartApp(NavRoutes.SPLASH)
+            ActionOptionsHome.SIGN_OUT -> {
+                initJob?.cancel()
+                referralsJob?.cancel()
+                realTimeJob?.cancel()
+                paginationJob?.cancel()
+                userMetricsJob?.cancel()
+
+                launchCatching {
+                    val userId = currentUserId
+                    clearFCMToken(userId)
+                    clearLocalCache()
+                    signOut()
+                    restartApp(NavRoutes.SPLASH)
+                }
             }
         }
     }
