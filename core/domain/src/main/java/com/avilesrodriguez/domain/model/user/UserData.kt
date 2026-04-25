@@ -49,6 +49,6 @@ sealed class UserData {
         val totalPayouts: Int = 0, // Cuantas veces ha pagado con exito
         val referralLimit: Int = 100,
         val website:String? = null,
-        val processingReferralsCount: Int = 0
+        val processingReferralsCount: Int = 0  //para que el provider procese sus referidos antes que le den mas
     ) : UserData()
 }

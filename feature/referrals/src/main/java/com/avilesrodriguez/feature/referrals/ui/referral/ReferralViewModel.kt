@@ -8,6 +8,7 @@ import com.avilesrodriguez.domain.ext.normalizeName
 import com.avilesrodriguez.domain.model.message.Message
 import com.avilesrodriguez.domain.model.message.MessageSystemKeys
 import com.avilesrodriguez.domain.model.referral.Referral
+import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.domain.model.validationRules.ValidationRules
@@ -17,6 +18,7 @@ import com.avilesrodriguez.domain.usecases.referral.GetReferralByIdFlow
 import com.avilesrodriguez.domain.usecases.user.GetUser
 import com.avilesrodriguez.domain.usecases.account.HasUser
 import com.avilesrodriguez.domain.usecases.message.SaveMessage
+import com.avilesrodriguez.domain.usecases.referral.GetReferralsByClientByProvider
 import com.avilesrodriguez.domain.usecases.referral.SaveRatingWithTransaction
 import com.avilesrodriguez.domain.usecases.referral.UpdateReferralFields
 import com.avilesrodriguez.presentation.R
@@ -49,7 +51,8 @@ class ReferralViewModel @Inject constructor(
     private val saveMessage: SaveMessage,
     private val getMessagesByReferral: GetMessagesByReferral,
     private val saveRatingWithTransaction: SaveRatingWithTransaction,
-    private val getReferralByIdFlow: GetReferralByIdFlow
+    private val getReferralByIdFlow: GetReferralByIdFlow,
+    private val getReferralsByClientByProvider: GetReferralsByClientByProvider
 ) : BaseViewModel() {
     private val _referralState = MutableStateFlow<Referral?>(null)
     val referralState: StateFlow<Referral?> = _referralState.asStateFlow()
@@ -64,7 +67,10 @@ class ReferralViewModel @Inject constructor(
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     private val _isLoadingRating = MutableStateFlow(false)
     val isLoadingRating: StateFlow<Boolean> = _isLoadingRating.asStateFlow()
+    private val _uiStateReferralsMetrics = MutableStateFlow(ReferralMetrics())
+    val uiStateReferralsMetrics: StateFlow<ReferralMetrics> = _uiStateReferralsMetrics.asStateFlow()
     private var loadJob: Job? = null
+    private var referralsJob: Job? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val unReadMessages: StateFlow<Int> = _referralState
@@ -100,6 +106,16 @@ class ReferralViewModel @Inject constructor(
         }
     }
 
+    private fun updateMetrics(referrals: List<Referral>) {
+        _uiStateReferralsMetrics.value = ReferralMetrics(
+            totalReferrals = referrals.size,
+            pendingReferrals = referrals.count { it.status == ReferralStatus.PENDING },
+            processingReferrals = referrals.count { it.status == ReferralStatus.PROCESSING },
+            rejectedReferrals = referrals.count { it.status == ReferralStatus.REJECTED },
+            paidReferrals = referrals.count { it.status == ReferralStatus.PAID }
+        )
+    }
+
     fun loadReferralInformation(referralId: String){
         if (_referralState.value?.id == referralId) return
         loadJob?.cancel()
@@ -128,6 +144,18 @@ class ReferralViewModel @Inject constructor(
             val providerDef = async { getUser(referral.providerId) }
             clientWhoReferred = clientDef.await()
             providerThatReceived = providerDef.await()
+            if(clientWhoReferred !=null && providerThatReceived != null)
+                loadReferralsByClient(referral.clientId, referral.providerId)
+        }
+    }
+
+    private fun loadReferralsByClient(clientId: String, providerId: String){
+        referralsJob?.cancel()
+        referralsJob = launchCatching {
+            getReferralsByClientByProvider(clientId, providerId)
+                .collect { referrals ->
+                    updateMetrics(referrals)
+                }
         }
     }
 

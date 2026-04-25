@@ -1,5 +1,6 @@
 package com.avilesrodriguez.feature.referrals.ui.referral
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,14 +22,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
@@ -39,6 +43,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,23 +54,31 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.domain.model.referral.Referral
+import com.avilesrodriguez.domain.model.referral.ReferralMetrics
 import com.avilesrodriguez.domain.model.referral.ReferralStatus
 import com.avilesrodriguez.domain.model.user.UserData
 import com.avilesrodriguez.presentation.R
+import com.avilesrodriguez.presentation.avatar.Avatar
+import com.avilesrodriguez.presentation.avatar.DEFAULT_AVATAR_USER
 import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.FormButtons
 import com.avilesrodriguez.presentation.composables.RatingBar
 import com.avilesrodriguez.presentation.composables.ToolBarWithIcon
+import com.avilesrodriguez.presentation.ext.referralMetricsColors
+import com.avilesrodriguez.presentation.ext.referralMetricsLabels
 import com.avilesrodriguez.presentation.ext.toColor
 import com.avilesrodriguez.presentation.ext.toDisplayName
+import com.avilesrodriguez.presentation.ext.toList
 import com.avilesrodriguez.presentation.ext.truncate
 import com.avilesrodriguez.presentation.fakeData.referral
 import com.avilesrodriguez.presentation.fakeData.userClient
 import com.avilesrodriguez.presentation.fakeData.userProvider
+import com.avilesrodriguez.presentation.graphs.ColumnVerticalGraph
 import com.avilesrodriguez.presentation.profile.ItemEditProfile
 import com.avilesrodriguez.presentation.profile.ItemProfile
 import com.avilesrodriguez.presentation.rating.RatingReason
@@ -92,6 +105,7 @@ fun ReferralScreen(
     val providerThatReceived = viewModel.providerThatReceived
     val unReadMessages by viewModel.unReadMessages.collectAsState()
     val countMessagesByReferral by viewModel.countMessagesByReferral.collectAsState()
+    val referralsMetrics by viewModel.uiStateReferralsMetrics.collectAsState()
 
     ReferralScreenContent(
         onBackClick = onBackClick,
@@ -113,7 +127,8 @@ fun ReferralScreen(
         onFeedbackReasonChanged = {viewModel.onFeedbackReasonChanged(it)},
         saveRatings = {viewModel.saveRatings()},
         isLoadingRating = isLoadingRating,
-        countMessagesByReferral = countMessagesByReferral
+        countMessagesByReferral = countMessagesByReferral,
+        referralMetrics = referralsMetrics
     )
 }
 
@@ -138,7 +153,8 @@ fun ReferralScreenContent(
     onFeedbackReasonChanged: (String) -> Unit,
     saveRatings: () -> Unit,
     isLoadingRating: Boolean,
-    countMessagesByReferral: Int
+    countMessagesByReferral: Int,
+    referralMetrics: ReferralMetrics
 ){
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -174,6 +190,7 @@ fun ReferralScreenContent(
                 isLoadingRating = isLoadingRating,
                 isLoading = isLoading,
                 countMessagesByReferral = countMessagesByReferral,
+                referralMetrics = referralMetrics,
                 modifier = Modifier.padding(paddingValues)
             )
         }
@@ -200,6 +217,7 @@ fun ProfileReferral(
     isLoadingRating: Boolean,
     isLoading: Boolean,
     countMessagesByReferral: Int,
+    referralMetrics: ReferralMetrics,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -419,8 +437,9 @@ fun ProfileReferral(
                     thickness = 1.dp,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                 )
-                val nameClient = clientWhoReferred?.name?.truncate(30)?:""
-                ItemProfile(R.drawable.step, title = R.string.referral, data = nameClient)
+                if (clientWhoReferred is UserData.Client) {
+                    InfoGeneralClient(title = R.string.referral, client = clientWhoReferred, referralMetrics = referralMetrics)
+                }
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -525,6 +544,91 @@ private fun InBox(
     }
 }
 
+@Composable
+private fun InfoGeneralClient(
+    @StringRes title: Int,
+    client: UserData.Client?,
+    referralMetrics: ReferralMetrics
+){
+    var expanded by remember { mutableStateOf(false) }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .clickable { expanded = !expanded },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Absolute.Left
+        ){
+            val photo = client?.photoUrl ?: DEFAULT_AVATAR_USER
+            Avatar(photoUri = photo, size = 42.dp)
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(
+                modifier =  Modifier
+                    .padding(start = 4.dp)
+                    .fillMaxWidth(0.80f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = stringResource(id = title),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = client?.name ?:"",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            if(expanded){
+                Icon(
+                    painter = painterResource(R.drawable.arrow_drop_up),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }else{
+                Icon(
+                    painter = painterResource(R.drawable.arrow_drop_down),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        if(expanded){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ){
+                Column(modifier = Modifier.weight(1f)) {
+                    /**
+                    ColumnVerticalGraph(
+                        values = referralMetrics.toList().map { it.toFloat() },
+                        labels = referralMetricsLabels(),
+                        colors = referralMetricsColors(),
+                        modifier = Modifier.padding(8.dp)
+                    ) */
+                }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun ProfileReferralPreview(){
@@ -549,7 +653,14 @@ fun ProfileReferralPreview(){
             onFeedbackReasonChanged = {},
             saveRatings = {},
             isLoadingRating = false,
-            countMessagesByReferral = 0
+            countMessagesByReferral = 0,
+            referralMetrics = ReferralMetrics(
+                totalReferrals = 10,
+                pendingReferrals = 3,
+                processingReferrals = 2,
+                rejectedReferrals = 1,
+                paidReferrals = 4
+            )
         )
     }
 }

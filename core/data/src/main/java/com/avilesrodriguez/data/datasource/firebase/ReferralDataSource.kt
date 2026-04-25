@@ -28,6 +28,7 @@ class ReferralDataSource @Inject constructor(
         
         return try {
             val activeReferral = referralsCol
+                .whereEqualTo(CLIENT_ID_FIELD, referral.clientId)
                 .whereEqualTo(NUMBER_PHONE_FIELD, referral.numberPhone)
                 .whereIn(STATUS_FIELD, listOf("PENDING", "PROCESSING"))
                 .get()
