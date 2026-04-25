@@ -616,13 +616,23 @@ private fun InfoGeneralClient(
                 horizontalArrangement = Arrangement.Center
             ){
                 Column(modifier = Modifier.weight(1f)) {
-                    /**
-                    ColumnVerticalGraph(
-                        values = referralMetrics.toList().map { it.toFloat() },
-                        labels = referralMetricsLabels(),
-                        colors = referralMetricsColors(),
-                        modifier = Modifier.padding(8.dp)
-                    ) */
+                    if(referralMetrics.totalReferrals > 0){
+                        ColumnVerticalGraph(
+                            values = referralMetrics.toList().map { it.toFloat() },
+                            labels = referralMetricsLabels(),
+                            colors = referralMetricsColors(),
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }else{
+                        Text(
+                            text=stringResource(R.string.not_yet_referrals),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp),
+                            textAlign = TextAlign.Justify
+                        )
+                    }
                 }
             }
         }

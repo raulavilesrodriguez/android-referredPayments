@@ -11,12 +11,19 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.offset
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.avilesrodriguez.presentation.R
 import io.github.koalaplot.core.bar.DefaultBar
 import io.github.koalaplot.core.bar.VerticalBarPlot
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
@@ -51,17 +58,17 @@ fun ColumnVerticalGraph(
             val range = 0f..(safeMax *1.2f)
             val yAxisModel = rememberFloatLinearAxisModel(range, minorTickCount = 0)
 
-            XYGraph(
+            XYGraph<String, Float>(
                 xAxisModel = xAxisModel,
                 yAxisModel = yAxisModel,
                 xAxisContent = AxisContent(
-                    labels = { it } ,
-                    title = { Text("") },
+                    labels = { Text(it, style = MaterialTheme.typography.labelSmall) },
+                    title = { Text(stringResource(R.string.status), style = MaterialTheme.typography.labelMedium) },
                     style = AxisStyle()
                 ),
                 yAxisContent = AxisContent(
-                    labels = { it.toString() },
-                    title = {Text("")},
+                    labels = { Text(it.toInt().toString(), style = MaterialTheme.typography.labelSmall) },
+                    title = { Text(stringResource(R.string.value), style = MaterialTheme.typography.labelMedium) },
                     style = AxisStyle()
                 ),
             ) {
@@ -69,10 +76,27 @@ fun ColumnVerticalGraph(
                     xData = labels,
                     yData = values,
                     bar = { index, _, _ ->
-                        DefaultBar(
-                            brush = SolidColor(colors[index]),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        Box(contentAlignment = Alignment.TopCenter) {
+                            DefaultBar(
+                                brush = SolidColor(colors[index]),
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                            )
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                                ),
+                                modifier = Modifier.offset(y = (-32).dp),
+                                shape = RoundedCornerShape(4.dp)
+                            ) {
+                                Text(
+                                    text = values[index].toInt().toString(),
+                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                        }
                     }
                 )
             }

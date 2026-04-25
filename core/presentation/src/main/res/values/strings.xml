@@ -22,6 +22,7 @@
     <string name="selected_date">Selected date</string>
     <string name="total">Total</string>
     <string name="warning">Warning!</string>
+    <string name="value">Value</string>
     <!-- Photo -->
     <string name="crop_image">Crop Image</string>
     <string name="cancel_crooper">Cancel</string>
@@ -143,6 +144,7 @@
     <string name="comment_save_name_referred">Please check that this name is correct</string>
     <string name="comment_save_email_referred">Please check that this email is correct</string>
     <string name="comment_save_phone_number_referred">Please check that this mobile phone number is correct</string>
+    <string name="not_yet_referrals">He/She has not yet sent referrals</string>
     <!-- Process Referral -->
     <string name="select_message">Select message</string>
     <string name="review_payment_process">Review Payment Process</string>
