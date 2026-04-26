@@ -22,6 +22,9 @@
     <string name="total">Total</string>
     <string name="warning">Advertencia!</string>
     <string name="value">Valor</string>
+    <string name="provider">Empresa</string>
+    <string name="receive_referrals">Quiero recibir referidos</string>
+    <string name="choose_account_type">Elige tu tipo de cuenta</string>
     <string name="crop_image">Recortar Imagen</string>
     <string name="cancel_crooper">Cancelar</string>
     <string name="confirm_crooper">Recortar</string>
@@ -287,4 +290,6 @@
     <string name="product_description">Descripción del producto</string>
     <string name="subject_referral_rejected">Referrido Rechazado</string>
     <string name="subject_referral_paid">Referrido Pagado</string>
+    <string name="client">Cliente</string>
+    <string name="refer_clients">Quiero referir clientes</string>
 </resources>

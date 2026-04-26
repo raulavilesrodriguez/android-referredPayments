@@ -15,6 +15,7 @@ import com.avilesrodriguez.presentation.ext.isValidPassword
 import com.avilesrodriguez.presentation.ext.passwordMatches
 import com.avilesrodriguez.presentation.navigation.NavRoutes
 import com.avilesrodriguez.presentation.snackbar.SnackbarManager
+import com.avilesrodriguez.presentation.user.getById
 import com.avilesrodriguez.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -31,6 +32,9 @@ class SignUpViewModel @Inject constructor(
 ): BaseViewModel() {
     private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState: StateFlow<SignUpUiState> = _uiState
+
+    private val _selectUserType = MutableStateFlow<UserType?>(null)
+    val selectUserType: StateFlow<UserType?> = _selectUserType
 
     private val email
         get() = _uiState.value.email
@@ -62,6 +66,11 @@ class SignUpViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(repeatPassword = repeatPassword)
     }
 
+    fun onSelectUserType(userType: Int){
+        val userType = UserType.getById(userType)
+        _selectUserType.value = userType
+    }
+
     fun onSignUpClick(openAndPopUp: (String, String) -> Unit){
         if(!email.isValidEmail()){
             SnackbarManager.showMessage(R.string.email_error)
@@ -77,10 +86,9 @@ class SignUpViewModel @Inject constructor(
         }
 
         launchCatching {
-            val isProvider = isAuthorizedProvider(email)
-            Log.d("SignUpViewModel", "isProvider: $isProvider")
             signUp(email, password)
-            val userType = if(isProvider) UserType.PROVIDER else UserType.CLIENT
+
+            val userType = _selectUserType.value
             val uid = currentUserIdUseCase()
 
             val newUser = when(userType){
@@ -94,6 +102,7 @@ class SignUpViewModel @Inject constructor(
                     name = name,
                     email = email
                 )
+                else -> {return@launchCatching}
             }
             saveUser(newUser)
             setNotFirstTime()

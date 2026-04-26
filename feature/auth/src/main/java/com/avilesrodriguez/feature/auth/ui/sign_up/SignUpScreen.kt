@@ -33,18 +33,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.avilesrodriguez.domain.model.user.UserType
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.BasicBottomBar
 import com.avilesrodriguez.presentation.composables.BasicButton
 import com.avilesrodriguez.presentation.composables.BasicTextButton
 import com.avilesrodriguez.presentation.composables.BasicToolbar
 import com.avilesrodriguez.presentation.composables.EmailField
+import com.avilesrodriguez.presentation.composables.MenuDropdownBox
 import com.avilesrodriguez.presentation.composables.NameField
 import com.avilesrodriguez.presentation.composables.PasswordField
 import com.avilesrodriguez.presentation.composables.RepeatPasswordField
 import com.avilesrodriguez.presentation.ext.basicButton
 import com.avilesrodriguez.presentation.ext.fieldModifier
 import com.avilesrodriguez.presentation.ext.textButton
+import com.avilesrodriguez.presentation.user.label
+import com.avilesrodriguez.presentation.user.options
 
 
 @Composable
@@ -53,6 +57,7 @@ fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel()
 ){
     val uiState by viewModel.uiState.collectAsState()
+    val selectUserType by viewModel.selectUserType.collectAsState()
 
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -72,6 +77,8 @@ fun SignUpScreen(
                 onRepeatPasswordChange = viewModel::onRepeatPasswordChange,
                 onSignUpClick = {viewModel.onSignUpClick(openAndPopUp)},
                 onNavigateToSignIn = {viewModel.onNavigateToSignIn(openAndPopUp)},
+                onUserTypeChange = viewModel::onSelectUserType,
+                selectUserType = selectUserType?.label(),
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -88,12 +95,15 @@ fun SignUpScreenContent(
     onRepeatPasswordChange: (String) -> Unit,
     onSignUpClick: () -> Unit,
     onNavigateToSignIn: () -> Unit,
+    onUserTypeChange: (Int) -> Unit,
+    selectUserType: Int?,
     modifier: Modifier = Modifier
 ){
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val userOptions = UserType.options()
     Column(
         modifier =
             modifier
@@ -115,6 +125,13 @@ fun SignUpScreenContent(
             )
         }
         Spacer(Modifier.height(4.dp))
+        MenuDropdownBox(
+            options = userOptions,
+            selectedOption = selectUserType?: R.string.choose_account_type,
+            title = R.string.account,
+            onClick = onUserTypeChange,
+            modifier = Modifier.fieldModifier()
+        )
         NameField(uiState.name, onNameChange, Modifier.fieldModifier(), R.string.placeholder_name)
         EmailField(uiState.email, onEmailChange, Modifier.fieldModifier())
         PasswordField(uiState.password, onPasswordChange, Modifier.fieldModifier())
@@ -141,7 +158,9 @@ fun SignUpScreenPreview(){
             onPasswordChange = {},
             onRepeatPasswordChange = {},
             onSignUpClick = {},
-            onNavigateToSignIn = {}
+            onNavigateToSignIn = {},
+            onUserTypeChange = {},
+            selectUserType = null
         )
     }
 }

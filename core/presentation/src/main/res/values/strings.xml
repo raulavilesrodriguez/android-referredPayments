@@ -23,6 +23,11 @@
     <string name="total">Total</string>
     <string name="warning">Warning!</string>
     <string name="value">Value</string>
+    <string name="client">Client</string>
+    <string name="provider">Provider</string>
+    <string name="refer_clients">I want to refer clients</string>
+    <string name="receive_referrals">I want to receive referrals</string>
+    <string name="choose_account_type">Choose your account type</string>
     <!-- Photo -->
     <string name="crop_image">Crop Image</string>
     <string name="cancel_crooper">Cancel</string>
