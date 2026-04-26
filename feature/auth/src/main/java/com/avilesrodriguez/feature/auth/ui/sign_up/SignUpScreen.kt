@@ -1,14 +1,19 @@
 package com.avilesrodriguez.feature.auth.ui.sign_up
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -17,8 +22,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.avilesrodriguez.presentation.R
 import com.avilesrodriguez.presentation.composables.BasicBottomBar
@@ -43,6 +56,7 @@ fun SignUpScreen(
 
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
             BasicToolbar(stringResource(R.string.sign_up))
         },
@@ -76,21 +90,40 @@ fun SignUpScreenContent(
     onNavigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier
 ){
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     Column(
         modifier =
             modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .background(color = MaterialTheme.colorScheme.background)
                 .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = if(isLandscape) Arrangement.Top else Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
+        if(!isLandscape){
+            Image(
+                painter = painterResource(id = R.drawable.logo_app),
+                contentDescription = "Logo",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(Color(0xFF0C2B4E), shape = CircleShape)
+                    .clip(CircleShape)
+            )
+        }
+        Spacer(Modifier.height(4.dp))
         NameField(uiState.name, onNameChange, Modifier.fieldModifier(), R.string.placeholder_name)
         EmailField(uiState.email, onEmailChange, Modifier.fieldModifier())
         PasswordField(uiState.password, onPasswordChange, Modifier.fieldModifier())
         RepeatPasswordField(uiState.repeatPassword, onRepeatPasswordChange, Modifier.fieldModifier())
-        BasicButton(text = R.string.sign_up, modifier = Modifier.basicButton()) { onSignUpClick() }
+        BasicButton(text = R.string.sign_up, modifier = Modifier.basicButton()) {
+            focusManager.clearFocus()
+            keyboardController?.hide()
+            onSignUpClick()
+        }
         BasicTextButton(R.string.navigate_sign_in, Modifier.textButton()) {
             onNavigateToSignIn()
         }
